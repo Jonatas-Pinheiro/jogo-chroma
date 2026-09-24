@@ -25,8 +25,10 @@ body.lightweight *{animation:none!important;transition:none!important}
 .switch{width:48px;height:27px;appearance:none;border-radius:18px;background:rgba(255,255,255,.18);border:1px solid var(--line);position:relative;cursor:pointer;flex:0 0 auto}
 .switch:after{content:'';position:absolute;width:21px;height:21px;top:2px;left:3px;border-radius:50%;background:#fff;transition:.18s;box-shadow:0 1px 3px #0006}.switch:checked{background:var(--g)}.switch:checked:after{left:22px}
 .theme-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.theme-choice button{height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);font:600 14px inherit;cursor:pointer}.theme-choice button.active{border-color:var(--y);box-shadow:0 0 0 2px #f5b30155}
-.opp.chroma .nm{border:3px solid transparent;border-radius:10px;padding:3px 6px;background:linear-gradient(#1b2550,#1b2550) padding-box,conic-gradient(var(--r),var(--y),var(--g),var(--b),var(--r)) border-box;box-shadow:0 0 12px rgba(245,179,1,.42)}
-.mytag{font-size:13px;color:var(--mut);font-weight:600;white-space:nowrap;padding:3px 7px;border:3px solid transparent;border-radius:9px}.mytag.chroma{color:var(--ink);background:linear-gradient(#1b2550,#1b2550) padding-box,conic-gradient(var(--r),var(--y),var(--g),var(--b),var(--r)) border-box;box-shadow:0 0 12px rgba(245,179,1,.42)}
+.opp.chroma .avatar{border-color:transparent;background:linear-gradient(#1b2550,#1b2550) padding-box,conic-gradient(var(--r),var(--y),var(--g),var(--b),var(--r)) border-box;box-shadow:0 0 14px rgba(245,179,1,.55)}
+.opp.chroma .nm,.opp.chroma .cnt{background:linear-gradient(90deg,var(--r),var(--y),var(--g),var(--b),var(--r));background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbowText 2.4s linear infinite}
+.mytag.chroma{color:var(--ink);background:transparent;border-color:transparent;box-shadow:none}.mytag.chroma .avatar{border-color:transparent;background:linear-gradient(#1b2550,#1b2550) padding-box,conic-gradient(var(--r),var(--y),var(--g),var(--b),var(--r)) border-box;box-shadow:0 0 12px rgba(245,179,1,.45)}.mytag.chroma .my-name{background:linear-gradient(90deg,var(--r),var(--y),var(--g),var(--b),var(--r));background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbowText 2.4s linear infinite}@keyframes rainbowText{to{background-position:220% center}}
+.mytag{font-size:13px;color:var(--mut);font-weight:600;white-space:nowrap;padding:3px 7px;border:3px solid transparent;border-radius:9px}
 .room-config{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0}.room-config label{font-size:13px;color:var(--mut)}.room-config input{margin-top:5px;text-align:center;padding:0 8px}.timer{font-size:14px;font-weight:700;color:var(--y);white-space:nowrap;background:rgba(245,179,1,.12);border:1px solid rgba(245,179,1,.35);border-radius:10px;padding:5px 9px}.timer.urgent{color:#ff8993;border-color:#ff8993;background:rgba(230,57,70,.16)}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -76,10 +78,11 @@ button{font-family:inherit}
 input.txt{width:100%;height:50px;border-radius:14px;border:2px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);font:500 18px 'Fredoka',system-ui,sans-serif;padding:0 16px;outline:none}
 input.txt:focus{border-color:var(--y)}
 .profile-box{display:grid;grid-template-columns:82px 1fr;gap:12px;align-items:center;padding:10px 0 2px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.profile-photo{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,var(--r),var(--b));border:3px solid var(--ink);box-shadow:0 3px 10px #0005;font-size:30px;font-weight:700;color:#fff;text-shadow:0 1px 2px #0008}
+.profile-photo{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,var(--r),var(--b));border:4px solid var(--ink);box-shadow:0 3px 10px #0005;font-size:30px;font-weight:700;color:#fff;text-shadow:0 1px 2px #0008;position:relative}
 .profile-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .profile-fields{display:flex;flex-direction:column;gap:7px;min-width:0}.profile-fields label{font-size:13px;color:var(--mut)}
-.profile-fields input[type=file]{width:100%;font:500 12px inherit;color:var(--mut)}
+.profile-upload{display:flex;align-items:center;justify-content:center;gap:6px;height:38px;border-radius:11px;border:1px solid var(--y);background:rgba(245,179,1,.14);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;transition:transform .08s,background .15s}.profile-upload:active{transform:scale(.97)}.profile-upload:hover{background:rgba(245,179,1,.25)}
+#profilePhoto{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);font:500 14px inherit;padding:0 9px;outline:none}
 .profile-hint{grid-column:1/-1;color:var(--mut);font-size:12px;margin:-3px 0 2px}
 #inCode{text-align:center;letter-spacing:.35em;font-weight:700;text-transform:uppercase}
@@ -114,24 +117,39 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
 .opt{display:flex;align-items:center;gap:12px;font-size:16px;padding:6px 2px;line-height:1.3}
 .opt input{width:22px;height:22px;accent-color:var(--y);flex:0 0 auto}
 .opt small{display:block;color:var(--mut);font-size:13px}
-.modes{display:flex;flex-direction:column;gap:2px;margin-bottom:4px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.mode-card{position:relative;display:block;border-radius:16px;overflow:hidden;cursor:pointer;
+  background:rgba(255,255,255,.05);border:3px solid var(--line);transition:border-color .15s,transform .08s}
+.mode-card:active{transform:scale(.97)}
+.mode-card input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.mode-card-img{position:relative;width:100%;aspect-ratio:16/10;
+  background:linear-gradient(135deg,rgba(255,255,255,.09),rgba(255,255,255,.02)) center/cover no-repeat}
+.mode-card-body{padding:7px 9px 9px;text-align:left}
+.mode-card-title{display:block;font-weight:700;font-size:14px;line-height:1.15}
+.mode-card-desc{display:block;color:var(--mut);font-size:11px;margin-top:2px;line-height:1.25}
+.mode-card:has(input:checked){border-color:var(--y);box-shadow:0 0 0 2px rgba(245,179,1,.35)}
+.mode-card:has(input:checked) .mode-card-body{background:rgba(245,179,1,.12)}
+.mode-card:has(input:checked) .mode-card-img::after{content:'✓';position:absolute;top:6px;right:6px;
+  width:22px;height:22px;border-radius:50%;background:var(--y);color:#241a00;font-weight:800;
+  font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+#modeWrap.locked .mode-card{cursor:not-allowed;opacity:.65}
 .modetag{font-size:12px;font-weight:600;color:var(--y);background:rgba(245,179,1,.15);border:1px solid rgba(245,179,1,.4);border-radius:10px;padding:2px 10px;display:none}
 .modetag.on{display:inline-block}
 .wait{color:var(--mut);text-align:center;font-size:16px;padding:6px}
 
 /* ---------- jogo ---------- */
-#game{--card-w:64px;--card-h:96px}
+#game{--card-w:64px;--card-h:96px;position:relative}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0;gap:10px}
 .roomtag{font-size:15px;color:var(--mut);font-weight:500}
 .roomtag b{color:var(--ink);letter-spacing:.12em}
 .topbar button{height:34px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--ink);font-size:14px;cursor:pointer}
 #opps{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px 10px 0;min-height:62px}
-.opp{min-width:74px;max-width:120px;background:rgba(255,255,255,.07);border:2px solid transparent;border-radius:14px;padding:6px 10px;text-align:center;transition:border-color .2s,background .2s}
-.opp.turn{border-color:var(--y);background:rgba(245,179,1,.15);animation:glow 1.4s ease-in-out infinite}
-.opp .nm{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.player-line{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}.player-line .nm{min-width:0}
-.avatar{width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;overflow:hidden;flex:0 0 auto;background:linear-gradient(135deg,var(--r),var(--b));border:2px solid rgba(255,255,255,.85);font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px #0008}.avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.gender{font-size:15px;line-height:1;flex:0 0 auto}.mytag{display:flex;align-items:center;gap:6px;max-width:150px;overflow:hidden;text-overflow:ellipsis}.mytag .avatar{width:25px;height:25px;font-size:11px}.mytag .my-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opp{min-width:76px;max-width:124px;background:transparent;border:2px solid transparent;border-radius:18px;padding:5px 8px 7px;text-align:center;transition:border-color .2s,background .2s}
+.opp.turn{border-color:transparent;background:transparent;animation:none}.opp.turn .avatar{box-shadow:0 0 0 4px rgba(245,179,1,.28),0 0 16px rgba(245,179,1,.5)}
+.opp .nm{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.player-line{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0}.player-line .nm{min-width:0}
+.avatar{width:48px;height:48px;border-radius:50%;display:inline-grid;place-items:center;overflow:hidden;flex:0 0 auto;background:linear-gradient(135deg,var(--r),var(--b));border:3px solid rgba(255,255,255,.85);font-size:19px;font-weight:700;color:#fff;text-shadow:0 1px 2px #0008;box-shadow:0 3px 10px #0005}.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.gender{font-size:15px;line-height:1;flex:0 0 auto}.mytag{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;max-width:180px;overflow:visible}.mytag .avatar{width:25px;height:25px;font-size:11px}.mytag .my-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chat-bubble{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff;color:#172044;border-radius:10px;padding:4px 8px;font-size:12px;font-weight:600;line-height:1.15;box-shadow:0 2px 7px rgba(0,0,0,.25);animation:chatIn .28s cubic-bezier(.2,1.35,.4,1)}.opp .chat-bubble{margin-top:5px}.mytag .chat-bubble{text-align:right;max-width:180px}@keyframes chatIn{from{opacity:0;transform:translateY(-7px) scale(.86)}65%{opacity:1;transform:translateY(2px) scale(1.04)}to{opacity:1;transform:none}}
 .opp .cnt{display:flex;align-items:center;justify-content:center;gap:6px;font-size:18px;font-weight:700}
 .opp .cnt.one{color:var(--y)}
 .opp .w{font-size:12px;color:var(--mut);min-height:14px}
@@ -165,6 +183,12 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
 #btnChroma.urgent{animation:pulse 0.7s ease-in-out infinite}
 #btnCatch{background:var(--r);color:#fff}
 #btnPass{background:rgba(255,255,255,.15);color:var(--ink)}
+#quickChatBtn{position:absolute;right:12px;bottom:calc(env(safe-area-inset-bottom) + 142px);z-index:12;width:46px;height:46px;border:0;border-radius:50%;background:#fff;color:#172044;font-size:23px;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.35);cursor:pointer}
+#quickChatBtn:active{transform:scale(.94)}
+#quickChatMenu{position:absolute;right:12px;bottom:calc(env(safe-area-inset-bottom) + 196px);z-index:13;width:min(76vw,250px);display:none;flex-direction:column;gap:6px;padding:9px;background:rgba(12,16,36,.94);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
+#quickChatMenu.on{display:flex}
+#quickChatMenu button{border:0;border-radius:10px;background:#fff;color:#172044;text-align:left;padding:9px 11px;font:600 14px 'Fredoka',system-ui,sans-serif;cursor:pointer}
+#quickChatMenu button:active{transform:scale(.98)}
 
 #hand{display:flex;overflow-x:auto;overflow-y:hidden;padding:20px 14px 16px;min-height:calc(var(--card-h) + 42px);-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #hand::-webkit-scrollbar{display:none}
@@ -179,8 +203,30 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
 
 .card.flying{position:fixed;z-index:30;pointer-events:none;margin:0;will-change:transform;box-shadow:0 16px 32px rgba(0,0,0,.5)}
 .mutebtn{width:40px;height:34px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--ink);font-size:16px;cursor:pointer;padding:0}
-#home{position:relative}
+#home{position:relative;padding-bottom:calc(env(safe-area-inset-bottom) + 88px)}
 #home>.mutebtn{position:absolute;top:calc(env(safe-area-inset-top) + 10px);right:12px;z-index:5}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:15;display:none;justify-content:center;gap:8px;
+  padding:8px 14px calc(env(safe-area-inset-bottom) + 8px);
+  background:rgba(8,10,28,.72);border-top:1px solid var(--line);backdrop-filter:blur(10px)}
+.dock.on{display:flex}
+.dock-btn{flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 4px 6px;border:none;border-radius:14px;background:transparent;color:var(--mut);
+  font:500 11px 'Fredoka',system-ui,sans-serif;cursor:pointer;transition:background .15s,color .15s}
+.dock-btn:active{transform:scale(.95)}
+.dock-btn .dock-ico{font-size:22px;line-height:1}
+.dock-btn.active{color:var(--ink);background:rgba(245,179,1,.16)}
+body.light .dock{background:rgba(255,255,255,.78)}
+body.light .dock-btn.active{background:rgba(245,179,1,.22)}
+.ping-badge{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:12px;z-index:16;
+  display:none;align-items:center;gap:6px;background:rgba(8,10,28,.65);border:1px solid var(--line);
+  border-radius:20px;padding:6px 11px;font:600 12px 'Fredoka',system-ui,sans-serif;color:var(--ink);
+  backdrop-filter:blur(6px)}
+.ping-badge.show{display:flex}
+.ping-dot{width:9px;height:9px;border-radius:50%;background:#666;box-shadow:0 0 6px currentColor;flex:0 0 auto}
+.ping-dot.good{background:var(--g);color:var(--g)}
+.ping-dot.mid{background:var(--y);color:var(--y)}
+.ping-dot.bad{background:var(--r);color:var(--r)}
+body.light .ping-badge{background:rgba(255,255,255,.78)}
 .topbar .mutebtn{padding:0}
 .topbar .btns{display:flex;gap:8px}
 
@@ -222,6 +268,24 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
 .rank-me{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}.rank-me div{background:rgba(255,255,255,.07);border-radius:12px;padding:10px}.rank-me small{display:block;color:var(--mut);font-size:12px}.rank-me b{font-size:18px}
 .rank-list{display:flex;flex-direction:column;gap:8px}.rank-row{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid transparent;border-radius:14px;padding:9px 12px}.rank-row.me{border-color:var(--y);background:rgba(245,179,1,.14)}.rank-pos{font-size:22px;font-weight:700;text-align:center}.rank-who{min-width:0}.rank-who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-who small{color:var(--mut)}.rank-stat{text-align:right;color:var(--mut);font-size:12px}.rank-stat strong{display:block;color:var(--ink);font-size:17px}.rank-progress{height:6px;background:rgba(255,255,255,.12);border-radius:5px;margin-top:5px;overflow:hidden}.rank-progress i{display:block;height:100%;background:linear-gradient(90deg,var(--r),var(--y),var(--g),var(--b));border-radius:5px}
 .tourney-meta{font-size:13px;color:var(--mut);text-align:center}.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:7px;align-items:end}.podium-card{background:rgba(255,255,255,.08);border-radius:16px;padding:12px 6px;text-align:center}.podium-card.first{background:rgba(245,179,1,.22);transform:translateY(-10px)}.podium-card .medal{font-size:32px}.podium-card b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.podium-card small{color:var(--mut)}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ach-card{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.4;filter:grayscale(1)}
+.ach-card.unlocked{opacity:1;filter:none;border-color:rgba(245,179,1,.5);background:rgba(245,179,1,.1)}
+.ach-card .ach-ico{font-size:30px;line-height:1}
+.ach-card b{font-size:13px}
+.ach-card small{color:var(--mut);font-size:11px;line-height:1.3}
+#settings,#achievements,#mail{align-items:center;overflow-y:auto;padding:18px 0 calc(env(safe-area-inset-bottom) + 100px)}
+.mail-list{width:100%;max-width:460px;display:flex;flex-direction:column;gap:10px}
+.mail-item{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:4px}
+.mail-item.unread{border-color:var(--y);background:rgba(245,179,1,.1)}
+.mail-item h3{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+.mail-item .mail-dot{width:8px;height:8px;border-radius:50%;background:var(--r,#e0453e);flex:0 0 auto}
+.mail-item small{color:var(--mut);font-size:12px}
+.mail-item p{margin:2px 0 0;font-size:14px;line-height:1.4}
+.mail-empty{color:var(--mut);text-align:center;padding:40px 20px;font-size:14px}
+.dock-ico-wrap{position:relative;display:inline-flex}
+.dock-badge{position:absolute;top:-3px;right:-5px;width:10px;height:10px;border-radius:50%;background:var(--r,#e0453e);box-shadow:0 0 0 2px rgba(8,10,28,.9);display:none}
+.dock-badge.show{display:block}
 @media(max-width:480px){.rank-me{grid-template-columns:1fr 1fr}.rank-me div:last-child{grid-column:1/-1}.rank-row{grid-template-columns:34px 1fr auto}.rank-stat{font-size:11px}}
 
 </style>
@@ -240,6 +304,7 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
       <div class="profile-photo" id="profilePreview">?</div>
       <div class="profile-fields">
         <label for="profilePhoto">Foto de perfil</label>
+        <label class="profile-upload" for="profilePhoto">📷 Escolher foto</label>
         <input id="profilePhoto" type="file" accept="image/*">
         <label for="profileGender">Gênero</label>
         <select id="profileGender" class="profile-select">
@@ -254,7 +319,6 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
     </div>
     <button class="btn primary" id="btnCreate">Criar sala</button>
     <button class="btn good" id="btnRanking">🏆 Placar</button>
-    <button class="btn" id="btnSettings">⚙ Configurações</button>
     <div class="or"><span>ou entre na sala de um amigo</span></div>
     <div class="row">
       <input id="inCode" class="txt" maxlength="5" placeholder="CÓDIGO" autocapitalize="characters" autocomplete="off" spellcheck="false">
@@ -272,6 +336,7 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
     <p><b>Modo Efeitos</b> dá poder ao número <b>0</b>: toda vez que alguém joga um 0, todas as mãos da mesa passam adiante, uma posição, no sentido do jogo.</p>
   </details>
 </div>
+
 
 
 <!-- ===== PLACAR ===== -->
@@ -298,10 +363,26 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
   <div class="panel" style="margin-top:14px">
     <ul class="players" id="lobPlayers"></ul>
     <div class="modes" id="modeWrap">
-      <label class="opt"><input type="radio" name="mode" value="classic"><span>Clássico<small>Regras tradicionais de UNO</small></span></label>
-      <label class="opt"><input type="radio" name="mode" value="caos"><span>Caos<small>+6, +10, Bloqueio Duplo e Coringa Troca (troca sua mão com um adversário aleatório)</small></span></label>
-      <label class="opt"><input type="radio" name="mode" value="effects"><span>Efeitos<small>Ao jogar um 0, todas as mãos passam para o próximo jogador</small></span></label>
-      <label class="opt"><input type="radio" name="mode" value="tournament"><span>🏆 Torneio<small>Partidas consecutivas, pontos por colocação e pódio final</small></span></label>
+      <label class="mode-card">
+        <input type="radio" name="mode" value="classic" checked>
+        <div class="mode-card-img" style="background-image:url('https://i.ibb.co/jPsKygd2/file-000000005310820e9822a061f3024d92.png')"></div>
+        <div class="mode-card-body"><span class="mode-card-title">Clássico</span><small class="mode-card-desc">Regras tradicionais de UNO</small></div>
+      </label>
+      <label class="mode-card">
+        <input type="radio" name="mode" value="caos">
+        <div class="mode-card-img" style="background-image:url('https://i.ibb.co/8D6jmkkv/file-00000000e2ac820e8bffa627e1898426.png')"></div>
+        <div class="mode-card-body"><span class="mode-card-title">Caos</span><small class="mode-card-desc">+6, +10, Bloqueio Duplo e Coringa Troca</small></div>
+      </label>
+      <label class="mode-card">
+        <input type="radio" name="mode" value="effects">
+        <div class="mode-card-img" style="background-image:url('MODO-CLASSICO.png')"></div>
+        <div class="mode-card-body"><span class="mode-card-title">Efeitos</span><small class="mode-card-desc">Ao jogar um 0, as mãos passam adiante</small></div>
+      </label>
+      <label class="mode-card">
+        <input type="radio" name="mode" value="tournament">
+        <div class="mode-card-img" style="background-image:url('https://i.ibb.co/PzmDgq5Q/file-000000005bf0820e828f67ad09e9a2ab.png')"></div>
+        <div class="mode-card-body"><span class="mode-card-title">🏆 Torneio</span><small class="mode-card-desc">Pontos por colocação e pódio final</small></div>
+      </label>
     </div>
     <label class="opt" id="optWrap"><input type="checkbox" id="optStack"><span>Empilhar +2/+4/+6/+10<small>Quem recebe pode devolver outra carta de compra em vez de comprar</small></span></label>
     <label class="opt" id="optDumpWrap"><input type="checkbox" id="optDump"><span>Descarte por cor<small>Adiciona a carta BURACO NEGRO, que devolve suas outras cartas da mesma cor ao monte</small></span></label>
@@ -345,6 +426,8 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
     <button id="btnPass">Passar a vez</button>
   </div>
   <div id="hand"></div>
+  <button id="quickChatBtn" type="button" aria-label="Abrir mensagens rápidas" title="Mensagens rápidas">💬</button>
+  <div id="quickChatMenu" aria-label="Mensagens rápidas"></div>
 </div>
 
 <!-- ===== OVERLAYS ===== -->
@@ -376,19 +459,49 @@ select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid
   </div>
 </div>
 
-<div class="ov" id="settingsOv">
-  <div class="sheet">
-    <h2>Configurações</h2>
+<div id="achievements" class="screen">
+  <div class="rank-top"><button class="btn ghost" id="achBack">← Menu</button><h1>🏅 CONQUISTAS</h1><span></span></div>
+  <div class="rank-panel">
+    <div class="ach-grid" id="achGrid"></div>
+  </div>
+</div>
+
+<div id="settings" class="screen">
+  <div class="rank-top"><button class="btn ghost" id="settingsBack">← Menu</button><h1>⚙️ AJUSTES</h1><span></span></div>
+  <div class="rank-panel">
     <div class="settings-list">
       <label class="settings-row"><span><b>Modo leve</b><small>Remova as animações para diminuir o gasto de internet</small></span><input class="switch" type="checkbox" id="lightMode"></label>
+      <label class="settings-row"><span><b>Indicador de ping</b><small>Mostra a qualidade da conexão durante as partidas</small></span><input class="switch" type="checkbox" id="pingMode"></label>
       <div class="settings-row"><span><b>Tema</b><small>Escolha a aparência do jogo</small><div class="theme-choice"><button id="themeLight">Modo Claro</button><button id="themeDark">Modo Escuro (Padrão)</button></div></span></div>
       <div class="settings-row"><span><b>Áudio</b><small>Ative ou desative os efeitos sonoros</small></span><button class="btn" id="settingsMute" type="button">🔊 Som ligado</button></div>
     </div>
-    <button class="btn ghost" id="settingsClose">Fechar</button>
   </div>
 </div>
+<div id="mail" class="screen">
+  <div class="rank-top"><button class="btn ghost" id="mailBack">← Menu</button><h1>✉️ CORREIO</h1><span></span></div>
+  <div class="mail-list" id="mailList"></div>
+</div>
 <div class="ov" id="busy"><span id="busyTxt">Conectando…</span></div>
+
+<nav class="dock on" id="mainDock">
+  <button class="dock-btn" id="dockAchievements" data-cat="achievements" aria-label="Conquistas">
+    <span class="dock-ico">🏅</span><span class="dock-lbl">Conquistas</span>
+  </button>
+  <button class="dock-btn" id="dockMail" data-cat="mail" aria-label="Correio">
+    <span class="dock-ico-wrap"><span class="dock-ico">✉️</span><span class="dock-badge" id="mailBadge"></span></span><span class="dock-lbl">Correio</span>
+  </button>
+  <button class="dock-btn active" id="dockHome" data-cat="home" aria-label="Início">
+    <span class="dock-ico">🏠</span><span class="dock-lbl">Início</span>
+  </button>
+  <button class="dock-btn" id="btnSettings" data-cat="settings" aria-label="Configurações">
+    <span class="dock-ico">⚙️</span><span class="dock-lbl">Ajustes</span>
+  </button>
+</nav>
 <div id="toast"></div>
+
+<div class="ping-badge" id="pingBadge" title="Qualidade da conexão">
+  <span class="ping-dot" id="pingDot"></span><span id="pingText">--</span>
+</div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>window.Peer||document.write('<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"><\/script>')</script>
@@ -409,8 +522,9 @@ const ICE=[
 
 const MIN_PLAYERS=2,MAX_PLAYERS=10,MIN_MINUTES=5,MAX_MINUTES=20;
 const COLORS=['r','y','g','b'];
-const PLUS={'+2':2,'+4':4,'+6':6,'+10':10};
-const MODES={classic:'Clássico',caos:'Caos',effects:'Efeitos',tournament:'🏆 Torneio'};
+  const PLUS={'+2':2,'+4':4,'+6':6,'+10':10};
+  const MODES={classic:'Clássico',caos:'Caos',effects:'Efeitos',tournament:'🏆 Torneio'};
+  const QUICK_MESSAGES=['Boa jogada!','Vamos lá!','Cuidado!','Não acredito!','Foi por pouco!','CHROMA!','GG!'];
 const TOURNAMENT_POINTS=[100,75,55,40,30,20,10,5];
 const RANK_TIERS=[{name:'Bronze',icon:'🥉',min:0,next:400},{name:'Prata',icon:'🥈',min:400,next:800},{name:'Ouro',icon:'🥇',min:800,next:1200},{name:'Platina',icon:'💎',min:1200,next:1700},{name:'Diamante',icon:'💎',min:1700,next:2300},{name:'Mestre',icon:'🔥',min:2300,next:3000},{name:'Grão-Mestre',icon:'👑',min:3000,next:null}];
 const CNAME={r:'Vermelho',y:'Amarelo',g:'Verde',b:'Azul'};
@@ -423,7 +537,10 @@ const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 
 let room=null, peer=null, isHost=false, hostConn=null, myId=null, view=null;
 let botTimer=null, toastT=null, colorCb=null, joined=false, clockTimer=null;
+let pingMs=null, pingUpdatedAt=0, hostRtts={}, pingTimer=null;
 let lastTop=null, prevIds=new Set(), wasMyTurn=false;
+let quickChatCooldownUntil=0;
+const CHAT_BUBBLE_MS=4000;
 const conns={};
 
 /* ---------------------------------------------------------------
@@ -475,6 +592,7 @@ const sfx={
   lose(at=0){[392,349,294,220].forEach((f,i)=>tone(f,.3,{vol:.14,at:at+i*.14}));},
   err(at=0){tone(180,.14,{type:'square',vol:.07,at,slide:-50});},
   join(at=0){tone(600,.1,{vol:.14,at});tone(800,.14,{vol:.14,at:at+.09});},
+  chat(at=0){tone(740,.08,{type:'sine',vol:.12,at});tone(988,.14,{type:'triangle',vol:.13,at:at+.07});},
   click(){tone(720,.04,{vol:.05});}
 };
 function cardSfx(c){
@@ -563,6 +681,9 @@ function newLog(a,b){
   return b;
 }
 function sfxDiff(prev,v,d0){
+  const oldChat=prev&&prev.chat&&prev.chat.length?prev.chat[prev.chat.length-1]:null;
+  const newChat=v.chat&&v.chat.length?v.chat[v.chat.length-1]:null;
+  if(newChat&&(!oldChat||oldChat.at!==newChat.at))sfx.chat(d0);
   if(v.phase==='playing'&&(!prev||prev.phase!=='playing')){sfx.deal();if(v.turn===v.me)sfx.turn(.75);return;}
   if(!prev||prev.phase!=='playing')return;
   const mine=v.hand.length-prev.hand.length;
@@ -595,7 +716,7 @@ function makeDeck(mode,dumpColor){
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function cardName(c){
-  const v={skip:'Bloqueio',skip2:'Bloqueio Duplo',rev:'Inverter','+2':'+2','+6':'+6','+10':'+10',wild:'Coringa','+4':'Coringa +4',swap:'Coringa Troca',blackhole:'BURACO NEGRO'}[c.v]||c.v;
+  const v={skip:'Bloqueio',skip2:'Bloqueio Duplo',rev:'Inverter','+2':'+2','+4':'Coringa +4','+6':'+6','+10':'+10',wild:'Coringa',swap:'Coringa Troca',blackhole:'BURACO NEGRO'}[c.v]||c.v;
   return c.c==='w'?v:v+' '+CNAME[c.c].toLowerCase();
 }
 function newRoom(code,hostName,profile={}){
@@ -603,7 +724,7 @@ function newRoom(code,hostName,profile={}){
     code,phase:'lobby',opts:{stack:false,mode:'classic',dumpColor:false,minutes:10,maxPlayers:4},
     players:[{id:'host',name:hostName,photo:profile.photo||'',gender:profile.gender||'',hand:[],bot:false,wins:0,called:false}],
     tournament:{round:0,maxRounds:5,scores:{},finished:false,id:null},
-    draw:[],discard:[],turn:0,dir:1,color:'r',pending:0,drawnId:null,vulnerable:null,winner:null,endsAt:null,log:[]
+    draw:[],discard:[],turn:0,dir:1,color:'r',pending:0,drawnId:null,vulnerable:null,winner:null,endsAt:null,log:[],chat:[]
   };
 }
 const cur=()=>room.players[room.turn];
@@ -639,7 +760,7 @@ function startRound(){
   room.endsAt=Date.now()+room.opts.minutes*60000;
   clearInterval(clockTimer);
   clockTimer=setInterval(()=>{if(room&&room.phase==='playing'&&Date.now()>=room.endsAt){finishByTime();broadcast();}},1000);
-  room.log=[];
+  room.log=[];room.chat=[];
   if(room.opts.mode==='tournament'){room.tournament.round++;room.tournament.id=room.code+'-'+Date.now();room.players.forEach(p=>{if(room.tournament.scores[p.id]==null)room.tournament.scores[p.id]=0;});}
   log('Rodada iniciada! '+cur().name+' começa.');
 }
@@ -663,6 +784,55 @@ function clampRoomOptions(minutes,maxPlayers){
 function rankTier(rating){let t=RANK_TIERS[0];for(const x of RANK_TIERS)if(rating>=x.min)t=x;return t;}
 function readRank(){try{return JSON.parse(localStorage.getItem('chroma-ranking')||'[]')}catch(e){return []}}
 function writeRank(a){try{localStorage.setItem('chroma-ranking',JSON.stringify(a))}catch(e){}}
+
+const ACHIEVEMENTS=[
+  {ico:'🎮',name:'Estreante',desc:'Jogue sua primeira partida',check:s=>s.played>=1},
+  {ico:'🏆',name:'Primeira Vitória',desc:'Vença uma partida',check:s=>s.wins>=1},
+  {ico:'🔥',name:'Em Ritmo',desc:'Jogue 10 partidas',check:s=>s.played>=10},
+  {ico:'🎖️',name:'Veterano',desc:'Jogue 25 partidas',check:s=>s.played>=25},
+  {ico:'⚔️',name:'Sanguinário',desc:'Vença 10 partidas',check:s=>s.wins>=10},
+  {ico:'🥈',name:'Prata',desc:'Alcance a patente Prata',check:s=>s.rating>=400},
+  {ico:'🥇',name:'Ouro',desc:'Alcance a patente Ouro',check:s=>s.rating>=800},
+  {ico:'💎',name:'Platina',desc:'Alcance a patente Platina',check:s=>s.rating>=1200},
+  {ico:'👑',name:'Grão-Mestre',desc:'Chegue ao topo do ranking',check:s=>s.rating>=3000},
+  {ico:'🤡',name:'Psicopata',desc:'Pessoas que jogam no modo claro são estranhas.',check:(s,f)=>f.psicopata},
+];
+function myFlags(){
+  let psicopata=false;try{psicopata=localStorage.getItem('chroma-flag-psicopata')==='1';}catch(e){}
+  return {psicopata};
+}
+function myRankStats(){
+  let name='';try{name=localStorage.getItem('chroma-name')||'';}catch(e){}
+  const p=name?readRank().find(x=>x.name.toLowerCase()===name.toLowerCase()):null;
+  return p||{rating:0,wins:0,losses:0,played:0};
+}
+// ---- Correio (mensagens de atualização do jogo) ----
+// Edite este array para publicar novas mensagens. "id" precisa ser único.
+const MAIL_MESSAGES=[
+  {id:'m1',title:'Bem-vindo!',date:'22/09/2026',body:'Obrigado por jogar. Fique de olho aqui para novidades e atualizações do jogo.'}
+];
+function readMailIds(){try{return JSON.parse(localStorage.getItem('chroma-mail-read')||'[]');}catch(e){return [];}}
+function writeMailIds(ids){try{localStorage.setItem('chroma-mail-read',JSON.stringify(ids));}catch(e){}}
+function hasUnreadMail(){const read=readMailIds();return MAIL_MESSAGES.some(m=>!read.includes(m.id));}
+function updateMailBadge(){$('#mailBadge').classList.toggle('show',hasUnreadMail());}
+function renderMail(){
+  const read=readMailIds();
+  if(!MAIL_MESSAGES.length){$('#mailList').innerHTML='<div class="mail-empty">Nenhuma mensagem por enquanto.</div>';return;}
+  $('#mailList').innerHTML=MAIL_MESSAGES.map(m=>{
+    const unread=!read.includes(m.id);
+    return '<div class="mail-item'+(unread?' unread':'')+'"><h3>'+(unread?'<span class="mail-dot"></span>':'')+esc(m.title)+'</h3><small>'+esc(m.date)+'</small><p>'+esc(m.body)+'</p></div>';
+  }).join('');
+  writeMailIds(MAIL_MESSAGES.map(m=>m.id));
+  updateMailBadge();
+}
+function renderAchievements(){
+  const s=myRankStats(),f=myFlags();
+  const unlockedCount=ACHIEVEMENTS.filter(a=>a.check(s,f)).length;
+  $('#achGrid').innerHTML=ACHIEVEMENTS.map(a=>{
+    const unlocked=a.check(s,f);
+    return '<div class="ach-card'+(unlocked?' unlocked':'')+'"><span class="ach-ico">'+a.ico+'</span><b>'+esc(a.name)+'</b><small>'+esc(a.desc)+'</small></div>';
+  }).join('')+'<div class="tourney-meta" style="grid-column:1/-1">'+unlockedCount+' de '+ACHIEVEMENTS.length+' conquistadas</div>';
+}
 function recordRank(name,delta,won,played){
   const a=readRank();let p=a.find(x=>x.name.toLowerCase()===name.toLowerCase());
   if(!p){p={name,rating:1000,wins:0,losses:0,played:0};a.push(p)}
@@ -705,6 +875,15 @@ function doAct(pid,a){
   if(i<0)return 'Jogador inválido';
   const p=room.players[i];
 
+  if(a.type==='chat'){
+    if(room.phase!=='playing')return 'O chat só está disponível durante a partida';
+    if(!QUICK_MESSAGES.includes(a.message))return 'Mensagem inválida';
+    if(p.lastChatAt&&Date.now()-p.lastChatAt<1200)return;
+    p.lastChatAt=Date.now();
+    room.chat.push({pid,text:a.message,at:Date.now()});
+    if(room.chat.length>30)room.chat.shift();
+    return null;
+  }
 
   if(a.type==='chroma'){
     if(room.vulnerable===pid){room.vulnerable=null;p.called=true;log(p.name+' gritou CHROMA!');return null;}
@@ -873,7 +1052,7 @@ function viewFor(p){
     top:room.discard[room.discard.length-1]||null,
     color:room.color,turn:turnId,dir:room.dir,pending:room.pending,
     drawLeft:room.draw.length,vulnerable:room.vulnerable,endsAt:room.endsAt,
-    log:room.log.slice(-4),winner:room.winner,tournament:room.tournament
+    log:room.log.slice(-4),chat:room.chat.slice(-30),winner:room.winner,tournament:room.tournament
   };
 }
 function broadcast(){
@@ -888,10 +1067,59 @@ function broadcast(){
 }
 
 /* ---------------------------------------------------------------
+   INDICADOR DE PING
+--------------------------------------------------------------- */
+function classifyPing(ms){
+  if(ms==null)return 'bad';
+  if(ms<=80)return 'good';
+  if(ms<=200)return 'mid';
+  return 'bad';
+}
+function updatePingUI(){
+  const badge=$('#pingBadge');if(!badge)return;
+  let enabled=true;try{enabled=localStorage.getItem('chroma-ping')!=='0';}catch(e){}
+  const connected=!!((isHost&&room)||(hostConn&&hostConn.open));
+  badge.classList.toggle('show',enabled&&connected);
+  if(!enabled||!connected)return;
+  const stale=!pingUpdatedAt||Date.now()-pingUpdatedAt>8000;
+  const val=stale?null:pingMs;
+  const cls=classifyPing(val);
+  $('#pingDot').className='ping-dot '+cls;
+  $('#pingText').textContent=val==null?'--':(Math.round(val)+'ms');
+}
+function pingRecordHost(peerId,rtt){
+  hostRtts[peerId]=rtt;
+  const vals=Object.values(hostRtts);
+  pingMs=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+  pingUpdatedAt=Date.now();
+  updatePingUI();
+}
+function sendPings(){
+  if(isHost){
+    if(!room)return updatePingUI();
+    if(Object.keys(conns).length===0){pingMs=0;pingUpdatedAt=Date.now();}
+    else for(const id in conns){const c=conns[id];if(c&&c.open){try{c.send({t:'ping',ts:Date.now()});}catch(_){}}}
+  }else if(hostConn&&hostConn.open){
+    try{hostConn.send({t:'ping',ts:Date.now()});}catch(_){}
+  }
+  updatePingUI();
+}
+
+/* ---------------------------------------------------------------
    REDE (PeerJS)
 --------------------------------------------------------------- */
 function genCode(){let s='';for(let i=0;i<5;i++)s+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return s;}
 function busy(msg){$('#busy').classList.toggle('on',!!msg);if(msg)$('#busyTxt').textContent=msg;}
+let chatExpiryTimer=null;
+function scheduleChatExpiry(at){
+  const fireAt=at+CHAT_BUBBLE_MS;
+  const delay=fireAt-Date.now();
+  if(delay<=0)return;
+  if(chatExpiryTimer&&chatExpiryTimer.fireAt<=fireAt)return;
+  if(chatExpiryTimer)clearTimeout(chatExpiryTimer.id);
+  const id=setTimeout(()=>{chatExpiryTimer=null;if(view&&view.phase==='playing')renderGame(view,view);},delay+30);
+  chatExpiryTimer={id,fireAt};
+}
 function toast(msg,ms){
   const t=$('#toast');t.textContent=msg;t.classList.add('on');
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200);
@@ -940,9 +1168,13 @@ function onGuestConn(conn){
       if(err){try{conn.send({t:'err',msg:err});}catch(_){}}else broadcast();
     }else if(d.t==='leave'){
       if(byId(conn.peer)){removePlayer(conn.peer);broadcast();}
+    }else if(d.t==='ping'){
+      try{conn.send({t:'pong',ts:d.ts});}catch(_){}
+    }else if(d.t==='pong'){
+      pingRecordHost(conn.peer,Date.now()-d.ts);
     }
   });
-  conn.on('close',()=>{if(room&&byId(conn.peer)&&conns[conn.peer]===conn){removePlayer(conn.peer);broadcast();}});
+  conn.on('close',()=>{delete hostRtts[conn.peer];if(room&&byId(conn.peer)&&conns[conn.peer]===conn){removePlayer(conn.peer);broadcast();}});
   conn.on('error',e=>console.warn('conn:',e));
 }
 function refuse(conn,msg){
@@ -976,6 +1208,8 @@ function joinRoom(code,name,profile){
       if(d.t==='state'){if(!joined){joined=true;clearTimeout(giveUp);busy(null);}render(d.s);}
       else if(d.t==='err'){if(d.fatal)fail(d.msg);else{cancelFly();warn(d.msg);}}
       else if(d.t==='closed')teardown('O host encerrou a sala.');
+      else if(d.t==='ping'){try{conn.send({t:'pong',ts:d.ts});}catch(_){}}
+      else if(d.t==='pong'){pingMs=Date.now()-d.ts;pingUpdatedAt=Date.now();updatePingUI();}
     });
     conn.on('close',()=>{if(hostConn===conn)teardown('A conexão com a sala foi perdida.',3500);});
     conn.on('error',e=>console.warn('conn:',e));
@@ -992,6 +1226,7 @@ function teardown(msg,ms){
   for(const k in conns)delete conns[k];
   try{if(p)p.destroy();}catch(_){}
   lastTop=null;prevIds=new Set();wasMyTurn=false;
+  pingMs=null;pingUpdatedAt=0;hostRtts={};updatePingUI();
   busy(null);show('home');
   if(msg)toast(msg,ms||3500);
 }
@@ -1012,7 +1247,7 @@ const SVG={
   skip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.2"/><path d="M6.2 17.8 17.8 6.2"/></svg>',
   rev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8h16M15.5 3.5 20 8l-4.5 4.5M20.5 16h-16M8.5 11.5 4 16l4.5 4.5"/></svg>',
   swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h14l-4-4M20 16.5H6l4 4"/></svg>',
-  blackhole:'<svg viewBox="0 0 24 24" aria-label="BURACO NEGRO"><circle cx="12" cy="12" r="8.4" fill="#10101a"/><path d="M5.4 12c1.8-4.7 8.9-6.7 12.7-2.2 2.1 2.5-.2 6.7-3.8 7.3-3.2.5-6.2-1.4-6.5-4.3-.3-2.8 2.1-5.1 4.8-4.9 2.2.2 3.5 2.1 2.9 3.7-.5 1.4-2.4 1.9-3.3.8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>'
+  blackhole:'<svg viewBox="0 0 512 512" aria-label="BURACO NEGRO" fill="currentColor"><path d="M19.188 17.5v152.063C66.86 258.63 151.98 320.656 248.28 341.092c7.287 2.303 15.034 3.563 23.064 3.563 6.747 0 13.288-.884 19.53-2.53-47.547 33.525-105.556 53.155-168.187 53.155-36.77 0-71.258-7.8-103.5-20.342v35.625c39.863 9.25 78.667 13.034 114.188 10.812 22.572-1.413 43.213-4.7 63.063-10.53-45.634 33.337-107.435 50.03-177.25 49.686v29.44c6.82.457 13.417.874 20.343.874 132.277 0 245.515-77.08 300.283-188.28.174-.357.357-.708.53-1.064.236-.48.463-.953.688-1.438-.046.417-.076.835-.124 1.25-7.255 62.57-34.964 122.59-82.937 170.563-7.697 7.696-15.647 14.944-23.94 21.594h104.595c28.33-57.514 37.687-120.485 29.125-180.72-3.284-23.093-8.64-45.25-16.938-67.188 53.172 71.838 78.54 160.38 71.47 247.907h73.374C492.68 363.235 416.173 252.043 305.406 199c-.273-.13-.538-.276-.812-.406-1.12-.54-2.227-1.045-3.375-1.53-.6-.278-1.183-.573-1.783-.845.102.086.21.16.313.25-4.324-1.73-8.834-3.08-13.5-4 61.317-7.77 125.604 3.935 183.25 37.218 8.896 5.135 17.562 10.86 25.656 16.78v-94.655c-22.682-5.175-45.22-7.668-68.125-7.97-66.77-.874-133.078 18.29-189.186 54.876-9.19 4.476-17.36 10.758-24.063 18.343 24.015-56.973 66.21-107.004 123.69-140.188 49.576-28.623 104.276-41.016 157.686-39V17.5h-118.78c-41.383 17.778-79.457 43.683-111.282 75.656 16.34-27.53 36.19-52.736 58.594-75.656h-42.032c-60.804 67.31-91.872 156.46-87 245.656-.093 1.544-.156 3.09-.156 4.656 0 14.815 4.25 28.65 11.563 40.407-47.44-37.913-83.766-90.83-100.625-153.75-12.45-46.46-12.248-92.975-2.657-136.97H19.188zm252.156 192.188c32.223 0 58.156 25.902 58.156 58.125 0 32.222-25.933 58.156-58.156 58.156-11.938 0-23.007-3.57-32.22-9.69 6.202 3.168 13.23 4.97 20.72 4.97 25.67 0 46.438-20.802 46.437-46.47.003-23.096-16.51-42.202-38.592-45.81 10.03 6.777 17 18.396 17 31.405 0 20.813-17.123 37.313-37.938 37.313-13.864 0-25.89-7.378-32.438-18.532-.72-3.67-1.125-7.457-1.125-11.344 0-32.223 25.934-58.125 58.157-58.125z"/></svg>'
 };
 function sym(c,small){
   if(c.v==='skip')return SVG.skip;
@@ -1033,7 +1268,7 @@ function cardEl(c,extra){
 }
 const AV=['#e63946','#f5b301','#25b05a','#2c7be5','#9b5de5','#f15bb5','#00a6a6','#ff7b00'];
 const ORD={r:0,y:1,g:2,b:3,w:4};
-const VORD=['0','1','2','3','4','5','6','7','8','9','skip','skip2','rev','+2','+4','+6','+10','wild','swap','blackhole'];
+  const VORD=['0','1','2','3','4','5','6','7','8','9','skip','skip2','rev','+2','+4','+6','+10','wild','swap','blackhole'];
 const GENDER_EMOJI={female:'♀️',male:'♂️',nonbinary:'⚧️',other:'⚧️'};
 
 function genderEmoji(g){return GENDER_EMOJI[g]||'';}
@@ -1053,6 +1288,9 @@ function avatarMarkup(p,cls='avatar'){
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
   if(id!=='game'){$('#endOv').classList.remove('on');$('#colorOv').classList.remove('on');}
+  const dockScreens=['home','achievements','mail','settings'];
+  $('#mainDock').classList.toggle('on',dockScreens.includes(id));
+  document.querySelectorAll('.dock-btn[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===id));
 }
 function render(v){
   const prev=view;view=v;
@@ -1073,6 +1311,7 @@ function renderLobby(v,prev){
   const st=$('#optStack');st.checked=!!v.opts.stack;st.disabled=!isHost;
   const dc=$('#optDump');dc.checked=!!v.opts.dumpColor;dc.disabled=!isHost;
   document.querySelectorAll('input[name=mode]').forEach(r=>{r.checked=r.value===(v.opts.mode||'classic');r.disabled=!isHost;});
+  $('#modeWrap').classList.toggle('locked',!isHost);
   $('#matchTime').value=v.opts.minutes||10;$('#matchTime').disabled=!isHost;
   $('#maxPlayers').value=v.opts.maxPlayers||4;$('#maxPlayers').disabled=!isHost;
   $('#hostBtns').style.display=isHost?'flex':'none';
@@ -1089,9 +1328,13 @@ function renderGame(v,prev){
   $('#roomCode').textContent=v.code;
   const remaining=v.endsAt?Math.max(0,v.endsAt-Date.now()):0;
   const timer=$('#matchTimer');timer.textContent=formatTime(remaining);timer.classList.toggle('urgent',remaining>0&&remaining<=60000);
+  const chatFor=pid=>{const m=(v.chat||[]).filter(x=>x.pid===pid).pop();
+    if(!m||Date.now()-m.at>=CHAT_BUBBLE_MS)return '';
+    scheduleChatExpiry(m.at);
+    return '<span class="chat-bubble">'+esc(m.text)+'</span>';};
   const mePlayer=v.players.find(p=>p.id===v.me);const myTag=$('#myTag');
-  myTag.innerHTML=mePlayer?avatarMarkup(mePlayer,'avatar')+'<span class="my-name">Você · '+esc(mePlayer.name)+'</span>'+(genderEmoji(mePlayer.gender)?'<span class="gender">'+genderEmoji(mePlayer.gender)+'</span>':''):'';
-  myTag.classList.toggle('chroma',!!(mePlayer&&mePlayer.count===1&&mePlayer.called));
+  myTag.innerHTML=mePlayer?avatarMarkup(mePlayer,'avatar')+'<span class="my-name">Você · '+esc(mePlayer.name)+'</span>'+(genderEmoji(mePlayer.gender)?'<span class="gender">'+genderEmoji(mePlayer.gender)+'</span>':'')+chatFor(v.me):'';
+  myTag.classList.toggle('chroma',!!(mePlayer&&mePlayer.count===1));
   const mt=$('#modeTag');const mn=MODES[v.opts.mode]||'';
   mt.textContent=mn;mt.classList.toggle('on',v.opts.mode&&v.opts.mode!=='classic');
   $('#dirInd').textContent=v.dir===1?'↻':'↺';
@@ -1100,8 +1343,8 @@ function renderGame(v,prev){
   const mi=v.players.findIndex(p=>p.id===v.me),opps=[];
   for(let k=1;k<v.players.length;k++)opps.push(v.players[(mi+k)%v.players.length]);
   $('#opps').innerHTML=opps.map(p=>
-    '<div class="opp'+(playing&&p.id===v.turn?' turn':'')+(p.count===1&&p.called?' chroma':'')+'" data-pid="'+esc(p.id)+'"><div class="player-line">'+avatarMarkup(p)+'<div class="nm">'+esc(p.name)+(p.bot?' 🤖':'')+'</div>'+(genderEmoji(p.gender)?'<span class="gender">'+genderEmoji(p.gender)+'</span>':'')+'</div>'+
-    '<div class="cnt'+(p.count===1?' one':'')+'"><span class="mini"></span>'+p.count+'</div>'+
+    '<div class="opp'+(playing&&p.id===v.turn?' turn':'')+(p.count===1?' chroma':'')+'" data-pid="'+esc(p.id)+'"><div class="player-line">'+avatarMarkup(p)+'<div class="nm">'+esc(p.name)+(p.bot?' 🤖':'')+'</div>'+(genderEmoji(p.gender)?'<span class="gender">'+genderEmoji(p.gender)+'</span>':'')+'</div>'+chatFor(p.id)+
+    '<div class="cnt'+(p.count===1?' one':'')+'">'+p.count+'</div>'+
     '<div class="w">'+(p.wins?'🏆 '+p.wins:'')+'</div></div>'
   ).join('');
 
@@ -1165,6 +1408,8 @@ function renderGame(v,prev){
   $('#btnCatch').classList.toggle('on',playing&&!!v.vulnerable&&v.vulnerable!==v.me);
   $('#btnPass').classList.toggle('on',myTurn&&!!v.drawnId);
   $('#drawpile').classList.toggle('pulse',myTurn&&!v.drawnId&&(v.legal.length===0||v.pending>0));
+  $('#quickChatBtn').style.display=playing?'block':'none';
+  if(!playing)$('#quickChatMenu').classList.remove('on');
 
   if(myTurn&&!wasMyTurn&&navigator.vibrate)navigator.vibrate(60);
   wasMyTurn=myTurn;
@@ -1209,11 +1454,11 @@ function openRanking(){renderRanking();show('ranking');}
 
 /* ---------- preferências ---------- */
 function applyPreferences(){
-  let light=false,low=false;try{light=localStorage.getItem('chroma-theme')==='light';low=localStorage.getItem('chroma-light')==='1';}catch(e){}
+  let light=false,low=false,ping=true;try{light=localStorage.getItem('chroma-theme')==='light';low=localStorage.getItem('chroma-light')==='1';ping=localStorage.getItem('chroma-ping')!=='0';}catch(e){}
   document.body.classList.toggle('light',light);document.body.classList.toggle('lightweight',low);
-  $('#lightMode').checked=low;$('#themeLight').classList.toggle('active',light);$('#themeDark').classList.toggle('active',!light);
+  $('#lightMode').checked=low;$('#pingMode').checked=ping;$('#themeLight').classList.toggle('active',light);$('#themeDark').classList.toggle('active',!light);updatePingUI();
 }
-function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{localStorage.setItem('chroma-light',e.target.checked?'1':'0');}catch(_){}applyPreferences();};$('#themeLight').onclick=()=>{try{localStorage.setItem('chroma-theme','light');}catch(_){}applyPreferences();};$('#themeDark').onclick=()=>{try{localStorage.setItem('chroma-theme','dark');}catch(_){}applyPreferences();};}
+function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{localStorage.setItem('chroma-light',e.target.checked?'1':'0');}catch(_){}applyPreferences();};$('#pingMode').onchange=e=>{try{localStorage.setItem('chroma-ping',e.target.checked?'1':'0');}catch(_){}updatePingUI();};$('#themeLight').onclick=()=>{try{localStorage.setItem('chroma-theme','light');localStorage.setItem('chroma-flag-psicopata','1');}catch(_){}applyPreferences();};$('#themeDark').onclick=()=>{try{localStorage.setItem('chroma-theme','dark');}catch(_){}applyPreferences();};}
 
 /* ---------- eventos ---------- */
 (function init(){
@@ -1224,7 +1469,7 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
   try{$('#inName').value=localStorage.getItem('chroma-name')||'';}catch(e){}
   const savedProfile=profileData();
   $('#profileGender').value=savedProfile.gender;
-  if(savedProfile.photo)$('#profilePreview').innerHTML='<img src="'+esc(savedProfile.photo)+'" alt="Foto de perfil">';
+  if(savedProfile.photo){$('#profilePreview').innerHTML='<img src="'+esc(savedProfile.photo)+'" alt="Foto de perfil">';$('.profile-upload').textContent='📷 Trocar foto';}
   $('#profileGender').onchange=e=>{const p=profileData();p.gender=GENDER_EMOJI[e.target.value]?e.target.value:'';saveProfile(p);};
   $('#profilePhoto').onchange=e=>{
     const file=e.target.files&&e.target.files[0];if(!file)return;
@@ -1237,7 +1482,7 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
         const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
         canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
         const p=profileData();p.photo=canvas.toDataURL('image/jpeg',.82);saveProfile(p);
-        $('#profilePreview').innerHTML='<img src="'+esc(p.photo)+'" alt="Foto de perfil">';
+        $('#profilePreview').innerHTML='<img src="'+esc(p.photo)+'" alt="Foto de perfil">';$('.profile-upload').textContent='📷 Trocar foto';
       };
       img.onerror=()=>toast('Não consegui ler essa imagem');img.src=reader.result;
     };
@@ -1309,10 +1554,18 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
 
 
   initPreferences();
+  pingTimer=setInterval(sendPings,3000);
   setInterval(()=>{if(view&&view.phase==='playing'&&view.endsAt){const left=Math.max(0,view.endsAt-Date.now()),timer=$('#matchTimer');timer.textContent=formatTime(left);timer.classList.toggle('urgent',left>0&&left<=60000);}},1000);
-  $('#btnSettings').onclick=()=>$('#settingsOv').classList.add('on');
-  $('#settingsClose').onclick=()=>$('#settingsOv').classList.remove('on');
-  $('#settingsOv').addEventListener('click',e=>{if(e.target.id==='settingsOv')$('#settingsOv').classList.remove('on');});
+  $('#btnSettings').onclick=()=>show('settings');
+  $('#settingsBack').onclick=()=>show('home');
+
+  // ---- dock inferior (categorias) ----
+  $('#dockAchievements').onclick=()=>{renderAchievements();show('achievements');};
+  $('#dockMail').onclick=()=>{renderMail();show('mail');};
+  $('#dockHome').onclick=()=>show('home');
+  $('#achBack').onclick=()=>show('home');
+  $('#mailBack').onclick=()=>show('home');
+  updateMailBadge();
 
   $('#hand').addEventListener('click',e=>{
     const el=e.target.closest('.card');if(!el||!view||view.phase!=='playing')return;
@@ -1340,6 +1593,15 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
   $('#btnChroma').onclick=()=>send({type:'chroma'});
   $('#btnCatch').onclick=()=>send({type:'catch'});
   $('#btnPass').onclick=()=>send({type:'pass'});
+  $('#quickChatMenu').innerHTML=QUICK_MESSAGES.map((m,i)=>'<button type="button" data-quick-chat="'+i+'">'+esc(m)+'</button>').join('');
+  $('#quickChatBtn').onclick=()=>{if(view&&view.phase==='playing')$('#quickChatMenu').classList.toggle('on');};
+  $('#quickChatMenu').addEventListener('click',e=>{
+    const b=e.target.closest('[data-quick-chat]');if(!b||!view||view.phase!=='playing')return;
+    if(Date.now()<quickChatCooldownUntil){$('#quickChatMenu').classList.remove('on');return;}
+    const message=QUICK_MESSAGES[Number(b.dataset.quickChat)];
+    if(message){send({type:'chat',message});quickChatCooldownUntil=Date.now()+1500;}
+    $('#quickChatMenu').classList.remove('on');
+  });
   $('#colorOv').addEventListener('click',e=>{
     const b=e.target.closest('[data-c]');
     if(b){const cb=colorCb;colorCb=null;$('#colorOv').classList.remove('on');if(cb)cb(b.dataset.c);}
