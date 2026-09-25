@@ -7,6 +7,7 @@
 <title>Chroma · cartas com os amigos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
 :root{
   --bg:#0c1024; --bg2:#182052; --ink:#f4f6ff; --mut:#9aa3d0; --line:rgba(255,255,255,.12);
@@ -38,6 +39,11 @@ body{
   color:var(--ink);font-family:'Fredoka',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   overflow:hidden;-webkit-user-select:none;user-select:none;
 }
+body.chaos-bg,body.super-chaos-bg{background:#000}
+body.chaos-bg::before{content:'';position:fixed;inset:0;background:#000 url('CAOS-FUNDO.png') center/cover no-repeat;opacity:.45;pointer-events:none;z-index:0}
+body.super-chaos-bg::before{content:'';position:fixed;inset:0;background:#000 url('SUPER-CAOS-FUNDO.png') center/cover no-repeat;opacity:.45;pointer-events:none;z-index:0}
+body.chaos-bg>.screen,body.super-chaos-bg>.screen{position:relative;z-index:1}
+body.chaos-bg .ov,body.chaos-bg .dock,body.chaos-bg .ping-badge,body.chaos-bg #toast,body.chaos-bg #busy,body.super-chaos-bg .ov,body.super-chaos-bg .dock,body.super-chaos-bg .ping-badge,body.super-chaos-bg #toast,body.super-chaos-bg #busy{z-index:20}
 input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit}
 .screen{display:none;height:100dvh;flex-direction:column;
@@ -52,6 +58,7 @@ button{font-family:inherit}
 }
 .card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.3),transparent 46%,rgba(0,0,0,.2));pointer-events:none}
 .card.c-r{--cc:var(--r)} .card.c-y{--cc:var(--y)} .card.c-g{--cc:var(--g)} .card.c-b{--cc:var(--b)} .card.c-w{--cc:#161a33}
+.card.rainbow99{border-color:transparent;background:linear-gradient(#161a33,#161a33) padding-box,conic-gradient(var(--r),var(--y),var(--g),var(--b),var(--r)) border-box;box-shadow:0 0 12px rgba(245,179,1,.45),0 2px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.4)}
 .card .mid{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);width:68%;aspect-ratio:1;border-radius:50%;
   background:#fff;color:var(--cc);display:grid;place-items:center;font-size:calc(var(--card-w)*.4);line-height:1;letter-spacing:-.03em;
@@ -85,6 +92,14 @@ input.txt:focus{border-color:var(--y)}
 #profilePhoto{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 select.profile-select{width:100%;height:38px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);font:500 14px inherit;padding:0 9px;outline:none}
 .profile-hint{grid-column:1/-1;color:var(--mut);font-size:12px;margin:-3px 0 2px}
+.profile-xp{grid-column:1/-1;padding:8px 0 3px}
+.profile-xp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;font-size:13px}
+.profile-xp-head b{font-size:14px;color:var(--ink)}
+.profile-xp-track{height:9px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid var(--line);overflow:hidden}
+.profile-xp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--b),var(--y),var(--g));border-radius:10px;transition:width .3s ease}
+.profile-xp-sub{display:flex;justify-content:space-between;color:var(--mut);font-size:11px;margin-top:4px}
+.redeem-row{display:flex;gap:8px;width:100%}.redeem-row input{flex:1;min-width:0}.redeem-row .btn{height:44px;padding:0 14px;font-size:15px}
+.code-reward{font-size:12px;color:var(--mut);margin-top:-4px}
 #inCode{text-align:center;letter-spacing:.35em;font-weight:700;text-transform:uppercase}
 .row{display:flex;gap:10px}
 .row input{flex:1;min-width:0}
@@ -237,6 +252,14 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
 .colors{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .colors button{height:76px;border-radius:18px;border:3px solid #fff;font-size:18px;font-weight:700;color:#fff;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.35)}
 .colors button[data-c=y]{color:#2b2000;text-shadow:none}
+.eye-targets{display:flex;flex-direction:column;gap:8px;max-height:42vh;overflow-y:auto}
+.eye-targets button{height:48px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.1);color:var(--ink);font:600 16px inherit;cursor:pointer}
+.eye-targets button:active{transform:scale(.98)}
+#eyeCards{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;max-height:42vh;overflow-y:auto;padding:4px}
+#eyeCards .card{--card-w:44px;--card-h:66px}
+#eyeCards .card .mid{font-size:calc(var(--card-w)*.4)}
+#eyeCards .card .cn{font-size:calc(var(--card-w)*.2)}
+.eye-countdown{color:var(--y);font-weight:700;font-size:14px}
 .score{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;text-align:left}
 .score li{display:flex;justify-content:space-between;background:rgba(255,255,255,.06);border-radius:12px;padding:8px 14px;font-size:17px}
 .score li.win{background:rgba(245,179,1,.2)}
@@ -274,6 +297,41 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
 .ach-card .ach-ico{font-size:30px;line-height:1}
 .ach-card b{font-size:13px}
 .ach-card small{color:var(--mut);font-size:11px;line-height:1.3}
+.coin-hud{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:12px;z-index:9999;display:flex;align-items:center;gap:6px;background:rgba(8,10,28,.72);border:1px solid rgba(245,179,1,.4);border-radius:20px;padding:7px 14px 7px 10px;font-weight:700;font-size:15px;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.35);backdrop-filter:blur(6px);pointer-events:none}
+.coin-hud .coin-ico{font-size:17px;line-height:1}
+.coin-hud.bump{animation:coinBump .35s ease}
+@keyframes coinBump{0%{transform:scale(1)}35%{transform:scale(1.18)}100%{transform:scale(1)}}
+body.light .coin-hud{background:rgba(255,255,255,.78);border-color:rgba(245,179,1,.55)}
+.reward-grid{display:flex;flex-direction:column;gap:10px;width:100%}
+.reward-card{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.reward-card b{font-size:16px}
+.reward-card small{color:var(--mut);font-size:12px;line-height:1.35}
+.streak-row{display:flex;gap:6px;justify-content:space-between}
+.streak-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);opacity:.55}
+.streak-day.done{opacity:1;border-color:rgba(37,176,90,.6);background:rgba(37,176,90,.12)}
+.streak-day.today{opacity:1;border-color:rgba(245,179,1,.65);background:rgba(245,179,1,.14);box-shadow:0 0 0 2px rgba(245,179,1,.25)}
+.streak-day .sd-n{font-size:10px;color:var(--mut)}
+.streak-day .sd-ico{font-size:18px}
+.streak-day .sd-amt{font-size:11px;font-weight:700}
+#btnClaimDaily{position:relative}
+#btnClaimDaily:disabled{opacity:.5;cursor:not-allowed}
+.mission-list{display:flex;flex-direction:column;gap:9px}
+.mission-item{display:flex;align-items:center;gap:12px;padding:11px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.mission-item.done{border-color:rgba(37,176,90,.55);background:rgba(37,176,90,.1)}
+.mission-ico{font-size:22px;flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:rgba(255,255,255,.06)}
+.mission-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.mission-body b{font-size:14px}
+.mission-track{height:7px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid var(--line);overflow:hidden}
+.mission-track i{display:block;height:100%;background:var(--y);border-radius:8px;transition:width .25s}
+.mission-item.done .mission-track i{background:var(--g)}
+.mission-meta{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mut)}
+.mission-reward{color:var(--y);font-weight:700}
+.mission-claim{flex:0 0 auto;height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--y);background:rgba(245,179,1,.15);color:var(--ink);font-weight:700;font-size:12px;cursor:pointer}
+.mission-claim:disabled{opacity:.4;cursor:not-allowed;border-color:var(--line);background:transparent}
+.mission-claim.claimed{border-color:var(--g);background:rgba(37,176,90,.18);color:var(--g)}
+.coin-fly{position:fixed;z-index:10000;font-size:20px;pointer-events:none;left:0;top:0;will-change:transform,opacity}
+[data-lucide]{width:1.1em;height:1.1em;vertical-align:-.18em;stroke-width:2.1}
+.btn [data-lucide],.dock-ico [data-lucide],h1 [data-lucide]{margin-right:2px}
 #settings,#achievements,#mail{align-items:center;overflow-y:auto;padding:18px 0 calc(env(safe-area-inset-bottom) + 100px)}
 .mail-list{width:100%;max-width:460px;display:flex;flex-direction:column;gap:10px}
 .mail-item{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:4px}
@@ -288,9 +346,18 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
 .dock-badge.show{display:block}
 @media(max-width:480px){.rank-me{grid-template-columns:1fr 1fr}.rank-me div:last-child{grid-column:1/-1}.rank-row{grid-template-columns:34px 1fr auto}.rank-stat{font-size:11px}}
 
+
+/* ---------- loja, cosméticos e roleta ---------- */
+#shop{align-items:center;overflow-y:auto;padding:18px 0 calc(env(safe-area-inset-bottom) + 100px)}
+.shop-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.shop-head p{margin:0;color:var(--mut);font-size:13px}.shop-coins{font-weight:700;color:var(--y);white-space:nowrap;background:rgba(245,179,1,.14);border:1px solid rgba(245,179,1,.4);padding:7px 10px;border-radius:12px}
+.shop-tabs{display:flex;gap:7px;overflow:auto;margin-bottom:13px}.shop-tabs button{flex:1;min-width:92px;height:38px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.06);color:var(--ink);font:600 13px inherit;cursor:pointer}.shop-tabs button.active{background:var(--y);border-color:var(--y);color:#241a00}
+.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.shop-item{position:relative;display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.065);border:1px solid var(--line);border-radius:17px;padding:11px;text-align:left;overflow:hidden}.shop-item.owned{border-color:rgba(37,176,90,.55)}.shop-item .item-art{height:94px;border-radius:13px;display:grid;place-items:center;font-size:44px;box-shadow:inset 0 0 30px rgba(255,255,255,.12)}.shop-item b{font-size:14px}.shop-item small{color:var(--mut);font-size:11px;line-height:1.25;min-height:29px}.shop-item button{height:35px;border-radius:10px;border:1px solid var(--y);background:rgba(245,179,1,.15);color:var(--ink);font-weight:700;cursor:pointer}.shop-item button.equipped{border-color:var(--g);background:rgba(37,176,90,.18)}.item-price{color:var(--y);font-size:12px;font-weight:700}.item-owned{position:absolute;top:8px;right:8px;background:var(--g);color:#04210f;font-size:10px;padding:3px 6px;border-radius:8px;font-weight:800}.shop-note{margin-top:13px;color:var(--mut);font-size:11px;text-align:center;line-height:1.35}.cosmetic-preview-frame{border-radius:50%;padding:5px;background:conic-gradient(#ffd86a,#a86b16,#fff1a8,#ffd86a);box-shadow:0 0 12px #f5b30199}.cosmetic-preview-frame>span{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--r),var(--b));font-size:22px;border:3px solid #151a3f}.card-skin-neon{filter:saturate(1.4) drop-shadow(0 0 5px #55f6ff)}.card-skin-gold{border-color:#ffe39a!important;box-shadow:0 0 8px #f5b301aa,0 2px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.4)!important}.card-skin-diamond{border-radius:4px!important;background:linear-gradient(135deg,#b9f4ff,#356ee8)!important}.profile-frame-gold{border-color:transparent!important;background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,#fff3a6,#c47a0c,#fff3a6) border-box!important;box-shadow:0 0 0 3px #d89b2c66,0 0 18px #f5b30199!important;padding:3px}.profile-frame-neon{border-color:#58f5ff!important;box-shadow:0 0 0 3px #58f5ff55,0 0 18px #58f5ff99!important}.profile-frame-void{border-color:#9b5de5!important;box-shadow:0 0 0 3px #26134b,0 0 18px #9b5de5aa!important}.profile-frame-fire{border-color:transparent!important;background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,#ff8a3d,#e63946,#ff8a3d) border-box!important;box-shadow:0 0 0 3px #e6394655,0 0 18px #ff8a3daa!important;padding:3px}.profile-frame-ice{border-color:#bff2ff!important;box-shadow:0 0 0 3px #bff2ff55,0 0 18px #6fd9ffaa!important}.profile-frame-forest{border-color:transparent!important;background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(135deg,#25b05a,#0f5c2c,#25b05a) border-box!important;box-shadow:0 0 0 3px #25b05a55,0 0 18px #25b05a99!important;padding:3px}.profile-frame-royal{border-color:transparent!important;background:linear-gradient(var(--bg2),var(--bg2)) padding-box,conic-gradient(var(--r),var(--y),var(--g),var(--b),var(--r)) border-box!important;box-shadow:0 0 0 3px #ffffff33,0 0 20px rgba(245,179,1,.7)!important;padding:3px}.card-skin-fire{filter:saturate(1.5) contrast(1.08) drop-shadow(0 0 6px #ff6a3d)}.card-skin-ice{border-color:#d7f8ff!important;background:linear-gradient(160deg,#eafeff,#6fc8ea)!important;box-shadow:0 0 10px #7fe0ffaa,0 2px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.4)!important}.card-skin-shadow{border-color:#2a1a4a!important;background:linear-gradient(160deg,#1b0f33,#3d1e63)!important;box-shadow:0 0 10px #9b5de5aa,0 2px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.4)!important}.card-skin-royal{border-radius:9px!important;border-color:#ffe39a!important;background:linear-gradient(160deg,#171b3b,#2a2f5e)!important;box-shadow:0 0 0 2px #f5b30155,0 0 10px #f5b30199,0 2px 0 rgba(0,0,0,.3),0 8px 18px rgba(0,0,0,.4)!important}
+.roulette-sheet{width:min(94vw,520px);max-width:none;overflow:hidden}.roulette-sub{color:var(--mut);font-size:13px;margin-top:-7px}.roulette-window{position:relative;overflow:hidden;border:2px solid rgba(245,179,1,.65);border-radius:17px;background:#0b102b;padding:14px 0}.roulette-window:before,.roulette-window:after{content:'';position:absolute;top:0;bottom:0;width:30%;z-index:2;pointer-events:none}.roulette-window:before{left:0;background:linear-gradient(90deg,#0b102b,transparent)}.roulette-window:after{right:0;background:linear-gradient(270deg,#0b102b,transparent)}.roulette-pointer{position:absolute;z-index:3;left:50%;top:0;bottom:0;width:3px;background:var(--y);box-shadow:0 0 9px var(--y);transform:translateX(-50%)}.roulette-track{display:flex;gap:9px;width:max-content;transform:translateX(0);transition:transform 3.3s cubic-bezier(.08,.72,.14,1)}.roulette-prize{width:82px;min-width:82px;height:90px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.1);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px}.roulette-prize strong{font-size:28px}.roulette-prize span{font-size:10px;text-align:center;color:var(--mut);padding:0 4px}.roulette-result{min-height:22px;font-weight:700;color:var(--y)}
+
 </style>
 </head>
 <body>
+<div class="coin-hud" id="coinHud"><span class="coin-ico"><i data-lucide="coins"></i></span><span id="coinAmt">0</span></div>
 
 <!-- ===== INÍCIO ===== -->
 <div id="home" class="screen on">
@@ -304,7 +371,7 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
       <div class="profile-photo" id="profilePreview">?</div>
       <div class="profile-fields">
         <label for="profilePhoto">Foto de perfil</label>
-        <label class="profile-upload" for="profilePhoto">📷 Escolher foto</label>
+        <label class="profile-upload" for="profilePhoto"><i data-lucide="camera"></i> Escolher foto</label>
         <input id="profilePhoto" type="file" accept="image/*">
         <label for="profileGender">Gênero</label>
         <select id="profileGender" class="profile-select">
@@ -316,9 +383,14 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
         </select>
       </div>
       <small class="profile-hint">A foto e o símbolo do gênero aparecerão para os jogadores durante a partida.</small>
+      <div class="profile-xp">
+        <div class="profile-xp-head"><span>Experiência</span><b id="profileLevel">Nível 1</b></div>
+        <div class="profile-xp-track"><div class="profile-xp-fill" id="profileXpFill"></div></div>
+        <div class="profile-xp-sub"><span id="profileXpText">0 / 100 XP</span><span id="profileXpNext">+100 XP</span></div>
+      </div>
     </div>
     <button class="btn primary" id="btnCreate">Criar sala</button>
-    <button class="btn good" id="btnRanking">🏆 Placar</button>
+    <button class="btn good" id="btnRanking"><i data-lucide="trophy"></i> Placar</button>
     <div class="or"><span>ou entre na sala de um amigo</span></div>
     <div class="row">
       <input id="inCode" class="txt" maxlength="5" placeholder="CÓDIGO" autocapitalize="characters" autocomplete="off" spellcheck="false">
@@ -331,7 +403,8 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
     <p>Jogue uma carta da <b>mesma cor</b> ou do <b>mesmo número/símbolo</b> da carta do topo. Sem carta boa? Compre uma; se ela servir, pode jogar na hora.</p>
     <p><b>Bloqueio</b> pula o próximo. <b>Inverter</b> muda o sentido. <b>+2</b>: o próximo compra 2 e perde a vez. <b>Coringa</b> escolhe a cor. <b>Coringa +4</b>: escolhe a cor e o próximo compra 4, mas só vale se você não tiver nenhuma carta da cor atual.</p>
     <p>Ficou com <b>1 carta</b>? Aperte <b>CHROMA!</b> (pode apertar já com 2 cartas). Se esquecer e alguém te denunciar antes da próxima jogada, você compra 2.</p>
-    <p><b>Modo Caos</b> (o host escolhe no lobby) adiciona <b>+6</b>, <b>+10</b>, <b>Bloqueio Duplo</b> (pula os 2 próximos) e o <b>Coringa Troca</b>, que troca sua mão inteira com a de um adversário sorteado.</p>
+    <p><b>Modo Caos</b> (o host escolhe no lobby) adiciona <b>+6</b>, <b>+10</b>, <b>Bloqueio Duplo</b> (pula os 2 próximos), o <b>Coringa Troca</b>, que troca sua mão inteira com a de um adversário sorteado, e o <b>Olho do Paizin</b>, que permite observar a mão de um adversário escolhido por 3 segundos.</p>
+    <p><b>Modo Super Caos</b> inclui todas as cartas do Caos e também a carta <b>+99</b>, que faz o próximo jogador comprar 99 cartas. A opção <b>Efeitos</b> pode ser ativada separadamente no lobby para fazer as mãos passarem adiante quando alguém jogar um 0.</p>
     <p>Quando ativado, o <b>Descarte por cor</b> adiciona a carta <b>BURACO NEGRO</b> ao baralho. Ao jogá-la, todas as suas outras cartas da mesma cor voltam embaralhadas para o monte de compra.</p>
     <p><b>Modo Efeitos</b> dá poder ao número <b>0</b>: toda vez que alguém joga um 0, todas as mãos da mesa passam adiante, uma posição, no sentido do jogo.</p>
   </details>
@@ -341,7 +414,7 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
 
 <!-- ===== PLACAR ===== -->
 <div id="ranking" class="screen">
-  <div class="rank-top"><button class="btn ghost" id="btnRankBack">← Menu</button><h1>🏆 PLACAR</h1><span></span></div>
+  <div class="rank-top"><button class="btn ghost" id="btnRankBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="trophy"></i> PLACAR</h1><span></span></div>
   <div class="rank-panel">
     <div class="rank-filters"><button class="active" data-rfilter="global">Global</button><button data-rfilter="season">Temporada atual</button></div>
     <div class="rank-me" id="rankMe"></div>
@@ -374,17 +447,18 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
         <div class="mode-card-body"><span class="mode-card-title">Caos</span><small class="mode-card-desc">+6, +10, Bloqueio Duplo e Coringa Troca</small></div>
       </label>
       <label class="mode-card">
-        <input type="radio" name="mode" value="effects">
-        <div class="mode-card-img" style="background-image:url('MODO-CLASSICO.png')"></div>
-        <div class="mode-card-body"><span class="mode-card-title">Efeitos</span><small class="mode-card-desc">Ao jogar um 0, as mãos passam adiante</small></div>
+        <input type="radio" name="mode" value="supercaos">
+        <div class="mode-card-img" style="background-image: url('https://i.ibb.co/kV82KqXM/IMG-20260924-170107.jpg');"></div>
+        <div class="mode-card-body"><span class="mode-card-title">Super Caos</span><small class="mode-card-desc">+99, +6, +10 e todas as cartas do Caos</small></div>
       </label>
       <label class="mode-card">
         <input type="radio" name="mode" value="tournament">
         <div class="mode-card-img" style="background-image:url('https://i.ibb.co/PzmDgq5Q/file-000000005bf0820e828f67ad09e9a2ab.png')"></div>
-        <div class="mode-card-body"><span class="mode-card-title">🏆 Torneio</span><small class="mode-card-desc">Pontos por colocação e pódio final</small></div>
+        <div class="mode-card-body"><span class="mode-card-title"><i data-lucide="trophy"></i> Torneio</span><small class="mode-card-desc">Pontos por colocação e pódio final</small></div>
       </label>
     </div>
-    <label class="opt" id="optWrap"><input type="checkbox" id="optStack"><span>Empilhar +2/+4/+6/+10<small>Quem recebe pode devolver outra carta de compra em vez de comprar</small></span></label>
+    <label class="opt" id="optWrap"><input type="checkbox" id="optStack"><span>Empilhar +2/+4/+6/+10/+99<small>Quem recebe pode devolver outra carta de compra em vez de comprar</small></span></label>
+    <label class="opt" id="optEffectsWrap"><input type="checkbox" id="optEffects"><span>Efeitos<small>Ao jogar um 0, todas as mãos passam adiante</small></span></label>
     <label class="opt" id="optDumpWrap"><input type="checkbox" id="optDump"><span>Descarte por cor<small>Adiciona a carta BURACO NEGRO, que devolve suas outras cartas da mesma cor ao monte</small></span></label>
     <div class="room-config">
       <label for="matchTime">Tempo da partida (min)<input class="txt" type="number" id="matchTime" min="5" max="20" step="1" value="10"></label>
@@ -426,7 +500,7 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
     <button id="btnPass">Passar a vez</button>
   </div>
   <div id="hand"></div>
-  <button id="quickChatBtn" type="button" aria-label="Abrir mensagens rápidas" title="Mensagens rápidas">💬</button>
+  <button id="quickChatBtn" type="button" aria-label="Abrir mensagens rápidas" title="Mensagens rápidas"><i data-lucide="message-circle"></i></button>
   <div id="quickChatMenu" aria-label="Mensagens rápidas"></div>
 </div>
 
@@ -444,6 +518,26 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
   </div>
 </div>
 
+<div class="ov" id="eyeTargetOv">
+  <div class="sheet">
+    <h2><i data-lucide="eye"></i> Olho do Paizin</h2>
+    <div>Escolha quem você quer observar:</div>
+    <div class="eye-targets" id="eyeTargets"></div>
+    <button class="btn ghost" id="eyeTargetCancel">Cancelar</button>
+  </div>
+</div>
+
+<div class="ov" id="eyeViewOv">
+  <div class="sheet">
+    <h2 id="eyeViewTitle">Cartas observadas</h2>
+    <div class="eye-countdown" id="eyeCountdown">Você tem 3 segundos</div>
+    <div id="eyeCards"></div>
+  </div>
+</div>
+
+
+<div class="ov" id="rouletteOv"><div class="sheet roulette-sheet"><div style="font-size:48px" id="rouletteIcon">🎰</div><h2 id="rouletteTitle">Baú de Roleta</h2><div class="roulette-sub">A roleta é aleatória. Boa sorte!</div><div class="roulette-window"><div class="roulette-pointer"></div><div class="roulette-track" id="rouletteTrack"></div></div><div class="roulette-result" id="rouletteResult"></div><button class="btn ghost" id="rouletteClose">Fechar</button></div></div>
+
 <div class="ov" id="endOv">
   <div class="sheet">
     <div class="trophy" id="endIcon">🏆</div>
@@ -460,41 +554,76 @@ body.light .ping-badge{background:rgba(255,255,255,.78)}
 </div>
 
 <div id="achievements" class="screen">
-  <div class="rank-top"><button class="btn ghost" id="achBack">← Menu</button><h1>🏅 CONQUISTAS</h1><span></span></div>
+  <div class="rank-top"><button class="btn ghost" id="achBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="medal"></i> CONQUISTAS</h1><span></span></div>
   <div class="rank-panel">
     <div class="ach-grid" id="achGrid"></div>
   </div>
 </div>
 
+<div id="shop" class="screen">
+  <div class="rank-top"><button class="btn ghost" id="shopBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="shopping-cart"></i> LOJA</h1><span></span></div>
+  <div class="rank-panel">
+    <div class="shop-head"><p>Use moedas apenas em itens cosméticos e baús.</p><span class="shop-coins">🪙 <b id="shopCoins">0</b></span></div>
+    <div class="shop-tabs"><button class="active" data-shop-tab="all">Tudo</button><button data-shop-tab="profile">Perfil</button><button data-shop-tab="cards">Cartas</button><button data-shop-tab="chests">Baús</button></div>
+    <div class="shop-grid" id="shopGrid"></div><div class="shop-note">Cosméticos de carta só alteram cartas compradas na loja e não mudam as cartas comuns do baralho.</div>
+  </div>
+</div>
+<div id="rewards" class="screen">
+  <div class="rank-top"><button class="btn ghost" id="rewardsBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="coins"></i> RECOMPENSAS</h1><span></span></div>
+  <div class="rank-panel">
+    <div class="reward-grid">
+      <div class="reward-card">
+        <b>Login Diário</b>
+        <small>Entre no jogo todos os dias para ganhar moedas. Complete os 7 dias sem perder nenhum!</small>
+        <div class="streak-row" id="streakRow"></div>
+        <button class="btn primary" id="btnClaimDaily" type="button">Coletar</button>
+      </div>
+      <div class="reward-card">
+        <b>Missões Diárias</b>
+        <small>Complete missões jogando partidas para ganhar moedas extras. Renovam todo dia.</small>
+        <div class="mission-list" id="missionList"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="settings" class="screen">
-  <div class="rank-top"><button class="btn ghost" id="settingsBack">← Menu</button><h1>⚙️ AJUSTES</h1><span></span></div>
+  <div class="rank-top"><button class="btn ghost" id="settingsBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="settings"></i> AJUSTES</h1><span></span></div>
   <div class="rank-panel">
     <div class="settings-list">
       <label class="settings-row"><span><b>Modo leve</b><small>Remova as animações para diminuir o gasto de internet</small></span><input class="switch" type="checkbox" id="lightMode"></label>
       <label class="settings-row"><span><b>Indicador de ping</b><small>Mostra a qualidade da conexão durante as partidas</small></span><input class="switch" type="checkbox" id="pingMode"></label>
       <div class="settings-row"><span><b>Tema</b><small>Escolha a aparência do jogo</small><div class="theme-choice"><button id="themeLight">Modo Claro</button><button id="themeDark">Modo Escuro (Padrão)</button></div></span></div>
       <div class="settings-row"><span><b>Áudio</b><small>Ative ou desative os efeitos sonoros</small></span><button class="btn" id="settingsMute" type="button">🔊 Som ligado</button></div>
+      <div class="settings-row"><span><b>Resgatar Códigos</b><small>Use um código promocional para receber moedas ou XP.</small></span></div>
+      <div class="redeem-row"><input id="redeemCode" class="txt" maxlength="16" placeholder="Digite o código" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn primary" id="btnRedeem" type="button">Resgatar</button></div>
+      <div class="code-reward">Exemplos: CHROMA100, XP250, SUPERXP500</div>
     </div>
   </div>
 </div>
 <div id="mail" class="screen">
-  <div class="rank-top"><button class="btn ghost" id="mailBack">← Menu</button><h1>✉️ CORREIO</h1><span></span></div>
+  <div class="rank-top"><button class="btn ghost" id="mailBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="mail"></i> CORREIO</h1><span></span></div>
   <div class="mail-list" id="mailList"></div>
 </div>
 <div class="ov" id="busy"><span id="busyTxt">Conectando…</span></div>
 
 <nav class="dock on" id="mainDock">
   <button class="dock-btn" id="dockAchievements" data-cat="achievements" aria-label="Conquistas">
-    <span class="dock-ico">🏅</span><span class="dock-lbl">Conquistas</span>
+    <span class="dock-ico"><i data-lucide="medal"></i></span><span class="dock-lbl">Conquistas</span>
   </button>
   <button class="dock-btn" id="dockMail" data-cat="mail" aria-label="Correio">
-    <span class="dock-ico-wrap"><span class="dock-ico">✉️</span><span class="dock-badge" id="mailBadge"></span></span><span class="dock-lbl">Correio</span>
+    <span class="dock-ico-wrap"><span class="dock-ico"><i data-lucide="mail"></i></span><span class="dock-badge" id="mailBadge"></span></span><span class="dock-lbl">Correio</span>
+  </button>
+  <button class="dock-btn" id="dockRewards" data-cat="rewards" aria-label="Recompensas">
+    <span class="dock-ico"><i data-lucide="coins"></i></span><span class="dock-lbl">Recompensas</span>
+  </button>
+  <button class="dock-btn" id="dockShop" data-cat="shop" aria-label="Loja">
+    <span class="dock-ico"><i data-lucide="shopping-cart"></i></span><span class="dock-lbl">Loja</span>
   </button>
   <button class="dock-btn active" id="dockHome" data-cat="home" aria-label="Início">
-    <span class="dock-ico">🏠</span><span class="dock-lbl">Início</span>
+    <span class="dock-ico"><i data-lucide="home"></i></span><span class="dock-lbl">Início</span>
   </button>
   <button class="dock-btn" id="btnSettings" data-cat="settings" aria-label="Configurações">
-    <span class="dock-ico">⚙️</span><span class="dock-lbl">Ajustes</span>
+    <span class="dock-ico"><i data-lucide="settings"></i></span><span class="dock-lbl">Ajustes</span>
   </button>
 </nav>
 <div id="toast"></div>
@@ -522,8 +651,8 @@ const ICE=[
 
 const MIN_PLAYERS=2,MAX_PLAYERS=10,MIN_MINUTES=5,MAX_MINUTES=20;
 const COLORS=['r','y','g','b'];
-  const PLUS={'+2':2,'+4':4,'+6':6,'+10':10};
-  const MODES={classic:'Clássico',caos:'Caos',effects:'Efeitos',tournament:'🏆 Torneio'};
+  const PLUS={'+2':2,'+4':4,'+6':6,'+10':10,'+99':99};
+  const MODES={classic:'Clássico',caos:'Caos',supercaos:'Super Caos',tournament:'🏆 Torneio'};
   const QUICK_MESSAGES=['Boa jogada!','Vamos lá!','Cuidado!','Não acredito!','Foi por pouco!','CHROMA!','GG!'];
 const TOURNAMENT_POINTS=[100,75,55,40,30,20,10,5];
 const RANK_TIERS=[{name:'Bronze',icon:'🥉',min:0,next:400},{name:'Prata',icon:'🥈',min:400,next:800},{name:'Ouro',icon:'🥇',min:800,next:1200},{name:'Platina',icon:'💎',min:1200,next:1700},{name:'Diamante',icon:'💎',min:1700,next:2300},{name:'Mestre',icon:'🔥',min:2300,next:3000},{name:'Grão-Mestre',icon:'👑',min:3000,next:null}];
@@ -540,6 +669,7 @@ let botTimer=null, toastT=null, colorCb=null, joined=false, clockTimer=null;
 let pingMs=null, pingUpdatedAt=0, hostRtts={}, pingTimer=null;
 let lastTop=null, prevIds=new Set(), wasMyTurn=false;
 let quickChatCooldownUntil=0;
+let eyeTargetCb=null,eyeViewTimer=null;
 const CHAT_BUBBLE_MS=4000;
 const conns={};
 
@@ -549,6 +679,20 @@ const conns={};
 const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 let muted=false;try{muted=localStorage.getItem('chroma-mute')==='1';}catch(e){}
 let actx=null,master=null,nbuf=null;
+let music=null,musicMode=null;
+const MUSIC_BY_MODE={classic:'CLASSICO.mp3',caos:'ULTIMOS-MINUTOS.mp3',supercaos:'ULTIMOS-MINUTOS.mp3'};
+function stopMusic(){
+  if(!music)return;
+  music.pause();music.currentTime=0;music=null;musicMode=null;
+}
+function syncMusic(mode,playing=true){
+  const src=playing?MUSIC_BY_MODE[mode]:null;
+  if(!src){stopMusic();return;}
+  if(music&&musicMode===mode){music.muted=muted;return;}
+  stopMusic();
+  music=new Audio(src);music.loop=true;music.volume=.35;music.muted=muted;musicMode=mode;
+  const p=music.play();if(p&&p.catch)p.catch(()=>{});
+}
 function audio(){
   if(!actx){
     const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
@@ -707,24 +851,26 @@ function makeDeck(mode,dumpColor){
     add(c,'0');
     for(let k=1;k<=9;k++){add(c,String(k));add(c,String(k));}
     for(const v of ['skip','rev','+2']){add(c,v);add(c,v);}
-    if(mode==='caos'){add(c,'skip2');add(c,'+10');}
+    if(mode==='caos'||mode==='supercaos'){add(c,'skip2');add(c,'+10');}
     if(dumpColor)add(c,'blackhole');
   }
   for(let k=0;k<4;k++){add('w','wild');add('w','+4');}
-  if(mode==='caos')for(let k=0;k<2;k++){add('w','+6');add('w','swap');}
+  if(mode==='caos'||mode==='supercaos')for(let k=0;k<2;k++){add('w','+6');add('w','swap');add('w','eye');}
+  if(mode==='supercaos'){for(let k=0;k<2;k++)add('w','+99');for(let k=0;k<2;k++)add('w','confuse');}
   return d;
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function cardName(c){
-  const v={skip:'Bloqueio',skip2:'Bloqueio Duplo',rev:'Inverter','+2':'+2','+4':'Coringa +4','+6':'+6','+10':'+10',wild:'Coringa',swap:'Coringa Troca',blackhole:'BURACO NEGRO'}[c.v]||c.v;
+  const v={skip:'Bloqueio',skip2:'Bloqueio Duplo',rev:'Inverter','+2':'+2','+4':'Coringa +4','+6':'+6','+10':'+10','+99':'+99',wild:'Coringa',swap:'Coringa Troca',eye:'Olho do Paizin',blackhole:'BURACO NEGRO',confuse:'Confusão'}[c.v]||c.v;
   return c.c==='w'?v:v+' '+CNAME[c.c].toLowerCase();
 }
 function newRoom(code,hostName,profile={}){
   return{
-    code,phase:'lobby',opts:{stack:false,mode:'classic',dumpColor:false,minutes:10,maxPlayers:4},
+    code,phase:'lobby',opts:{stack:false,effects:false,mode:'classic',dumpColor:false,minutes:10,maxPlayers:4},
     players:[{id:'host',name:hostName,photo:profile.photo||'',gender:profile.gender||'',hand:[],bot:false,wins:0,called:false}],
     tournament:{round:0,maxRounds:5,scores:{},finished:false,id:null},
-    draw:[],discard:[],turn:0,dir:1,color:'r',pending:0,drawnId:null,vulnerable:null,winner:null,endsAt:null,log:[],chat:[]
+    deckSerial:0,
+    draw:[],discard:[],turn:0,dir:1,color:'r',pending:0,drawnId:null,vulnerable:null,winner:null,endsAt:null,roundId:null,log:[],chat:[]
   };
 }
 const cur=()=>room.players[room.turn];
@@ -735,8 +881,14 @@ function advance(k){const n=room.players.length;room.turn=((room.turn+room.dir*k
 
 function refill(){
   const top=room.discard.pop();
+  if((room.opts.mode==='caos'||room.opts.mode==='supercaos') && !room.discard.length){
+    room.deckSerial=(room.deckSerial||0)+1;
+    room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor).map((c,i)=>({...c,id:'r'+room.deckSerial+'-'+i})));
+    room.discard=top?[top]:[];
+    return;
+  }
   room.draw=shuffle(room.discard);
-  room.discard=[top];
+  room.discard=top?[top]:[];
 }
 function drawCards(p,n){
   const out=[];
@@ -748,7 +900,8 @@ function drawCards(p,n){
   return out;
 }
 function startRound(){
-  room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor));room.discard=[];
+  room.deckSerial=(room.deckSerial||0)+1;
+  room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor).map((c,i)=>({...c,id:'r'+room.deckSerial+'-'+i})));room.discard=[];
   room.players.forEach(p=>{p.hand=[];p.called=false;});
   for(let k=0;k<7;k++)room.players.forEach(p=>p.hand.push(room.draw.pop()));
   let c,guard=0;
@@ -756,6 +909,7 @@ function startRound(){
   room.discard.push(c);
   room.color=c.c;room.dir=1;room.pending=0;room.drawnId=null;room.vulnerable=null;room.winner=null;
   room.turn=Math.floor(Math.random()*room.players.length);
+  room.roundId=room.code+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
   room.phase='playing';
   room.endsAt=Date.now()+room.opts.minutes*60000;
   clearInterval(clockTimer);
@@ -813,6 +967,202 @@ const MAIL_MESSAGES=[
 ];
 function readMailIds(){try{return JSON.parse(localStorage.getItem('chroma-mail-read')||'[]');}catch(e){return [];}}
 function writeMailIds(ids){try{localStorage.setItem('chroma-mail-read',JSON.stringify(ids));}catch(e){}}
+
+// ---- moedas & recompensa de login diário ----
+const DAILY_REWARD_AMOUNTS=[10,10,15,15,20,20,50];
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function readCoins(){try{return parseInt(localStorage.getItem('chroma-coins')||'0',10)||0;}catch(e){return 0;}}
+function writeCoins(n){try{localStorage.setItem('chroma-coins',String(n));}catch(e){}}
+function readStreak(){try{return JSON.parse(localStorage.getItem('chroma-daily-streak')||'{"day":0,"lastClaim":null}');}catch(e){return {day:0,lastClaim:null};}}
+function writeStreak(s){try{localStorage.setItem('chroma-daily-streak',JSON.stringify(s));}catch(e){}}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function updateCoinHud(bump){const el=$('#coinAmt');if(el)el.textContent=readCoins();if(bump){const hud=$('#coinHud');if(hud){hud.classList.remove('bump');void hud.offsetWidth;hud.classList.add('bump');}}}
+
+
+// ---- loja: cosméticos locais e baús de roleta ----
+const SHOP_ITEMS=[
+ {id:'frame-gold',type:'profile',name:'Moldura Dourada',desc:'Um aro dourado envolve sua foto de perfil.',icon:'👑',price:180,css:'profile-frame-gold'},
+ {id:'frame-neon',type:'profile',name:'Moldura Neon',desc:'Brilho ciano elétrico para seu avatar.',icon:'💠',price:160,css:'profile-frame-neon'},
+ {id:'frame-void',type:'profile',name:'Moldura Vazio',desc:'Um halo roxo inspirado no caos.',icon:'🌀',price:220,css:'profile-frame-void'},
+ {id:'card-neon',type:'cards',name:'Cartas Neon',desc:'Contornos luminosos para suas cartas cosméticas.',icon:'🌈',price:140,css:'card-skin-neon'},
+ {id:'card-gold',type:'cards',name:'Cartas Douradas',desc:'Borda dourada e brilho de raridade.',icon:'✨',price:200,css:'card-skin-gold'},
+ {id:'card-diamond',type:'cards',name:'Cartas Diamante',desc:'Formato facetado e fundo cristalino.',icon:'💎',price:240,css:'card-skin-diamond'},
+ {id:'frame-fire',type:'profile',name:'Moldura Fogo',desc:'Aro em chamas laranja e vermelho.',icon:'🔥',price:190,css:'profile-frame-fire'},
+ {id:'frame-ice',type:'profile',name:'Moldura Gelo',desc:'Brilho azul-claro congelante.',icon:'❄️',price:170,css:'profile-frame-ice'},
+ {id:'frame-forest',type:'profile',name:'Moldura Floresta',desc:'Verde profundo com brilho natural.',icon:'🌿',price:170,css:'profile-frame-forest'},
+ {id:'frame-royal',type:'profile',name:'Moldura Real',desc:'As quatro cores clássicas em um único aro lendário.',icon:'🏆',price:280,css:'profile-frame-royal'},
+ {id:'card-fire',type:'cards',name:'Cartas Fogo',desc:'Contraste intenso e brilho vermelho-alaranjado.',icon:'🔥',price:150,css:'card-skin-fire'},
+ {id:'card-ice',type:'cards',name:'Cartas Gelo',desc:'Fundo gelado e borda cristalina.',icon:'❄️',price:150,css:'card-skin-ice'},
+ {id:'card-shadow',type:'cards',name:'Cartas Sombra',desc:'Tons roxo-escuros com brilho místico.',icon:'🌑',price:180,css:'card-skin-shadow'},
+ {id:'card-royal',type:'cards',name:'Cartas Reais',desc:'Bordas douradas com cantos retos, visual lendário.',icon:'🏆',price:260,css:'card-skin-royal'},
+ {id:'chest-common',type:'chests',name:'Baú Brilhante',desc:'Roleta com cosméticos e poções.',icon:'🎁',price:120,chest:'common'},
+ {id:'chest-royal',type:'chests',name:'Baú Real',desc:'Mais chances de recompensas raras.',icon:'👑',price:300,chest:'royal'}
+];
+const CHEST_PRIZES={common:[
+ {id:'coins-60',name:'60 moedas',icon:'🪙',kind:'coins',amount:60,weight:30},{id:'xp-potion',name:'Poção 2× XP · 30 min',icon:'🧪',kind:'potion',amount:30,weight:22},{id:'frame-neon',name:'Moldura Neon',icon:'💠',kind:'item',weight:9},{id:'card-neon',name:'Cartas Neon',icon:'🌈',kind:'item',weight:9},{id:'frame-ice',name:'Moldura Gelo',icon:'❄️',kind:'item',weight:8},{id:'frame-forest',name:'Moldura Floresta',icon:'🌿',kind:'item',weight:8},{id:'card-fire',name:'Cartas Fogo',icon:'🔥',kind:'item',weight:6},{id:'coins-150',name:'150 moedas',icon:'💰',kind:'coins',amount:150,weight:8}],royal:[
+ {id:'coins-250',name:'250 moedas',icon:'💰',kind:'coins',amount:250,weight:20},{id:'xp-potion',name:'Poção 2× XP · 30 min',icon:'🧪',kind:'potion',amount:30,weight:16},{id:'frame-gold',name:'Moldura Dourada',icon:'👑',kind:'item',weight:14},{id:'card-gold',name:'Cartas Douradas',icon:'✨',kind:'item',weight:12},{id:'card-diamond',name:'Cartas Diamante',icon:'💎',kind:'item',weight:8},{id:'frame-fire',name:'Moldura Fogo',icon:'🔥',kind:'item',weight:10},{id:'card-shadow',name:'Cartas Sombra',icon:'🌑',kind:'item',weight:10},{id:'frame-royal',name:'Moldura Real',icon:'🏆',kind:'item',weight:6},{id:'card-royal',name:'Cartas Reais',icon:'🏆',kind:'item',weight:4}]};
+function readShop(){try{return JSON.parse(localStorage.getItem('chroma-shop')||'{"owned":[],"equipped":{"profile":"","cards":""},"potions":[]}')}catch(e){return{owned:[],equipped:{profile:'',cards:''},potions:[]}}}
+function writeShop(x){try{localStorage.setItem('chroma-shop',JSON.stringify(x));}catch(e){}}
+function ownedShop(id){return readShop().owned.includes(id)}
+function grantPrize(prize){const st=readShop();if(prize.kind==='coins'){writeCoins(readCoins()+prize.amount);updateCoinHud(true);return '+'+prize.amount+' moedas';}if(prize.kind==='potion'){st.potions=st.potions||[];st.potions.push({id:'xp2',expires:Date.now()+1800000});writeShop(st);return 'Poção 2× XP por 30 minutos';}if(!st.owned.includes(prize.id))st.owned.push(prize.id);writeShop(st);return prize.name+' desbloqueado';}
+function buyShop(id){const item=SHOP_ITEMS.find(x=>x.id===id);if(!item)return;const st=readShop();if(item.chest){if(readCoins()<item.price){toast('Moedas insuficientes');return;}writeCoins(readCoins()-item.price);updateCoinHud(true);openRoulette(item);return;}if(st.owned.includes(id)){equipShop(id);return;}if(readCoins()<item.price){toast('Moedas insuficientes');return;}writeCoins(readCoins()-item.price);st.owned.push(id);writeShop(st);updateCoinHud(true);toast(item.name+' comprado!');renderShop();applyCosmetics();}
+function equipShop(id){const item=SHOP_ITEMS.find(x=>x.id===id),st=readShop();if(!item)return;st.equipped[item.type]=st.equipped[item.type]===id?'':id;writeShop(st);toast(st.equipped[item.type]?'Equipado: '+item.name:'Desequipado');renderShop();applyCosmetics();}
+function renderShop(filter='all'){const grid=$('#shopGrid');if(!grid)return;const st=readShop();$('#shopCoins').textContent=readCoins();const items=SHOP_ITEMS.filter(x=>filter==='all'||x.type===filter);grid.innerHTML=items.map(x=>{const own=st.owned.includes(x.id),eq=st.equipped[x.type]===x.id;return '<article class="shop-item '+(own?'owned':'')+'"><div class="item-art '+(x.css||'')+'">'+x.icon+'</div>'+(own?'<span class="item-owned">DESBLOQUEADO</span>':'')+'<b>'+x.name+'</b><small>'+x.desc+'</small><span class="item-price">'+(own?'':('🪙 '+x.price))+'</span><button data-shop-buy="'+x.id+'" class="'+(eq?'equipped':'')+'">'+(eq?'Equipado ✓':own?'Equipar':'Comprar')+'</button></article>';}).join('');}
+function openRoulette(item){const ov=$('#rouletteOv'),track=$('#rouletteTrack'),result=$('#rouletteResult');const prizes=CHEST_PRIZES[item.chest];const weighted=[];prizes.forEach(x=>{for(let i=0;i<x.weight;i++)weighted.push(x)});const win=weighted[Math.floor(Math.random()*weighted.length)];const sequence=[];for(let i=0;i<26;i++)sequence.push(prizes[Math.floor(Math.random()*prizes.length)]);sequence[21]=win;track.innerHTML=sequence.map(x=>'<div class="roulette-prize"><strong>'+x.icon+'</strong><span>'+x.name+'</span></div>').join('');track.style.transition='none';track.style.transform='translateX(0)';result.textContent='';ov.classList.add('on');void track.offsetWidth;const target=-(21*91-((ov.querySelector('.roulette-window').clientWidth/2)-41));track.style.transition='transform 3.3s cubic-bezier(.08,.72,.14,1)';track.style.transform='translateX('+target+'px)';setTimeout(()=>{const msg=grantPrize(win);result.textContent='Você ganhou: '+msg;renderShop();},3500);}
+function applyCosmetics(){const st=readShop(),frame=SHOP_ITEMS.find(x=>x.id===st.equipped.profile),photo=$('#profilePreview');if(photo)photo.className='profile-photo '+(frame?frame.css:'');}
+
+// ---- experiência, níveis e códigos promocionais ----
+const MATCH_XP=50;
+const REDEEM_CODES={
+  CHROMA100:{type:'coins',amount:100},
+  MOEDAS250:{type:'coins',amount:250},
+  CARTAS500:{type:'coins',amount:500},
+  XP100:{type:'xp',amount:100},
+  XP250:{type:'xp',amount:250},
+  SUPERXP500:{type:'xp',amount:500}
+};
+function readXP(){try{return Math.max(0,parseInt(localStorage.getItem('chroma-xp')||'0',10)||0);}catch(e){return 0;}}
+function writeXP(n){try{localStorage.setItem('chroma-xp',String(Math.max(0,Math.floor(n))));}catch(e){}}
+function levelFromXP(xp){return Math.floor(xp/100)+1;}
+function renderProfileXP(){
+  const xp=readXP(),level=levelFromXP(xp),current=xp%100,el=$('#profileXpFill');
+  if(!el)return;
+  $('#profileLevel').textContent='Nível '+level;
+  $('#profileXpText').textContent=current+' / 100 XP';
+  $('#profileXpNext').textContent='Nível '+(level+1);
+  el.style.width=current+'%';
+}
+function addXP(amount,reason){
+  const before=readXP(),after=before+Math.max(0,Math.floor(amount));writeXP(after);renderProfileXP();
+  if(reason)toast('+'+Math.floor(amount)+' XP · '+reason);
+}
+function readRedeemedCodes(){try{return JSON.parse(localStorage.getItem('chroma-redeemed-codes')||'[]');}catch(e){return [];}}
+function writeRedeemedCodes(a){try{localStorage.setItem('chroma-redeemed-codes',JSON.stringify(a));}catch(e){}}
+function redeemCode(){
+  const input=$('#redeemCode');if(!input)return;
+  const code=(input.value||'').trim().toUpperCase();
+  if(!code){toast('Digite um código');input.focus();return;}
+  const reward=REDEEM_CODES[code];
+  if(!reward){toast('Código inválido ou inexistente');return;}
+  const used=readRedeemedCodes();
+  if(used.includes(code)){toast('Esse código já foi resgatado');return;}
+  used.push(code);writeRedeemedCodes(used);
+  if(reward.type==='coins'){writeCoins(readCoins()+reward.amount);updateCoinHud(true);toast('Código resgatado: +'+reward.amount+' moedas');}
+  else{addXP(reward.amount,'código '+code);}
+  input.value='';renderProfileXP();
+}
+function xpMultiplier(){const st=readShop(),now=Date.now();st.potions=(st.potions||[]).filter(x=>x.expires>now);writeShop(st);return st.potions.length?2:1;}
+function awardMatchXP(v,prev){
+  if(!v||v.phase!=='ended'||!prev||prev.phase!=='playing'||!v.roundId)return;
+  const key='chroma-xp-awarded-'+v.roundId;
+  try{if(localStorage.getItem(key)==='1')return;localStorage.setItem(key,'1');}catch(e){}
+  const won=v.winner===v.me,mult=xpMultiplier(),amount=(won?MATCH_XP*2:MATCH_XP)*mult;
+  addXP(amount,(mult===2?'poção 2× · ':'')+(won?'vitória!':'partida concluída'));
+  bumpMissionStat('played',1);
+  if(won)bumpMissionStat('wins',1);
+}
+function canClaimDaily(){const s=readStreak();return s.lastClaim!==todayKey();}
+
+// ---- missões diárias ----
+const DAILY_MISSIONS=[
+ {id:'play-1',desc:'Jogue 1 partida',goal:1,stat:'played',reward:20,icon:'🎮'},
+ {id:'play-3',desc:'Jogue 3 partidas',goal:3,stat:'played',reward:50,icon:'🃏'},
+ {id:'win-1',desc:'Vença 1 partida',goal:1,stat:'wins',reward:60,icon:'🏆'},
+ {id:'play-5',desc:'Jogue 5 partidas',goal:5,stat:'played',reward:100,icon:'⭐'}
+];
+function readMissions(){
+  const today=todayKey();
+  let st;
+  try{st=JSON.parse(localStorage.getItem('chroma-missions')||'null');}catch(e){st=null;}
+  if(!st||st.day!==today)st={day:today,progress:{},claimed:[]};
+  return st;
+}
+function writeMissions(st){try{localStorage.setItem('chroma-missions',JSON.stringify(st));}catch(e){}}
+function bumpMissionStat(stat,amount){
+  const st=readMissions();
+  st.progress[stat]=(st.progress[stat]||0)+amount;
+  writeMissions(st);
+}
+function claimMission(id){
+  const m=DAILY_MISSIONS.find(x=>x.id===id);if(!m)return;
+  const st=readMissions();
+  const val=st.progress[m.stat]||0;
+  if(val<m.goal||st.claimed.includes(id))return;
+  st.claimed.push(id);writeMissions(st);
+  writeCoins(readCoins()+m.reward);
+  updateCoinHud(true);
+  toast('+'+m.reward+' moedas — '+m.desc);
+  renderMissions();
+}
+function renderMissions(){
+  const list=$('#missionList');if(!list)return;
+  const st=readMissions();
+  list.innerHTML=DAILY_MISSIONS.map(m=>{
+    const val=Math.min(m.goal,st.progress[m.stat]||0);
+    const done=val>=m.goal;
+    const claimed=st.claimed.includes(m.id);
+    const pct=Math.round((val/m.goal)*100);
+    return '<div class="mission-item'+(done?' done':'')+'"><span class="mission-ico">'+m.icon+'</span><div class="mission-body"><b>'+m.desc+'</b><div class="mission-track"><i style="width:'+pct+'%"></i></div><div class="mission-meta"><span>'+val+'/'+m.goal+'</span><span class="mission-reward">🪙 +'+m.reward+'</span></div></div><button class="mission-claim'+(claimed?' claimed':'')+'" data-claim-mission="'+m.id+'" '+((!done||claimed)?'disabled':'')+'>'+(claimed?'Resgatado ✓':'Coletar')+'</button></div>';
+  }).join('');
+}
+
+function renderRewards(){
+  const s=readStreak();const today=todayKey();
+  const row=$('#streakRow');if(row){
+    row.innerHTML=DAILY_REWARD_AMOUNTS.map((amt,i)=>{
+      const dayNum=i+1;
+      const completed=s.lastClaim!==null && dayNum<=s.day;
+      const isToday=canClaimDaily()&&dayNum===((s.day%7)+1);
+      return '<div class="streak-day'+(completed?' done':'')+(isToday?' today':'')+'"><span class="sd-n">Dia '+dayNum+'</span><span class="sd-ico">'+(completed?'✅':'🪙')+'</span><span class="sd-amt">+'+amt+'</span></div>';
+    }).join('');
+  }
+  const btn=$('#btnClaimDaily');
+  if(btn){
+    const can=canClaimDaily();
+    btn.disabled=!can;
+    btn.textContent=can?'Coletar':'Coletado hoje ✓';
+  }
+  updateCoinHud(false);
+  renderMissions();
+}
+function claimDaily(e){
+  if(!canClaimDaily())return;
+  const s=readStreak();const today=todayKey();
+  let nextDay;
+  if(s.lastClaim && daysBetween(s.lastClaim,today)===1){nextDay=(s.day%7)+1;}
+  else{nextDay=1;}
+  const amount=DAILY_REWARD_AMOUNTS[nextDay-1];
+  writeStreak({day:nextDay,lastClaim:today});
+  writeCoins(readCoins()+amount);
+  flyCoins(e&&e.currentTarget?e.currentTarget:$('#btnClaimDaily'),$('#coinHud'));
+  renderRewards();
+}
+function flyCoins(fromEl,toEl){
+  if(!fromEl||!toEl)return;
+  const from=fromEl.getBoundingClientRect(),to=toEl.getBoundingClientRect();
+  const startX=from.left+from.width/2,startY=from.top+from.height/2;
+  const endX=to.left+to.width/2,endY=to.top+to.height/2;
+  const count=8;
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');
+    el.className='coin-fly';el.textContent='🪙';
+    document.body.appendChild(el);
+    const jx=(Math.random()-.5)*60,jy=(Math.random()-.5)*40;
+    const delay=i*45;
+    el.style.transform='translate('+startX+'px,'+startY+'px) scale(1)';
+    el.style.opacity='1';
+    el.style.transition='transform .6s cubic-bezier(.2,.7,.3,1) '+delay+'ms, opacity .6s ease '+delay+'ms';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      el.style.transform='translate('+(startX+jx)+'px,'+(startY+jy-30)+'px) scale(1.2)';
+    }));
+    setTimeout(()=>{
+      el.style.transform='translate('+endX+'px,'+endY+'px) scale(.4)';
+      el.style.opacity='0';
+    },140+delay);
+    setTimeout(()=>{el.remove();if(i===count-1)updateCoinHud(true);},760+delay);
+  }
+  if(count===0)updateCoinHud(true);
+}
 function hasUnreadMail(){const read=readMailIds();return MAIL_MESSAGES.some(m=>!read.includes(m.id));}
 function updateMailBadge(){$('#mailBadge').classList.toggle('show',hasUnreadMail());}
 function renderMail(){
@@ -905,11 +1255,16 @@ function doAct(pid,a){
     const c=p.hand[idx];
     if(room.drawnId&&room.drawnId!==c.id)return 'Jogue a carta comprada ou passe a vez';
     if(!isLegal(p,c))return 'Essa carta não pode ser jogada agora';
-    if(c.c==='w'&&!COLORS.includes(a.color))return 'Escolha uma cor';
+    if(c.v==='eye'&&room.opts.mode!=='caos'&&room.opts.mode!=='supercaos')return 'Essa carta só existe no modo Caos';
+    if(c.v==='eye'){
+      const target=byId(a.targetId);
+      if(!target||target.id===p.id)return 'Escolha outro jogador para observar';
+    }else if(c.c==='w'&&!COLORS.includes(a.color))return 'Escolha uma cor';
     room.vulnerable=null;
     p.hand.splice(idx,1);room.discard.push(c);
-    room.color=c.c==='w'?a.color:c.c;room.drawnId=null;
-    log(p.name+' jogou '+cardName(c)+(c.c==='w'?' → '+CNAME[a.color]:''));
+    if(c.c==='w'&&c.v!=='eye')room.color=a.color;else if(c.c!=='w')room.color=c.c;
+    room.drawnId=null;
+    log(p.name+' jogou '+cardName(c)+(c.c==='w'&&c.v!=='eye'?' → '+CNAME[a.color]:''));
     if(room.opts.dumpColor&&c.v==='blackhole'){
       const same=p.hand.filter(x=>x.c===c.c);
       if(same.length){
@@ -933,7 +1288,7 @@ function doAct(pid,a){
         log(names.join(' e ')+' perderam a vez (Bloqueio Duplo)');advance(k+1);break;
       }
       case 'rev':room.dir*=-1;log('Sentido invertido');advance(n===2?2:1);break;
-      case '+2':case '+4':case '+6':case '+10':{
+      case '+2':case '+4':case '+6':case '+10':case '+99':{
         const k=PLUS[c.v];
         if(room.opts.stack){room.pending+=k;advance(1);}
         else{const t=peekP(1);drawCards(t,k);log(t.name+' comprou '+k+' e perdeu a vez');advance(2);}
@@ -948,8 +1303,31 @@ function doAct(pid,a){
         }
         advance(1);break;
       }
+      case 'confuse':{
+        const pool=shuffle(room.players.reduce((acc,q)=>acc.concat(q.hand),[]));
+        const total=pool.length,base=Math.floor(total/n);
+        let extra=total-base*n;
+        const startIdx=room.players.indexOf(p);
+        const order=[];for(let i=0;i<n;i++)order.push(room.players[(startIdx+i)%n]);
+        order.forEach(q=>{
+          const take=base+(extra>0?1:0);if(extra>0)extra--;
+          q.hand=pool.splice(0,take);
+        });
+        log('CONFUSÃO! As cartas de todos foram embaralhadas e redistribuídas ('+base+(total%n?'-'+(base+1):'')+' cada)');
+        advance(1);break;
+      }
+      case 'eye':{
+        const target=byId(a.targetId);
+        if(target){
+          const cards=target.hand.map(x=>({id:x.id,c:x.c,v:x.v}));
+          if(pid==='host')showEyeView(target.name,cards);
+          else if(conns[pid]&&conns[pid].open){try{conns[pid].send({t:'eye',name:target.name,hand:cards});}catch(_){} }
+          log(p.name+' observou as cartas de '+target.name+' por 3 segundos');
+        }
+        advance(1);break;
+      }
       case '0':{
-        if(room.opts.mode==='effects'&&n>=2){
+        if(room.opts.effects&&n>=2){
           const old=room.players.map(q=>q.hand);
           room.players.forEach((q,j)=>{q.hand=old[((j-room.dir)%n+n)%n];});
           log('Todas as mãos giraram '+(room.dir===1?'em sentido horário':'em sentido anti-horário')+'!');
@@ -1025,13 +1403,17 @@ function botMove(){
     if(act.length&&(peekP(1).hand.length<=3||Math.random()<.4))pool=act;
     const c=pool[Math.floor(Math.random()*pool.length)];
     if(p.hand.length===2&&Math.random()<.85)p.called=true;
-    let color;
+    let color,targetId;
     if(c.c==='w'){
+      if(c.v==='eye'){
+        const others=room.players.filter(x=>x.id!==p.id);
+        targetId=others.length?others[Math.floor(Math.random()*others.length)].id:null;
+      }
       const cnt={r:0,y:0,g:0,b:0};
       p.hand.forEach(x=>{if(x!==c&&x.c!=='w')cnt[x.c]++;});
       color=COLORS.slice().sort((x,y)=>cnt[y]-cnt[x]||Math.random()-.5)[0];
     }
-    a={type:'play',cardId:c.id,color};
+    a={type:'play',cardId:c.id,color,targetId};
   }
   const err=doAct(p.id,a);
   if(err){console.warn('bot:',err);doAct(p.id,{type:room.drawnId?'pass':'draw'});}
@@ -1051,7 +1433,7 @@ function viewFor(p){
     drawnId:mine?room.drawnId:null,
     top:room.discard[room.discard.length-1]||null,
     color:room.color,turn:turnId,dir:room.dir,pending:room.pending,
-    drawLeft:room.draw.length,vulnerable:room.vulnerable,endsAt:room.endsAt,
+    drawLeft:room.draw.length,vulnerable:room.vulnerable,endsAt:room.endsAt,roundId:room.roundId,
     log:room.log.slice(-4),chat:room.chat.slice(-30),winner:room.winner,tournament:room.tournament
   };
 }
@@ -1207,6 +1589,7 @@ function joinRoom(code,name,profile){
       if(!d)return;
       if(d.t==='state'){if(!joined){joined=true;clearTimeout(giveUp);busy(null);}render(d.s);}
       else if(d.t==='err'){if(d.fatal)fail(d.msg);else{cancelFly();warn(d.msg);}}
+      else if(d.t==='eye')showEyeView(d.name,d.hand||[]);
       else if(d.t==='closed')teardown('O host encerrou a sala.');
       else if(d.t==='ping'){try{conn.send({t:'pong',ts:d.ts});}catch(_){}}
       else if(d.t==='pong'){pingMs=Date.now()-d.ts;pingUpdatedAt=Date.now();updatePingUI();}
@@ -1247,20 +1630,26 @@ const SVG={
   skip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.2"/><path d="M6.2 17.8 17.8 6.2"/></svg>',
   rev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8h16M15.5 3.5 20 8l-4.5 4.5M20.5 16h-16M8.5 11.5 4 16l4.5 4.5"/></svg>',
   swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h14l-4-4M20 16.5H6l4 4"/></svg>',
-  blackhole:'<svg viewBox="0 0 512 512" aria-label="BURACO NEGRO" fill="currentColor"><path d="M19.188 17.5v152.063C66.86 258.63 151.98 320.656 248.28 341.092c7.287 2.303 15.034 3.563 23.064 3.563 6.747 0 13.288-.884 19.53-2.53-47.547 33.525-105.556 53.155-168.187 53.155-36.77 0-71.258-7.8-103.5-20.342v35.625c39.863 9.25 78.667 13.034 114.188 10.812 22.572-1.413 43.213-4.7 63.063-10.53-45.634 33.337-107.435 50.03-177.25 49.686v29.44c6.82.457 13.417.874 20.343.874 132.277 0 245.515-77.08 300.283-188.28.174-.357.357-.708.53-1.064.236-.48.463-.953.688-1.438-.046.417-.076.835-.124 1.25-7.255 62.57-34.964 122.59-82.937 170.563-7.697 7.696-15.647 14.944-23.94 21.594h104.595c28.33-57.514 37.687-120.485 29.125-180.72-3.284-23.093-8.64-45.25-16.938-67.188 53.172 71.838 78.54 160.38 71.47 247.907h73.374C492.68 363.235 416.173 252.043 305.406 199c-.273-.13-.538-.276-.812-.406-1.12-.54-2.227-1.045-3.375-1.53-.6-.278-1.183-.573-1.783-.845.102.086.21.16.313.25-4.324-1.73-8.834-3.08-13.5-4 61.317-7.77 125.604 3.935 183.25 37.218 8.896 5.135 17.562 10.86 25.656 16.78v-94.655c-22.682-5.175-45.22-7.668-68.125-7.97-66.77-.874-133.078 18.29-189.186 54.876-9.19 4.476-17.36 10.758-24.063 18.343 24.015-56.973 66.21-107.004 123.69-140.188 49.576-28.623 104.276-41.016 157.686-39V17.5h-118.78c-41.383 17.778-79.457 43.683-111.282 75.656 16.34-27.53 36.19-52.736 58.594-75.656h-42.032c-60.804 67.31-91.872 156.46-87 245.656-.093 1.544-.156 3.09-.156 4.656 0 14.815 4.25 28.65 11.563 40.407-47.44-37.913-83.766-90.83-100.625-153.75-12.45-46.46-12.248-92.975-2.657-136.97H19.188zm252.156 192.188c32.223 0 58.156 25.902 58.156 58.125 0 32.222-25.933 58.156-58.156 58.156-11.938 0-23.007-3.57-32.22-9.69 6.202 3.168 13.23 4.97 20.72 4.97 25.67 0 46.438-20.802 46.437-46.47.003-23.096-16.51-42.202-38.592-45.81 10.03 6.777 17 18.396 17 31.405 0 20.813-17.123 37.313-37.938 37.313-13.864 0-25.89-7.378-32.438-18.532-.72-3.67-1.125-7.457-1.125-11.344 0-32.223 25.934-58.125 58.157-58.125z"/></svg>'
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg>',
+  blackhole:'<svg viewBox="0 0 512 512" aria-label="BURACO NEGRO" fill="currentColor"><path d="M19.188 17.5v152.063C66.86 258.63 151.98 320.656 248.28 341.092c7.287 2.303 15.034 3.563 23.064 3.563 6.747 0 13.288-.884 19.53-2.53-47.547 33.525-105.556 53.155-168.187 53.155-36.77 0-71.258-7.8-103.5-20.342v35.625c39.863 9.25 78.667 13.034 114.188 10.812 22.572-1.413 43.213-4.7 63.063-10.53-45.634 33.337-107.435 50.03-177.25 49.686v29.44c6.82.457 13.417.874 20.343.874 132.277 0 245.515-77.08 300.283-188.28.174-.357.357-.708.53-1.064.236-.48.463-.953.688-1.438-.046.417-.076.835-.124 1.25-7.255 62.57-34.964 122.59-82.937 170.563-7.697 7.696-15.647 14.944-23.94 21.594h104.595c28.33-57.514 37.687-120.485 29.125-180.72-3.284-23.093-8.64-45.25-16.938-67.188 53.172 71.838 78.54 160.38 71.47 247.907h73.374C492.68 363.235 416.173 252.043 305.406 199c-.273-.13-.538-.276-.812-.406-1.12-.54-2.227-1.045-3.375-1.53-.6-.278-1.183-.573-1.783-.845.102.086.21.16.313.25-4.324-1.73-8.834-3.08-13.5-4 61.317-7.77 125.604 3.935 183.25 37.218 8.896 5.135 17.562 10.86 25.656 16.78v-94.655c-22.682-5.175-45.22-7.668-68.125-7.97-66.77-.874-133.078 18.29-189.186 54.876-9.19 4.476-17.36 10.758-24.063 18.343 24.015-56.973 66.21-107.004 123.69-140.188 49.576-28.623 104.276-41.016 157.686-39V17.5h-118.78c-41.383 17.778-79.457 43.683-111.282 75.656 16.34-27.53 36.19-52.736 58.594-75.656h-42.032c-60.804 67.31-91.872 156.46-87 245.656-.093 1.544-.156 3.09-.156 4.656 0 14.815 4.25 28.65 11.563 40.407-47.44-37.913-83.766-90.83-100.625-153.75-12.45-46.46-12.248-92.975-2.657-136.97H19.188zm252.156 192.188c32.223 0 58.156 25.902 58.156 58.125 0 32.222-25.933 58.156-58.156 58.156-11.938 0-23.007-3.57-32.22-9.69 6.202 3.168 13.23 4.97 20.72 4.97 25.67 0 46.438-20.802 46.437-46.47.003-23.096-16.51-42.202-38.592-45.81 10.03 6.777 17 18.396 17 31.405 0 20.813-17.123 37.313-37.938 37.313-13.864 0-25.89-7.378-32.438-18.532-.72-3.67-1.125-7.457-1.125-11.344 0-32.223 25.934-58.125 58.157-58.125z"/></svg>',
+  confuse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 0 7 2.5 7 6s-2.8 5.5-6 5.5-4.8-1.6-4.8-3.7 1.8-3.3 3.8-3.3 3 1.1 3 2.6-1.1 2.2-2.2 2.2"/><circle cx="12" cy="20" r="1.4" fill="currentColor" stroke="none"/></svg>'
 };
 function sym(c,small){
   if(c.v==='skip')return SVG.skip;
   if(c.v==='skip2')return small?'2×':SVG.skip;
   if(c.v==='rev')return SVG.rev;
+  if(c.v==='+99')return '+99';
   if(c.v==='wild')return small?'<span class="wdot"></span>':'';
   if(c.v==='swap')return small?'<span class="wdot"></span>':SVG.swap;
+  if(c.v==='eye')return small?'👁':SVG.eye;
   if(c.v==='blackhole')return SVG.blackhole;
+  if(c.v==='confuse')return small?'🌀':SVG.confuse;
   return esc(c.v);
 }
 function cardEl(c,extra){
   const el=document.createElement('div');
-  el.className='card c-'+c.c+(extra?' '+extra:'');
+  el.className='card c-'+c.c+(c.v==='+99'?' rainbow99':'')+(extra?' '+extra:'');
+      if(extra&&extra.includes('own-card')){const st=readShop(),skin=SHOP_ITEMS.find(x=>x.id===st.equipped.cards);if(skin)el.classList.add(skin.css);}
   el.dataset.id=c.id;
   el.title=cardName(c);
   el.innerHTML='<span class="cn tl">'+sym(c,true)+'</span><div class="mid">'+sym(c,false)+'</div><span class="cn br">'+sym(c,true)+'</span>';
@@ -1268,7 +1657,7 @@ function cardEl(c,extra){
 }
 const AV=['#e63946','#f5b301','#25b05a','#2c7be5','#9b5de5','#f15bb5','#00a6a6','#ff7b00'];
 const ORD={r:0,y:1,g:2,b:3,w:4};
-  const VORD=['0','1','2','3','4','5','6','7','8','9','skip','skip2','rev','+2','+4','+6','+10','wild','swap','blackhole'];
+  const VORD=['0','1','2','3','4','5','6','7','8','9','skip','skip2','rev','+2','+4','+6','+10','+99','wild','swap','eye','blackhole','confuse'];
 const GENDER_EMOJI={female:'♀️',male:'♂️',nonbinary:'⚧️',other:'⚧️'};
 
 function genderEmoji(g){return GENDER_EMOJI[g]||'';}
@@ -1287,8 +1676,11 @@ function avatarMarkup(p,cls='avatar'){
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
+  const coinHud=$('#coinHud');if(coinHud)coinHud.style.display=(id==='game')?'none':'';
+  if(id!=='game'){stopMusic();document.body.classList.remove('chaos-bg','super-chaos-bg');}
+  if(id!=='game'){$('#eyeTargetOv').classList.remove('on');$('#eyeViewOv').classList.remove('on');}
   if(id!=='game'){$('#endOv').classList.remove('on');$('#colorOv').classList.remove('on');}
-  const dockScreens=['home','achievements','mail','settings'];
+  const dockScreens=['home','achievements','mail','settings','rewards','shop'];
   $('#mainDock').classList.toggle('on',dockScreens.includes(id));
   document.querySelectorAll('.dock-btn[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===id));
 }
@@ -1299,6 +1691,7 @@ function render(v){
 }
 
 function renderLobby(v,prev){
+  document.body.classList.remove('chaos-bg','super-chaos-bg');
   killFly();dealing.clear();lastTop=null;prevIds=new Set();
   if(prev&&prev.phase==='lobby'&&v.players.length>prev.players.length)sfx.join();
   $('#lobCode').textContent=v.code;
@@ -1309,6 +1702,7 @@ function renderLobby(v,prev){
     (isHost&&p.bot?'<button data-rm="'+esc(p.id)+'" aria-label="Remover bot">✕</button>':'')+'</li>'
   ).join('');
   const st=$('#optStack');st.checked=!!v.opts.stack;st.disabled=!isHost;
+  const ef=$('#optEffects');ef.checked=!!v.opts.effects;ef.disabled=!isHost;
   const dc=$('#optDump');dc.checked=!!v.opts.dumpColor;dc.disabled=!isHost;
   document.querySelectorAll('input[name=mode]').forEach(r=>{r.checked=r.value===(v.opts.mode||'classic');r.disabled=!isHost;});
   $('#modeWrap').classList.toggle('locked',!isHost);
@@ -1321,7 +1715,11 @@ function renderLobby(v,prev){
 }
 
 function renderGame(v,prev){
+  awardMatchXP(v,prev);
   const playing=v.phase==='playing';
+  document.body.classList.toggle('chaos-bg',v.opts.mode==='caos');
+  document.body.classList.toggle('super-chaos-bg',v.opts.mode==='supercaos');
+  syncMusic(v.opts.mode,playing);
   const myTurn=playing&&v.turn===v.me;
   const cont=!!prev&&prev.phase==='playing';
   if(playing&&!cont){prevIds=new Set();dealing.clear();killFly();}
@@ -1381,7 +1779,7 @@ function renderGame(v,prev){
   const fresh=[];
   hand.forEach(c=>{
     if(c.id===hidId)return;
-    const el=cardEl(c);
+    const el=cardEl(c,'own-card');
     if(myTurn)el.classList.add(v.legal.includes(c.id)?'legal':'dim');
     if(dealing.has(c.id))el.style.visibility='hidden';
     hEl.appendChild(el);
@@ -1437,6 +1835,26 @@ function renderGame(v,prev){
 }
 
 function pickColor(cb){colorCb=cb;$('#colorOv').classList.add('on');}
+function pickEyeTarget(cb){
+  eyeTargetCb=cb;
+  const targets=(view&&view.players||[]).filter(p=>p.id!==view.me);
+  $('#eyeTargets').innerHTML=targets.map(p=>'<button type="button" data-eye-target="'+esc(p.id)+'">'+esc(p.name)+' · '+p.count+' cartas</button>').join('');
+  $('#eyeTargetOv').classList.add('on');
+}
+function closeEyeView(){
+  clearTimeout(eyeViewTimer);eyeViewTimer=null;$('#eyeViewOv').classList.remove('on');
+}
+function showEyeView(name,cards){
+  closeEyeView();
+  $('#eyeViewTitle').textContent='Cartas de '+name;
+  $('#eyeCountdown').textContent='Você tem 3 segundos';
+  $('#eyeCards').innerHTML='';
+  (cards||[]).forEach(c=>$('#eyeCards').appendChild(cardEl(c)));
+  $('#eyeViewOv').classList.add('on');
+  const started=Date.now();
+  const tick=()=>{const left=Math.max(0,3000-(Date.now()-started));$('#eyeCountdown').textContent=left?'Fecha em '+(left/1000).toFixed(1)+'s':'Visão encerrada';if(left)eyeViewTimer=setTimeout(tick,100);else eyeViewTimer=setTimeout(closeEyeView,300);};
+  tick();
+}
 function formatTime(ms){const total=Math.ceil(Math.max(0,ms)/1000),m=Math.floor(total/60),s=String(total%60).padStart(2,'0');return m+':'+s;}
 
 
@@ -1522,6 +1940,7 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
     catch(e){toast('Código: '+code);}
   };
   $('#optStack').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.stack=e.target.checked;broadcast();}};
+  $('#optEffects').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.effects=e.target.checked;broadcast();}};
   $('#optDump').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.dumpColor=e.target.checked;broadcast();}};
   const updateRoomLimits=()=>{
     if(!isHost||!room||room.phase!=='lobby')return;
@@ -1553,19 +1972,36 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
   $('#btnBackLobby').onclick=()=>{if(isHost&&room){room.phase='lobby';broadcast();}};
 
 
+  if(window.lucide)lucide.createIcons();
   initPreferences();
   pingTimer=setInterval(sendPings,3000);
   setInterval(()=>{if(view&&view.phase==='playing'&&view.endsAt){const left=Math.max(0,view.endsAt-Date.now()),timer=$('#matchTimer');timer.textContent=formatTime(left);timer.classList.toggle('urgent',left>0&&left<=60000);}},1000);
   $('#btnSettings').onclick=()=>show('settings');
   $('#settingsBack').onclick=()=>show('home');
+  $('#btnRedeem').onclick=redeemCode;
+  $('#redeemCode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16);});
+  $('#redeemCode').addEventListener('keydown',e=>{if(e.key==='Enter')redeemCode();});
 
   // ---- dock inferior (categorias) ----
   $('#dockAchievements').onclick=()=>{renderAchievements();show('achievements');};
   $('#dockMail').onclick=()=>{renderMail();show('mail');};
   $('#dockHome').onclick=()=>show('home');
+  $('#dockRewards').onclick=()=>{renderRewards();show('rewards');};
+  $('#dockShop').onclick=()=>{renderShop();show('shop');};
+  document.querySelectorAll('[data-shop-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-shop-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderShop(b.dataset.shopTab);});
+  $('#shopGrid').addEventListener('click',e=>{const b=e.target.closest('[data-shop-buy]');if(b)buyShop(b.dataset.shopBuy);});
+  $('#rouletteClose').onclick=()=>$('#rouletteOv').classList.remove('on');
   $('#achBack').onclick=()=>show('home');
   $('#mailBack').onclick=()=>show('home');
+  $('#rewardsBack').onclick=()=>show('home');
+  $('#shopBack').onclick=()=>show('home');
+  $('#btnClaimDaily').onclick=e=>claimDaily(e);
+  $('#missionList').addEventListener('click',e=>{const b=e.target.closest('[data-claim-mission]');if(b)claimMission(b.dataset.claimMission);});
   updateMailBadge();
+  updateCoinHud(false);
+  renderProfileXP();
+  applyCosmetics();
+  renderShop();
 
   $('#hand').addEventListener('click',e=>{
     const el=e.target.closest('.card');if(!el||!view||view.phase!=='playing')return;
@@ -1578,11 +2014,13 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
       return;
     }
     const from=rectOf(el);
-    const go=col=>{
+    const play=payload=>{
       if(!RM)startFly(c,from,true);
-      send(col?{type:'play',cardId:id,color:col}:{type:'play',cardId:id});
+      send(Object.assign({type:'play',cardId:id},payload||{}));
     };
-    if(c.c==='w')pickColor(go);else go();
+    if(c.v==='eye')pickEyeTarget(targetId=>play({targetId}));
+    else if(c.c==='w')pickColor(color=>play({color}));
+    else play();
   });
   $('#drawpile').onclick=()=>{
     if(!view||view.phase!=='playing')return;
@@ -1607,9 +2045,15 @@ function initPreferences(){applyPreferences();$('#lightMode').onchange=e=>{try{l
     if(b){const cb=colorCb;colorCb=null;$('#colorOv').classList.remove('on');if(cb)cb(b.dataset.c);}
     else if(e.target.id==='colorCancel'||e.target.id==='colorOv'){colorCb=null;$('#colorOv').classList.remove('on');}
   });
+  $('#eyeTargetOv').addEventListener('click',e=>{
+    const b=e.target.closest('[data-eye-target]');
+    if(b){const cb=eyeTargetCb;eyeTargetCb=null;$('#eyeTargetOv').classList.remove('on');if(cb)cb(b.dataset.eyeTarget);}
+    else if(e.target.id==='eyeTargetCancel'||e.target.id==='eyeTargetOv'){eyeTargetCb=null;$('#eyeTargetOv').classList.remove('on');}
+  });
+  $('#eyeViewOv').addEventListener('click',e=>{if(e.target.id==='eyeViewOv')closeEyeView();});
   const syncMute=()=>{const b=$('#settingsMute');if(!b)return;b.textContent=muted?'🔇 Som desligado':'🔊 Som ligado';b.setAttribute('aria-label',muted?'Ligar som':'Desligar som');};
   syncMute();
-  $('#settingsMute').addEventListener('click',()=>{muted=!muted;try{localStorage.setItem('chroma-mute',muted?'1':'0');}catch(e){}syncMute();});
+  $('#settingsMute').addEventListener('click',()=>{muted=!muted;try{localStorage.setItem('chroma-mute',muted?'1':'0');}catch(e){}if(music)music.muted=muted;syncMute();});
   ['pointerdown','touchend','keydown'].forEach(n=>document.addEventListener(n,()=>audio(),{passive:true}));
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button'))sfx.click();});
   window.addEventListener('beforeunload',()=>{
