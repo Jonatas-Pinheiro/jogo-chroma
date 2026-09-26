@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="coin-hud" id="coinHud"><span class="coin-ico"><i data-lucide="coins"></i></span><span id="coinAmt">0</span></div>
@@ -768,12 +768,12 @@ const SHOP_ITEMS=[
  {id:'card-royal',rarity:'Lendário',type:'cards',name:'Cartas Reais',desc:'Contorno dourado com cantos retos, sem alterar o card.',image:'Link da imagem aqui',price:260,css:'card-skin-royal'},
  {id:'card-aurora',rarity:'Raro',type:'cards',name:'Cartas Aurora',desc:'Skin rara exclusiva da recompensa do nível 10.',image:'Link da imagem aqui',price:0,css:'card-skin-aurora',levelOnly:10},
  {id:'card-constelacao',rarity:'Mítico',type:'cards',name:'Cartas Constelação',desc:'Skin mítica premium: brilho pulsante, estrelas cintilantes nos cantos e números em fonte élfica exclusiva.',image:'Link da imagem aqui',price:320,css:'card-skin-constelacao'},
- {id:'chest-simple',type:'chests',name:'Baú Simples',desc:'Recompensas básicas para começar sua coleção.',image:'assets/baus/BAU-SIMPLES.png',price:60,chest:'simple'},
- {id:'chest-common',type:'chests',name:'Baú Brilhante',desc:'Roleta com cosméticos e poções.',image:'assets/baus/BAU-BRILHANTE.png',price:120,chest:'common'},
- {id:'chest-royal',type:'chests',name:'Baú Real',desc:'Mais chances de recompensas raras.',image:'assets/baus/BAU-REAL.png',price:300,chest:'royal'}
+ {id:'chest-simple',type:'chests',name:'Baú Simples',desc:'Recompensas básicas para começar sua coleção.',image:'BAU-SIMPLES.png',price:60,chest:'simple'},
+ {id:'chest-common',type:'chests',name:'Baú Brilhante',desc:'Roleta com cosméticos e poções.',image:'BAU-BRILHANTE.png',price:120,chest:'common'},
+ {id:'chest-royal',type:'chests',name:'Baú Real',desc:'Mais chances de recompensas raras.',image:'BAU-REAL.png',price:300,chest:'royal'}
 ];
 const CHEST_PRIZES={simple:[
- {id:'coins-20',name:'20 moedas',image:'assets/baus/BAU-SIMPLES.png',kind:'coins',amount:20,weight:30},{id:'coins-40',name:'40 moedas',image:'assets/baus/BAU-SIMPLES.png',kind:'coins',amount:40,weight:25},{id:'xp-potion',name:'Poção 2× XP · 15 min',image:'assets/baus/BAU-SIMPLES.png',kind:'potion',amount:15,weight:15},{id:'frame-neon',name:'Moldura Neon',image:'Link da imagem aqui',kind:'item',weight:8},{id:'card-neon',name:'Cartas Neon',image:'Link da imagem aqui',kind:'item',weight:7},{id:'coins-80',name:'80 moedas',image:'assets/baus/BAU-SIMPLES.png',kind:'coins',amount:80,weight:15}],common:[
+ {id:'coins-20',name:'20 moedas',image:'BAU-SIMPLES.png',kind:'coins',amount:20,weight:30},{id:'coins-40',name:'40 moedas',image:'BAU-SIMPLES.png',kind:'coins',amount:40,weight:25},{id:'xp-potion',name:'Poção 2× XP · 15 min',image:'BAU-SIMPLES.png',kind:'potion',amount:15,weight:15},{id:'frame-neon',name:'Moldura Neon',image:'Link da imagem aqui',kind:'item',weight:8},{id:'card-neon',name:'Cartas Neon',image:'Link da imagem aqui',kind:'item',weight:7},{id:'coins-80',name:'80 moedas',image:'BAU-SIMPLES.png',kind:'coins',amount:80,weight:15}],common:[
  {id:'coins-60',name:'60 moedas',image:'Link da imagem aqui',kind:'coins',amount:60,weight:30},{id:'xp-potion',name:'Poção 2× XP · 30 min',image:'Link da imagem aqui',kind:'potion',amount:30,weight:22},{id:'frame-neon',name:'Moldura Neon',image:'Link da imagem aqui',kind:'item',weight:9},{id:'card-neon',name:'Cartas Neon',image:'Link da imagem aqui',kind:'item',weight:9},{id:'frame-ice',name:'Moldura Gelo',image:'Link da imagem aqui',kind:'item',weight:8},{id:'frame-forest',name:'Moldura Floresta',image:'Link da imagem aqui',kind:'item',weight:8},{id:'card-fire',name:'Cartas Fogo',image:'Link da imagem aqui',kind:'item',weight:6},{id:'coins-150',name:'150 moedas',image:'Link da imagem aqui',kind:'coins',amount:150,weight:8}],royal:[
  {id:'coins-250',name:'250 moedas',image:'Link da imagem aqui',kind:'coins',amount:250,weight:20},{id:'xp-potion',name:'Poção 2× XP · 30 min',image:'Link da imagem aqui',kind:'potion',amount:30,weight:16},{id:'frame-gold',name:'Moldura Dourada',image:'Link da imagem aqui',kind:'item',weight:14},{id:'card-gold',name:'Cartas Douradas',image:'Link da imagem aqui',kind:'item',weight:12},{id:'card-diamond',name:'Cartas Diamante',image:'Link da imagem aqui',kind:'item',weight:8},{id:'frame-fire',name:'Moldura Fogo',image:'Link da imagem aqui',kind:'item',weight:10},{id:'card-shadow',name:'Cartas Sombra',image:'Link da imagem aqui',kind:'item',weight:10},{id:'frame-royal',name:'Moldura Real',image:'Link da imagem aqui',kind:'item',weight:6},{id:'card-royal',name:'Cartas Reais',image:'Link da imagem aqui',kind:'item',weight:4}]};
 function readShop(){try{const x=JSON.parse(localStorage.getItem('chroma-shop')||'{"owned":[],"equipped":{"profile":"","cards":"","name-effect":""},"potions":[]}');x.equipped=x.equipped||{};if(x.equipped['name-effect']==null)x.equipped['name-effect']='';return x;}catch(e){return{owned:[],equipped:{profile:'',cards:'','name-effect':''},potions:[]}}}
@@ -2023,6 +2023,6 @@ function adminLockAll(){
   writeShop(st);renderShop();renderInventory();applyCosmetics();toast('Cosméticos removidos (moedas, poções e baús preservados)');
 }
 </script>
-<script type="module" src="js/firebase-auth.js"></script>
+<script type="module" src="firebase-auth.js"></script>
 </body>
 </html>
