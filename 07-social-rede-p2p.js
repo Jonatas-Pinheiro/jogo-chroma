@@ -11,8 +11,12 @@ function renderMail(){
   writeMailIds(MAIL_MESSAGES.map(m=>m.id));
   updateMailBadge();
 }
+function readShowcaseAchievements(){try{return JSON.parse(localStorage.getItem('chroma-showcase-achievements')||'[]').filter(id=>ACHIEVEMENTS.some(a=>a.id===id)).slice(0,3)}catch(e){return[]}}
+function writeShowcaseAchievements(ids){const clean=[...new Set((ids||[]).filter(id=>ACHIEVEMENTS.some(a=>a.id===id)))].slice(0,3);try{localStorage.setItem('chroma-showcase-achievements',JSON.stringify(clean))}catch(e){}renderAchievements();window.dispatchEvent(new Event('chroma-state-changed'));}
+function renderShowcaseSlots(){const el=$('#showcaseSlots');if(!el)return;const s=myRankStats(),f=myFlags(),chosen=readShowcaseAchievements();el.innerHTML=[0,1,2].map(i=>'<select data-showcase-slot="'+i+'" aria-label="Slot de insígnia '+(i+1)+'"><option value="">Slot '+(i+1)+' vazio</option>'+ACHIEVEMENTS.filter(a=>a.check(s,f)).map(a=>'<option value="'+esc(a.id)+'" '+(chosen[i]===a.id?'selected':'')+'>'+esc(a.name)+'</option>').join('')+'</select>').join('');el.querySelectorAll('[data-showcase-slot]').forEach(sel=>sel.onchange=()=>{const ids=[...el.querySelectorAll('[data-showcase-slot]')].map(x=>x.value).filter(Boolean);writeShowcaseAchievements(ids);});}
 function renderAchievements(){
   const s=myRankStats(),f=myFlags();
+  renderShowcaseSlots();
   const unlockedCount=ACHIEVEMENTS.filter(a=>a.check(s,f)).length;
   $('#achGrid').innerHTML=ACHIEVEMENTS.map(a=>{
     const unlocked=a.check(s,f);
@@ -20,19 +24,15 @@ function renderAchievements(){
   }).join('')+'<div class="tourney-meta" style="grid-column:1/-1">'+unlockedCount+' de '+ACHIEVEMENTS.length+' conquistadas</div>';
 }
 function readFriends(){try{return JSON.parse(localStorage.getItem('chroma-friends')||'{\"friends\":[],\"requests\":[],\"sent\":[]}')}catch(e){return{friends:[],requests:[],sent:[]}}}
-function writeFriends(x){try{localStorage.setItem('chroma-friends',JSON.stringify(x))}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function writeFriends(x){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-friends',JSON.stringify(x))}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function sendFriendRequest(username){const n=String(username||'').trim().toLowerCase().replace(/^@+/,'').replace(/[^a-z0-9_]/g,'').slice(0,18),me=String(localStorage.getItem('chroma-username')||'').toLowerCase();if(n.length<3){toast('Digite um nome de usuário válido');return;}if(n===me){toast('Você não pode adicionar a si mesmo');return;}const f=readFriends();if(f.friends.includes(n)||f.sent.includes(n)){toast('Esse jogador já está nos seus amigos ou pedidos');return;}f.sent.push(n);writeFriends(f);renderFriends();toast('Pedido enviado para @'+n);}
 function renderFriends(){const f=readFriends(),empty='<div class="friend-empty">Nenhum registro por enquanto.</div>';const row=(n,actions)=>'<div class="friend-row"><span class="friend-avatar">@</span><b>@'+esc(n)+'</b><span class="friend-actions">'+(actions||'')+'</span></div>';$('#friendRequests').innerHTML=f.requests.length?f.requests.map(n=>row(n,'<button class="btn primary" data-friend-accept="'+esc(n)+'">Aceitar</button>')).join(''):empty;$('#friendSent').innerHTML=f.sent.length?f.sent.map(n=>row(n,'<small>Pendente</small>')).join(''):empty;$('#friendList').innerHTML=f.friends.length?f.friends.map(n=>row(n)).join(''):empty;}
 function acceptFriend(n){const f=readFriends();f.requests=f.requests.filter(x=>x!==n);if(!f.friends.includes(n))f.friends.push(n);writeFriends(f);renderFriends();}
 function renderMatchPlayers(){const list=$('#matchPlayersList');if(!list||!view)return;list.innerHTML=(view.players||[]).map(p=>'<div class="match-player-row"><div class="match-player-name">'+avatarMarkup(p,'avatar')+'<span>'+esc(p.name)+(p.id===view.me?' <small>(você)</small>':'')+'</span></div>'+(p.id!==view.me&&!p.bot?'<button class="btn primary" data-match-add="'+esc(p.name)+'">Adicionar amizade</button>':'<small class="player-status">'+(p.bot?'Bot':'Você')+'</small>')+'</div>').join('');}
-function recordRank(name,delta,won,played){
-  const a=readRank();let p=a.find(x=>x.name.toLowerCase()===name.toLowerCase());
-  if(!p){p={name,rating:1000,wins:0,losses:0,played:0};a.push(p)}
-  p.rating=Math.max(0,Math.round(p.rating+delta));p.wins+=won?1:0;p.losses+=won?0:1;p.played+=played?1:0;p.updated=Date.now();writeRank(a);
-}
+function recordRank(name,delta,won,played){return recordRanked(name,delta,won);}
 const RANKED_WIN_POINTS=[34,30,26,22,18,14],RANKED_LOSS_POINTS=[12,11,10,9,8,7];
 function readRanked(){try{return JSON.parse(localStorage.getItem('chroma-ranked')||'[]')}catch(e){return []}}
-function writeRanked(a){try{localStorage.setItem('chroma-ranked',JSON.stringify(a))}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function writeRanked(a){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-ranked',JSON.stringify(a))}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function rankedStats(name){const a=readRanked(),p=a.find(x=>x.name.toLowerCase()===String(name||'').toLowerCase());return p||{name:name||'Você',points:0,wins:0,losses:0,played:0};}
 function recordRanked(name,delta,won){const a=readRanked();let p=a.find(x=>x.name.toLowerCase()===name.toLowerCase());if(!p){p={name,points:0,wins:0,losses:0,played:0};a.push(p);}p.points=Math.max(0,Math.round(p.points+delta));p.wins+=won?1:0;p.losses+=won?0:1;p.played++;p.updated=Date.now();writeRanked(a);return p;}
 function settleRankedView(v){if(!v||!v.opts||!v.opts.ranked||!v.roundId||!v.winner)return;if(v.opts.mode==='tournament'&&v.tournament&&!v.tournament.finished)return;let done=[];try{done=JSON.parse(localStorage.getItem('chroma-ranked-settled')||'[]')}catch(e){}const key=v.code+'|'+v.roundId;if(done.includes(key))return;const me=v.players.find(p=>p.id===v.me),winner=v.players.find(p=>p.id===v.winner);if(!me)return;const won=v.winnerTeam!=null?me.team===v.winnerTeam:me.id===v.winner;const tier=rankedTier(rankedStats(me.name).points),idx=RANKED_TIERS.indexOf(tier),base=won?RANKED_WIN_POINTS[Math.floor(idx/4)]:-RANKED_LOSS_POINTS[Math.floor(idx/4)],delta=won&&v.opts.mode==='supercaos'?Math.round(base*1.5):base;recordRanked(me.name,delta,won);done.push(key);if(done.length>40)done=done.slice(-40);try{localStorage.setItem('chroma-ranked-settled',JSON.stringify(done));}catch(e){}if(me.id===v.me)toast((won?'+':'')+delta+' pontos ranqueados');}
@@ -262,10 +262,13 @@ function botMove(){
   else{
     const nonW=legal.filter(c=>c.c!=='w');
     let pool=nonW.length?nonW:legal;
-    const act=pool.filter(c=>!/^\d$/.test(c.v));
-    if(act.length&&(peekP(1).hand.length<=3||Math.random()<.4))pool=act;
+    const difficulty=p.botDifficulty||'normal';
+    if(difficulty==='easy'){pool=legal;}
+    else if(difficulty==='hard'){pool=pool.slice().sort((a,b)=>(/^\d$/.test(a.v)?0:2)-(/^\d$/.test(b.v)?0:2)||b.v.length-a.v.length);}
+    else if(difficulty==='master'){pool=pool.slice().sort((a,b)=>{const score=c=>((/^\d$/.test(c.v)?0:5)+(c.c==='w'?3:0)+(c.v in PLUS?4:0)+(p.hand.filter(x=>x.c===c.c).length*.15));return score(b)-score(a);});}
+    else{const act=pool.filter(c=>!/^\d$/.test(c.v));if(act.length&&(peekP(1).hand.length<=3||Math.random()<.4))pool=act;}
     const c=pool[Math.floor(Math.random()*pool.length)];
-    if(p.hand.length===2&&Math.random()<.85)p.called=true;
+    if(p.hand.length===2&&Math.random()<(difficulty==='easy'?.45:difficulty==='master'?.98:.85))p.called=true;
     let color,targetId;
     if(c.c==='w'){
       if(c.v==='eye'){
@@ -291,7 +294,7 @@ function viewFor(p){
   return{
     phase:room.phase,code:room.code,me:p.id,opts:room.opts,
     winnerTeam:room.winnerTeam==null?null:room.winnerTeam,team:p.team==null?null:p.team,turnEndsAt:room.turnEndsAt,
-    players:room.players.map(q=>({id:q.id,name:q.name,photo:q.photo||'',gender:q.gender||'',count:q.hand.length,called:!!q.called,bot:q.bot,wins:q.wins,team:q.team==null?null:q.team,frame:safeFrameClass(q.frame),nameEffect:safeNameEffect(q.nameEffect)})),
+    players:room.players.map(q=>({id:q.id,name:q.name,photo:q.photo||'',gender:q.gender||'',count:q.hand.length,called:!!q.called,bot:q.bot,wins:q.wins,team:q.team==null?null:q.team,frame:safeFrameClass(q.frame),nameEffect:safeNameEffect(q.nameEffect),showcase:Array.isArray(q.showcase)?q.showcase.slice(0,3):[]})),
     hand:p.hand,
     legal:mine?legalCards(p).map(c=>c.id):[],
     drawnId:mine?room.drawnId:null,
@@ -371,7 +374,16 @@ function toast(msg,ms){
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200);
 }
 function cleanName(n){return (n||'').replace(/\s+/g,' ').trim().slice(0,14);}
-function saveName(n){try{localStorage.setItem('chroma-name',n);}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function saveName(n){if(!window.chromaCloud?.canWrite()){toast('Sem conexão com a internet. Esta alteração não foi realizada.');return false;}const previous=localStorage.getItem('chroma-name')||'';try{localStorage.setItem('chroma-name',n);}catch(e){return false;}window.chromaCloud.persistState().catch(()=>{try{localStorage.setItem('chroma-name',previous);}catch(_){}toast('Não foi possível salvar o nome no servidor.');renderProfile();});window.dispatchEvent(new Event('chroma-state-changed'));return true;}
+
+function startTraining(name,profile,count,difficulty){
+  teardown('');
+  room=newRoom('TRAINING',name,profile);isHost=true;joined=true;peer=null;hostConn=null;
+  room.opts.training=true;room.opts.botCount=Math.max(1,Math.min(4,Number(count)||2));room.opts.botDifficulty=['easy','normal','hard','master'].includes(difficulty)?difficulty:'normal';room.opts.maxPlayers=room.opts.botCount+1;
+  room.players[0].id='host';
+  for(let i=0;i<room.opts.botCount;i++){const base=BOT_NAMES[i%BOT_NAMES.length];room.players.push({id:'bot-'+Math.random().toString(36).slice(2,7),name:base,hand:[],bot:true,botDifficulty:room.opts.botDifficulty,wins:0,called:false,team:null});}
+  startRound();render(viewFor(room.players[0]));
+}
 
 function createRoom(name,profile){
   isHost=true;myId='host';busy('Criando sala…');
@@ -405,7 +417,7 @@ function onGuestConn(conn){
       if(room.phase!=='lobby')return refuse(conn,'A partida já começou.');
       if(room.players.length>=room.opts.maxPlayers)return refuse(conn,'A sala está cheia.');
       if(room.players.some(p=>p.id===conn.peer))return;
-      const p={id:conn.peer,name:uniqueName(cleanName(d.name)||'Jogador'),photo:typeof d.photo==='string'?d.photo.slice(0,350000):'',gender:GENDER_EMOJI[d.gender]?d.gender:'',frame:safeFrameClass(d.frame),nameEffect:safeNameEffect(d.nameEffect),hand:[],bot:false,wins:0,called:false,team:teamForIndex(room.players.length,room.opts.mode)};
+      const p={id:conn.peer,name:uniqueName(cleanName(d.name)||'Jogador'),photo:typeof d.photo==='string'?d.photo.slice(0,350000):'',gender:GENDER_EMOJI[d.gender]?d.gender:'',frame:safeFrameClass(d.frame),nameEffect:safeNameEffect(d.nameEffect),showcase:Array.isArray(d.showcase)?d.showcase.filter(id=>ACHIEVEMENTS.some(a=>a.id===id)).slice(0,3):[],hand:[],bot:false,wins:0,called:false,team:teamForIndex(room.players.length,room.opts.mode)};
       room.players.push(p);conns[conn.peer]=conn;
       broadcast();
     }else if(d.t==='act'){
@@ -448,7 +460,7 @@ function joinRoom(code,name,profile){
     myId=id;
     const conn=pr.connect(APP+code,{reliable:true});
     hostConn=conn;
-    conn.on('open',()=>conn.send({t:'join',name,photo:profile.photo,gender:profile.gender,frame:profile.frame,nameEffect:profile.nameEffect}));
+    conn.on('open',()=>conn.send({t:'join',name,photo:profile.photo,gender:profile.gender,frame:profile.frame,nameEffect:profile.nameEffect,showcase:profile.showcase||[]}));
     conn.on('data',d=>{
       if(!d)return;
       if(d.t==='state'){if(!joined){joined=true;clearTimeout(giveUp);busy(null);}render(d.s);}

@@ -1,17 +1,73 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function validAccount() {
+      return request.resource.data.uid == request.auth.uid
+        && request.resource.data.coins is int && request.resource.data.coins >= 0
+        && request.resource.data.xp is int && request.resource.data.xp >= 0
+        && request.resource.data.level is int && request.resource.data.level >= 1
+        && request.resource.data.rank is string && request.resource.data.username is string
+        && request.resource.data.username.size() <= 18 && !('role' in request.resource.data);
+    }
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId && !('role' in request.resource.data);
-      allow update: if request.auth != null && request.auth.uid == userId
+      allow read: if owner(userId);
+      allow create: if owner(userId) && request.resource.data.uid == userId
+        && request.resource.data.coins == 0 && request.resource.data.xp == 0
+        && request.resource.data.level == 1 && request.resource.data.rank == 'Prata I'
+        && request.resource.data.cosmetics == [] && request.resource.data.equipped == {} && validAccount();
+      allow update: if owner(userId) && validAccount()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'email','coins','xp','shop','name','username','photo','gender','streak',
-          'levelRewards','redeemedCodes','missions','ranking','ranked','mailRead','friends','updatedAt'
+          'uid','email','coins','xp','level','rank','cosmetics','equipped','shop','name','username','photo','gender','streak',
+          'levelRewards','redeemedCodes','missions','ranking','ranked','mailRead','friends','gameStats','showcaseAchievements','cardsPlayed','flags','updatedAt','clanId','clanRole'
         ]);
+      allow delete: if false;
+    }
+    match /publicProfiles/{uid} {
+      allow read: if signedIn();
+      allow create: if owner(uid) && request.resource.data.uid == uid
+        && request.resource.data.usernameLower is string && request.resource.data.usernameLower.size() >= 2
+        && request.resource.data.usernameLower.size() <= 18 && request.resource.data.name is string
+        && request.resource.data.name.size() <= 40;
+      allow update: if owner(uid) && request.resource.data.uid == resource.data.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid','username','usernameLower','name','photo','rank','level','clanId','clanName','createdAt','updatedAt']);
+      allow delete: if false;
+    }
+    match /friendRequests/{requestId} {
+      allow read: if signedIn() && (request.auth.uid == resource.data.fromUid || request.auth.uid == resource.data.toUid);
+      allow create: if signedIn() && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.toUid is string && request.resource.data.toUid != request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if signedIn() && ((request.auth.uid == resource.data.toUid && resource.data.status == 'pending' && request.resource.data.status in ['accepted','declined'])
+        || (request.auth.uid == resource.data.fromUid && resource.data.status == 'pending' && request.resource.data.status == 'cancelled'));
+      allow delete: if signedIn() && (request.auth.uid == resource.data.fromUid || request.auth.uid == resource.data.toUid);
+    }
+    match /friendships/{friendshipId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participants;
+      allow create: if signedIn() && request.auth.uid in request.resource.data.participants
+        && request.resource.data.participants.size() == 2;
+      allow delete: if signedIn() && request.auth.uid in resource.data.participants;
+      allow update: if false;
+    }
+    match /clans/{clanId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.leaderId == request.auth.uid
+        && request.resource.data.memberCount == 1 && request.resource.data.level == 1
+        && request.resource.data.xp == 0 && request.resource.data.name is string
+        && request.resource.data.name.size() >= 3 && request.resource.data.name.size() <= 24;
+      allow update: if signedIn() && (
+        resource.data.leaderId == request.auth.uid
+        || (resource.data.members[request.auth.uid].role == 'member'
+          && ((request.resource.data.memberCount == resource.data.memberCount + 1 && request.resource.data.members[request.auth.uid].role == 'member')
+            || (request.resource.data.memberCount == resource.data.memberCount - 1 && request.resource.data.members[request.auth.uid] == null)))
+      ) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','memberCount','updatedAt']);
+      allow delete: if signedIn() && resource.data.leaderId == request.auth.uid;
     }
     match /mail/{mailId} {
-      allow read: if request.auth != null && request.auth.uid in resource.data.recipients;
+      allow read: if signedIn() && request.auth.uid in resource.data.recipients;
       allow write: if false;
     }
   }

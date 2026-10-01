@@ -7,7 +7,7 @@ function cardName(c){
 function newRoom(code,hostName,profile={}){
   return{
     code,phase:'lobby',opts:{stack:false,effects:false,ranked:false,mode:'classic',dumpColor:false,minutes:10,maxPlayers:4,turnSeconds:6},
-    players:[{id:'host',name:hostName,photo:profile.photo||'',gender:profile.gender||'',frame:profile.frame||'',nameEffect:profile.nameEffect||'',hand:[],bot:false,wins:0,called:false,team:0}],
+    players:[{id:'host',name:hostName,photo:profile.photo||'',gender:profile.gender||'',frame:profile.frame||'',nameEffect:profile.nameEffect||'',showcase:Array.isArray(profile.showcase)?profile.showcase.slice(0,3):[],hand:[],bot:false,wins:0,called:false,team:0}],
     tournament:{round:0,maxRounds:5,scores:{},finished:false,id:null},
     deckSerial:0,
     draw:[],discard:[],turn:0,dir:1,color:'r',pending:0,drawnId:null,vulnerable:null,winner:null,winnerTeam:null,turnEndsAt:null,endsAt:null,roundId:null,log:[],chat:[]
@@ -88,31 +88,41 @@ function clampRoomOptions(minutes,maxPlayers,turnSeconds){
   return{minutes:Math.max(MIN_MINUTES,Math.min(MAX_MINUTES,Number(minutes)||10)),maxPlayers:Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,Number(maxPlayers)||4)),turnSeconds:Math.max(1,Math.min(30,Number(turnSeconds)||6))};
 }
 
-function rankTier(rating){let t=RANK_TIERS[0];for(const x of RANK_TIERS)if(rating>=x.min)t=x;return t;}
 function rankedTier(points){let t=RANKED_TIERS[0];for(const x of RANKED_TIERS)if(points>=x.min)t=x;return t;}
-function readRank(){try{return JSON.parse(localStorage.getItem('chroma-ranking')||'[]')}catch(e){return []}}
-function writeRank(a){try{localStorage.setItem('chroma-ranking',JSON.stringify(a))}catch(e){}}
+function rankTier(points){return rankedTier(points);}
+function readRank(){return readRanked();}
+function writeRank(a){writeRanked(a);}
 
 const ACHIEVEMENTS=[
-  {ico:'',image:'CONQUISTA-PRIMEIRA-PARTIDA.png',name:'Estreante',desc:'Jogue sua primeira partida',check:s=>s.played>=1},
-  {ico:'',image:'CONQUISTA-VITORIOSO.png',name:'Primeira Vitória',desc:'Vença uma partida',check:s=>s.wins>=1},
-  {ico:'',image:'CONQUISTA-QUINZE-PARTIDAS.png',name:'Quinze Partidas',desc:'Jogue 15 partidas',check:s=>s.played>=15},
-  {ico:'',name:'Veterano',desc:'Jogue 25 partidas',check:s=>s.played>=25},
-  {ico:'',image:'CONQUISTA-MIL-CARTAS.png',name:'Mil Cartas',desc:'Jogue 1.000 cartas',rainbow:true,check:s=>s.cardsPlayed>=1000},
-  {ico:'',name:'Sanguinário',desc:'Vença 10 partidas',check:s=>s.wins>=10},
-  {ico:'',name:'Prata',desc:'Alcance a patente Prata',check:s=>s.rating>=400},
-  {ico:'',name:'Ouro',desc:'Alcance a patente Ouro',check:s=>s.rating>=800},
-  {ico:'',name:'Platina',desc:'Alcance a patente Platina',check:s=>s.rating>=1200},
-  {ico:'',name:'Grão-Mestre',desc:'Chegue ao topo do ranking',check:s=>s.rating>=3000},
-  {ico:'',image:'CONQUISTA-PSICOPATA.png',name:'Psicopata',desc:'Pessoas que jogam no modo claro são estranhas.',check:(s,f)=>f.psicopata},
+  {id:'estreante',ico:'',image:'CONQUISTA-PRIMEIRA-PARTIDA.png',name:'Estreante',desc:'Jogue sua primeira partida',check:s=>s.played>=1},
+  {id:'primeira-vitoria',ico:'',image:'CONQUISTA-VITORIOSO.png',name:'Primeira Vitória',desc:'Vença uma partida',check:s=>s.wins>=1},
+  {id:'quinze-partidas',ico:'',image:'CONQUISTA-QUINZE-PARTIDAS.png',name:'Quinze Partidas',desc:'Jogue 15 partidas',check:s=>s.played>=15},
+  {id:'veterano',ico:'',name:'Veterano',desc:'Jogue 25 partidas',check:s=>s.played>=25},
+  {id:'mil-cartas',ico:'',image:'CONQUISTA-MIL-CARTAS.png',name:'Mil Cartas',desc:'Jogue 1.000 cartas',rainbow:true,check:s=>s.cardsPlayed>=1000},
+  {id:'sanguinario',ico:'',name:'Sanguinário',desc:'Vença 10 partidas',check:s=>s.wins>=10},
+  {id:'prata',ico:'',name:'Prata',desc:'Alcance a patente Prata',check:s=>s.rating>=400},
+  {id:'ouro',ico:'',name:'Ouro',desc:'Alcance a patente Ouro',check:s=>s.rating>=800},
+  {id:'platina',ico:'',name:'Platina',desc:'Alcance a patente Platina',check:s=>s.rating>=1200},
+  {id:'grao-mestre',ico:'',name:'Grão-Mestre',desc:'Chegue ao topo do ranking',check:s=>s.rating>=3000},
+  {id:'psicopata',ico:'',image:'CONQUISTA-PSICOPATA.png',name:'Psicopata',desc:'Pessoas que jogam no modo claro são estranhas.',check:(s,f)=>f.psicopata},
+  {id:'treinador',ico:'',name:'Treinador',desc:'Vença 3 partidas no Treinamento',check:(s)=>s.trainingWins>=3},
+  {id:'imbativel',ico:'',name:'Imbatível',desc:'Alcance uma sequência de 5 vitórias',check:(s)=>s.bestWinStreak>=5},
+  {id:'mestre-caos',ico:'',name:'Mestre do Caos',desc:'Vença uma partida no Super Caos',check:(s)=>s.superChaosWins>=1},
+  {id:'dupla-perfeita',ico:'',name:'Dupla Perfeita',desc:'Vença em Duplas',check:(s)=>s.teamWins>=1},
+  {id:'veterano-ranqueado',ico:'',name:'Veterano Ranqueado',desc:'Complete 10 partidas ranqueadas',check:(s)=>s.rankedPlayed>=10},
+  {id:'soberano',ico:'',name:'Soberano',desc:'Alcance a patente Soberano',check:(s)=>s.points>=2420},
 ];
+function readGameStats(){try{return Object.assign({trainingWins:0,chaosWins:0,superChaosWins:0,teamWins:0,rankedPlayed:0,winStreak:0,bestWinStreak:0},JSON.parse(localStorage.getItem('chroma-game-stats')||'{}'));}catch(e){return {trainingWins:0,chaosWins:0,superChaosWins:0,teamWins:0,rankedPlayed:0,winStreak:0,bestWinStreak:0};}}
+function bumpGameStat(key,amount=1){const s=readGameStats();s[key]=(s[key]||0)+amount;try{localStorage.setItem('chroma-game-stats',JSON.stringify(s));}catch(e){}return s;}
+
 function myFlags(){
   let psicopata=false;try{psicopata=localStorage.getItem('chroma-flag-psicopata')==='1';}catch(e){}
   return {psicopata};
 }
 function myRankStats(){
   let name='';try{name=localStorage.getItem('chroma-name')||'';}catch(e){}
-  const p=name?readRank().find(x=>x.name.toLowerCase()===name.toLowerCase()):null;
+  const p=name?readRanked().find(x=>x.name.toLowerCase()===name.toLowerCase()):null;const gs=readGameStats();
   let cardsPlayed=0;try{cardsPlayed=Number(localStorage.getItem('chroma-cards-played')||0)||0;}catch(e){};
-  return Object.assign({rating:0,wins:0,losses:0,played:0,cardsPlayed},p||{});
+  const points=Number(p&&p.points||0);
+  return Object.assign({rating:points,points:points,wins:0,losses:0,played:0,cardsPlayed},gs,p||{}, {rating:points,points:points});
 }

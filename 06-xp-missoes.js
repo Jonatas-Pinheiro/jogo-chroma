@@ -16,7 +16,7 @@ const REDEEM_CODES={
   FESTACHROMA:{type:'coins',amount:750}
 };
 function readXP(){try{return Math.max(0,parseInt(localStorage.getItem('chroma-xp')||'0',10)||0);}catch(e){return 0;}}
-function writeXP(n){try{localStorage.setItem('chroma-xp',String(Math.max(0,Math.floor(n))));}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function writeXP(n){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-xp',String(Math.max(0,Math.floor(n))));}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 const LOCKED_MODES=['caos','supercaos'];
 const LEVEL_REWARDS={
   2:{coins:50,title:'Recompensa do nível 2',body:'Você alcançou o nível 2 e recebeu 50 moedas.'},
@@ -41,7 +41,7 @@ function renderProfileXP(){
   el.style.width=Math.min(100,(current/needed)*100)+'%';
 }
 function readLevelRewards(){try{return JSON.parse(localStorage.getItem('chroma-level-rewards')||'[]');}catch(e){return [];}}
-function writeLevelRewards(a){try{localStorage.setItem('chroma-level-rewards',JSON.stringify(a));}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function writeLevelRewards(a){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-level-rewards',JSON.stringify(a));}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function ensureLevelRewards(){
   const level=levelFromXP(readXP()),claimed=readLevelRewards(),shop=readShop();
   let coinsAdded=0,shopChanged=false;
@@ -72,7 +72,7 @@ function addXP(amount,reason){
   if(reason)toast('+'+Math.floor(amount)+' XP · '+reason);
 }
 function readRedeemedCodes(){try{return JSON.parse(localStorage.getItem('chroma-redeemed-codes')||'[]');}catch(e){return [];}}
-function writeRedeemedCodes(a){try{localStorage.setItem('chroma-redeemed-codes',JSON.stringify(a));}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function writeRedeemedCodes(a){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-redeemed-codes',JSON.stringify(a));}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function redeemCode(){
   const input=$('#redeemCode');if(!input)return;
   const code=(input.value||'').trim().toUpperCase();
@@ -91,19 +91,26 @@ function awardMatchXP(v,prev){
   if(!v||v.phase!=='ended'||!prev||prev.phase!=='playing'||!v.roundId)return;
   const key='chroma-xp-awarded-'+v.roundId;
   try{if(localStorage.getItem(key)==='1')return;localStorage.setItem(key,'1');}catch(e){}
-  const won=v.winner===v.me,mult=xpMultiplier(),amount=(won?MATCH_XP*2:MATCH_XP)*mult;
+  const mePlayer=Array.isArray(v.players)?v.players.find(p=>p.id===v.me):null;
+  const won=v.winnerTeam!=null ? !!mePlayer&&mePlayer.team===v.winnerTeam : v.winner===v.me;
+  const mult=xpMultiplier(),amount=(won?MATCH_XP*2:MATCH_XP)*mult;
   addXP(amount,(mult===2?'poção 2× · ':'')+(won?'vitória!':'partida concluída'));
   bumpMissionStat('played',1);
+  bumpGameStat('played',1);
   if(won)bumpMissionStat('wins',1);
+  if(v.opts.training)bumpMissionStat('training',1);
+  if(v.opts.mode==='team2x2'||v.opts.mode==='team3x3')bumpMissionStat('team',1);
+  if(won){if(v.opts.training)bumpGameStat('trainingWins',1);if(v.opts.mode==='caos')bumpGameStat('chaosWins',1);if(v.opts.mode==='supercaos')bumpGameStat('superChaosWins',1);if(v.opts.mode==='team2x2'||v.opts.mode==='team3x3')bumpGameStat('teamWins',1);if(v.opts.ranked)bumpGameStat('rankedPlayed',1);bumpGameStat('winStreak',1);const n=readGameStats();n.bestWinStreak=Math.max(n.bestWinStreak,n.winStreak);try{localStorage.setItem('chroma-game-stats',JSON.stringify(n));}catch(e){}}else{const n=readGameStats();n.winStreak=0;try{localStorage.setItem('chroma-game-stats',JSON.stringify(n));}catch(e){}}
 }
 function canClaimDaily(){const s=readStreak();return s.lastClaim!==todayKey();}
 
 // ---- missões diárias ----
 const DAILY_MISSIONS=[
  {id:'play-1',desc:'Jogue 1 partida',goal:1,stat:'played',reward:20,icon:''},
- {id:'play-3',desc:'Jogue 3 partidas',goal:3,stat:'played',reward:50,icon:''},
  {id:'win-1',desc:'Vença 1 partida',goal:1,stat:'wins',reward:60,icon:''},
- {id:'play-5',desc:'Jogue 5 partidas',goal:5,stat:'played',reward:100,icon:'⭐'}
+ {id:'training-1',desc:'Jogue 1 partida no Treinamento',goal:1,stat:'training',reward:45,icon:''},
+ {id:'team-1',desc:'Jogue uma partida em equipe',goal:1,stat:'team',reward:55,icon:''},
+ {id:'chroma-1',desc:'Use CHROMA uma vez',goal:1,stat:'chroma',reward:40,icon:''}
 ];
 function readMissions(){
   const today=todayKey();
@@ -112,7 +119,7 @@ function readMissions(){
   if(!st||st.day!==today)st={day:today,progress:{},claimed:[]};
   return st;
 }
-function writeMissions(st){try{localStorage.setItem('chroma-missions',JSON.stringify(st));}catch(e){}window.dispatchEvent(new Event('chroma-state-changed'));}
+function writeMissions(st){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-missions',JSON.stringify(st));}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function bumpMissionStat(stat,amount){
   const st=readMissions();
   st.progress[stat]=(st.progress[stat]||0)+amount;
