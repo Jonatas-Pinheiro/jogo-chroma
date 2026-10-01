@@ -2,7 +2,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
 // Structural guards: these protect the production invariants against regressions.
 assert.match(html, /function resolveExpiredTurn\(epoch=room&&room\.turnEpoch\)/);

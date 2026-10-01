@@ -374,7 +374,7 @@ function toast(msg,ms){
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200);
 }
 function cleanName(n){return (n||'').replace(/\s+/g,' ').trim().slice(0,14);}
-function saveName(n){if(!window.chromaCloud?.canWrite()){toast('Sem conexão com a internet. Esta alteração não foi realizada.');return false;}const previous=localStorage.getItem('chroma-name')||'';try{localStorage.setItem('chroma-name',n);}catch(e){return false;}window.chromaCloud.persistState().catch(()=>{try{localStorage.setItem('chroma-name',previous);}catch(_){}toast('Não foi possível salvar o nome no servidor.');renderProfile();});window.dispatchEvent(new Event('chroma-state-changed'));return true;}
+function saveName(n){if(!window.chromaCloud?.canWrite()){toast((window.chromaCloud?.getWriteMessage?.()||'Não foi possível realizar esta alteração.'));return false;}const previous=localStorage.getItem('chroma-name')||'';try{localStorage.setItem('chroma-name',n);}catch(e){return false;}window.chromaCloud.persistState().catch(()=>{try{localStorage.setItem('chroma-name',previous);}catch(_){}toast('Não foi possível salvar o nome no servidor.');renderProfile();});window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 
 function startTraining(name,profile,count,difficulty){
   teardown('');
