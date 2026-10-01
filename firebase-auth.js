@@ -6,11 +6,11 @@ import { firebaseConfig } from './firebase-config.js';
 const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app), googleProvider=new GoogleAuthProvider();
 const authPersistenceReady=setPersistence(auth,browserLocalPersistence).catch(e=>{reportError('setPersistence',e);});   // falha de persistência é registrada (o Auth usa a persistência padrão do SDK)
 const $=s=>document.querySelector(s);
-const keys={coins:'chroma-coins',xp:'chroma-xp',shop:'chroma-shop',name:'chroma-name',username:'chroma-username',photo:'chroma-profile-photo',gender:'chroma-profile-gender',streak:'chroma-daily-streak',levelRewards:'chroma-level-rewards',redeemedCodes:'chroma-redeemed-codes',missions:'chroma-missions',ranking:'chroma-ranking',ranked:'chroma-ranked',mailRead:'chroma-mail-read',friends:'chroma-friends'};
+const keys={coins:'chroma-coins',xp:'chroma-xp',shop:'chroma-shop',name:'chroma-name',username:'chroma-username',photo:'chroma-profile-photo',gender:'chroma-profile-gender',streak:'chroma-daily-streak',levelRewards:'chroma-level-rewards',redeemedCodes:'chroma-redeemed-codes',missions:'chroma-missions',ranking:'chroma-ranking',ranked:'chroma-ranked',mailRead:'chroma-mail-read',friends:'chroma-friends',battlePass:'chroma-battle-pass'};
 const defaultShop=()=>({owned:[],equipped:{profile:'',cards:'','name-effect':'', 'profile-theme':'','profile-badge':''},potions:[]});
 function json(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));}catch(e){return fallback;}}
-function localState(){const shop=json(keys.shop,defaultShop()),name=localStorage.getItem(keys.name)||'';let rank='Prata I';try{if(typeof rankedStats==='function'&&typeof rankedTier==='function'){const tier=rankedTier(rankedStats(name).points);rank=tier.name+' '+tier.level;}}catch(e){reportError('localStateRank',e);}return {coins:Number(localStorage.getItem(keys.coins)||0)||0,xp:Number(localStorage.getItem(keys.xp)||0)||0,level:typeof levelFromXP==='function'?levelFromXP(Number(localStorage.getItem(keys.xp)||0)||0):1,rank,cosmetics:Array.isArray(shop.owned)?shop.owned:[],equipped:shop.equipped||{},shop,name,username:localStorage.getItem(keys.username)||'',photo:localStorage.getItem(keys.photo)||'',gender:localStorage.getItem(keys.gender)||'',streak:json(keys.streak,{day:0,lastClaim:null}),levelRewards:json(keys.levelRewards,[]),redeemedCodes:json(keys.redeemedCodes,[]),missions:json(keys.missions,null),ranking:json(keys.ranking,[]),ranked:json(keys.ranked,[]),mailRead:json(keys.mailRead,[]),friends:json(keys.friends,{friends:[],requests:[],sent:[]}),gameStats:json('chroma-game-stats',{}),showcaseAchievements:json('chroma-showcase-achievements',[]),cardsPlayed:Number(localStorage.getItem('chroma-cards-played')||0)||0,flags:{psicopata:localStorage.getItem('chroma-flag-psicopata')==='1'}};}
-function writeLocal(data){if(data.coins!=null)localStorage.setItem(keys.coins,String(data.coins));if(data.xp!=null)localStorage.setItem(keys.xp,String(data.xp));if(data.shop)localStorage.setItem(keys.shop,JSON.stringify({...defaultShop(),...data.shop,equipped:{...defaultShop().equipped,...(data.shop.equipped||{})}}));for(const k of ['streak','levelRewards','redeemedCodes','missions','ranking','ranked','mailRead','friends'])if(data[k]!==undefined)localStorage.setItem(keys[k],JSON.stringify(data[k]));if(data.gameStats!==undefined)localStorage.setItem('chroma-game-stats',JSON.stringify(data.gameStats));if(data.showcaseAchievements!==undefined)localStorage.setItem('chroma-showcase-achievements',JSON.stringify(data.showcaseAchievements));if(data.cardsPlayed!=null)localStorage.setItem('chroma-cards-played',String(data.cardsPlayed));if(data.flags?.psicopata!=null)localStorage.setItem('chroma-flag-psicopata',data.flags.psicopata?'1':'0');for(const k of ['name','username','photo','gender'])if(data[k]!==undefined)localStorage.setItem(keys[k],data[k]||'');}
+function localState(){const shop=json(keys.shop,defaultShop()),name=localStorage.getItem(keys.name)||'';let rank='Prata I';try{if(typeof rankedStats==='function'&&typeof rankedTier==='function'){const tier=rankedTier(rankedStats(name).points);rank=tier.name+' '+tier.level;}}catch(e){reportError('localStateRank',e);}return {coins:Number(localStorage.getItem(keys.coins)||0)||0,xp:Number(localStorage.getItem(keys.xp)||0)||0,level:typeof levelFromXP==='function'?levelFromXP(Number(localStorage.getItem(keys.xp)||0)||0):1,rank,cosmetics:Array.isArray(shop.owned)?shop.owned:[],equipped:shop.equipped||{},shop,name,username:localStorage.getItem(keys.username)||'',photo:localStorage.getItem(keys.photo)||'',gender:localStorage.getItem(keys.gender)||'',streak:json(keys.streak,{day:0,lastClaim:null}),levelRewards:json(keys.levelRewards,[]),redeemedCodes:json(keys.redeemedCodes,[]),missions:json(keys.missions,null),ranking:json(keys.ranking,[]),ranked:json(keys.ranked,[]),mailRead:json(keys.mailRead,[]),friends:json(keys.friends,{friends:[],requests:[],sent:[]}),battlePass:json(keys.battlePass,{season:'s1',xp:0,claimed:[],daily:{period:'',progress:{},claimed:[]},weekly:{period:'',progress:{},claimed:[]}}),gameStats:json('chroma-game-stats',{}),showcaseAchievements:json('chroma-showcase-achievements',[]),cardsPlayed:Number(localStorage.getItem('chroma-cards-played')||0)||0,flags:{psicopata:localStorage.getItem('chroma-flag-psicopata')==='1'}};}
+function writeLocal(data){if(data.coins!=null)localStorage.setItem(keys.coins,String(data.coins));if(data.xp!=null)localStorage.setItem(keys.xp,String(data.xp));if(data.shop)localStorage.setItem(keys.shop,JSON.stringify({...defaultShop(),...data.shop,equipped:{...defaultShop().equipped,...(data.shop.equipped||{})}}));for(const k of ['streak','levelRewards','redeemedCodes','missions','ranking','ranked','mailRead','friends','battlePass'])if(data[k]!==undefined)localStorage.setItem(keys[k],JSON.stringify(data[k]));if(data.gameStats!==undefined)localStorage.setItem('chroma-game-stats',JSON.stringify(data.gameStats));if(data.showcaseAchievements!==undefined)localStorage.setItem('chroma-showcase-achievements',JSON.stringify(data.showcaseAchievements));if(data.cardsPlayed!=null)localStorage.setItem('chroma-cards-played',String(data.cardsPlayed));if(data.flags?.psicopata!=null)localStorage.setItem('chroma-flag-psicopata',data.flags.psicopata?'1':'0');for(const k of ['name','username','photo','gender'])if(data[k]!==undefined)localStorage.setItem(keys[k],data[k]||'');}
 
 /* ===== SESSÃO / ESTADOS =====
    Autenticação (quem é o usuário) e perfil Firestore (dados da conta) são conceitos separados:
@@ -110,7 +110,7 @@ function setState(next,err=null){authState=next;sessionError=err;updateAccountUI
 
 function usernameFromUser(user){return String(user.displayName||user.email?.split('@')[0]||'jogador').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_]/g,'').slice(0,18)||'jogador';}
 function accountMessage(text,error=false){const el=$('#accountMsg');if(el){el.textContent=text;el.className='account-msg'+(error?' error':'');}}
-function defaultProfile(user){const shop=defaultShop();return {uid:user.uid,email:user.email||'',username:usernameFromUser(user),coins:0,xp:0,level:1,rank:'Prata I',cosmetics:[],equipped:{},shop,name:user.displayName||'',photo:user.photoURL||'',gender:'',streak:{day:0,lastClaim:null},levelRewards:[],redeemedCodes:[],missions:null,ranking:[],ranked:[],mailRead:[],friends:{friends:[],requests:[],sent:[]},gameStats:{},showcaseAchievements:[],cardsPlayed:0,flags:{psicopata:false},createdAt:serverTimestamp(),updatedAt:serverTimestamp()};}
+function defaultProfile(user){const shop=defaultShop();return {uid:user.uid,email:user.email||'',username:usernameFromUser(user),coins:0,xp:0,level:1,rank:'Prata I',cosmetics:[],equipped:{},shop,name:user.displayName||'',photo:user.photoURL||'',gender:'',streak:{day:0,lastClaim:null},levelRewards:[],redeemedCodes:[],missions:null,ranking:[],ranked:[],mailRead:[],friends:{friends:[],requests:[],sent:[]},battlePass:{season:'s1',xp:0,claimed:[],daily:{period:'',progress:{},claimed:[]},weekly:{period:'',progress:{},claimed:[]}},gameStats:{},showcaseAchievements:[],cardsPlayed:0,flags:{psicopata:false},createdAt:serverTimestamp(),updatedAt:serverTimestamp()};}
 function cloudPayload(uid){const s=localState();return {...s,uid,email:currentUser&&currentUser.uid===uid?currentUser.email||'':'',cosmetics:Array.isArray(s.shop?.owned)?s.shop.owned:[],equipped:s.shop?.equipped||{},updatedAt:serverTimestamp()};}
 function updateAccountUI(){
   const email=currentUser&&currentUser.email||'';
@@ -125,7 +125,7 @@ function updateAccountUI(){
 
 /* ===== CACHE LOCAL (espelho dos dados da conta) ===== */
 function withRemoteGuard(fn){const prev=applyingRemote;applyingRemote=true;try{return fn();}finally{applyingRemote=prev;}}
-function refreshGameAfterCloud(){try{if($('#inName'))$('#inName').value=localStorage.getItem(keys.name)||'';if($('#profileGender'))$('#profileGender').value=localStorage.getItem(keys.gender)||'';const photo=localStorage.getItem(keys.photo)||'';if(photo&&$('#profilePreview'))$('#profilePreview').innerHTML='<img src="'+photo.replace(/"/g,'&quot;')+'" alt="Foto de perfil">';if(typeof updateCoinHud==='function')updateCoinHud(false);if(typeof renderProfileXP==='function')renderProfileXP();if(typeof updateModeLockUI==='function')updateModeLockUI();if(typeof applyCosmetics==='function')applyCosmetics();if(typeof renderShop==='function')renderShop();if(typeof renderProfile==='function')renderProfile();if(typeof renderInventory==='function')renderInventory();if(typeof updateMailBadge==='function')updateMailBadge();}catch(e){reportError('refreshGameAfterCloud',e);}}
+function refreshGameAfterCloud(){try{if($('#inName'))$('#inName').value=localStorage.getItem(keys.name)||'';if($('#profileGender'))$('#profileGender').value=localStorage.getItem(keys.gender)||'';const photo=localStorage.getItem(keys.photo)||'';if(photo&&$('#profilePreview'))$('#profilePreview').innerHTML='<img src="'+photo.replace(/"/g,'&quot;')+'" alt="Foto de perfil">';if(typeof updateCoinHud==='function')updateCoinHud(false);if(typeof renderProfileXP==='function')renderProfileXP();if(typeof updateModeLockUI==='function')updateModeLockUI();if(typeof applyCosmetics==='function')applyCosmetics();if(typeof renderShop==='function')renderShop();if(typeof renderProfile==='function')renderProfile();if(typeof renderInventory==='function')renderInventory();if(typeof renderBattlePass==='function'&&$('#battlePass')?.classList.contains('on'))renderBattlePass();if(typeof updateMailBadge==='function')updateMailBadge();}catch(e){reportError('refreshGameAfterCloud',e);}}
 function clearCloudCache(){withRemoteGuard(()=>{for(const k of CACHE_KEYS)localStorage.removeItem(k);localStorage.removeItem(CACHE_OWNER);window._socialSearch={};refreshGameAfterCloud();});lastPublishedSig='';lastRankedBoardSig='';}
 function applyRemote(data,user){
   clearTimeout(syncTimer);syncTimer=null;                      // o que estava agendado partiu de dados locais antigos
@@ -430,6 +430,48 @@ async function respondSocialFriendRequest(requestId,accept){
   }); return result;
 }
 async function removeSocialFriend(friendshipId){ensureSocial();await deleteDoc(doc(db,'friendships',friendshipId));}
+async function socialGifts(){
+  const s=ensureSocial();
+  const snap=await getDocs(query(collection(db,'gifts'),where('recipientUid','==',s.uid),limit(100)));
+  return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>toMillis(b.createdAt)-toMillis(a.createdAt));
+}
+async function sendSocialGift(target,item){
+  const s=ensureSocial();
+  if(!target?.uid||target.uid===s.uid)throw new ChromaError('Escolha um amigo válido.');
+  const catalog=window.CHROMA_SHOP_CATALOG||{};
+  const itemId=String(item?.id||'');
+  const itemName=String(item?.name||'').trim();
+  if(!catalog[itemId]||!itemName)throw new ChromaError('Item de presente inválido.');
+  const friendshipId=friendKey(s.uid,target.uid), friendRef=doc(db,'friendships',friendshipId);
+  const senderRef=doc(db,'users',s.uid), giftRef=doc(collection(db,'gifts'));
+  const senderName=String(localStorage.getItem(keys.name)||currentUser?.displayName||'Jogador').slice(0,40);
+  await runTransaction(db,async tx=>{
+    const [friendSnap,senderSnap]=await Promise.all([tx.get(friendRef),tx.get(senderRef)]);
+    if(!friendSnap.exists()||(friendSnap.data().participants||[]).indexOf(target.uid)<0)throw new ChromaError('Você só pode enviar presentes para seus amigos.');
+    const data=senderSnap.data()||{},shop={...(data.shop||{})},owned=Array.isArray(shop.owned)?shop.owned.slice():[];
+    if(!owned.includes(itemId))throw new ChromaError('Esse item não está no seu inventário.');
+    shop.owned=owned.filter(id=>id!==itemId);
+    if(Array.isArray(data.cosmetics))data.cosmetics=shop.owned.slice();
+    tx.update(senderRef,{shop,cosmetics:shop.owned,updatedAt:serverTimestamp()});
+    tx.set(giftRef,{senderUid:s.uid,recipientUid:target.uid,senderName,recipientName:String(target.name||target.username||'Jogador').slice(0,40),itemId,itemName,friendshipId,status:'pending',createdAt:serverTimestamp()});
+  });
+  return {id:giftRef.id};
+}
+async function redeemSocialGift(giftId){
+  const s=ensureSocial(); const giftRef=doc(db,'gifts',String(giftId)),userRef=doc(db,'users',s.uid); let itemId='';
+  await runTransaction(db,async tx=>{
+    const [giftSnap,userSnap]=await Promise.all([tx.get(giftRef),tx.get(userRef)]);
+    if(!giftSnap.exists())throw new ChromaError('Presente não encontrado.');
+    const gift=giftSnap.data(); if(gift.recipientUid!==s.uid||gift.status!=='pending')throw new ChromaError('Este presente já foi resgatado ou não está disponível.');
+    const data=userSnap.data()||{},shop={...(data.shop||{})},owned=Array.isArray(shop.owned)?shop.owned.slice():[];
+    itemId=String(gift.itemId||''); if(!itemId)throw new ChromaError('Presente inválido.');
+    if(!owned.includes(itemId))owned.push(itemId);
+    shop.owned=owned; if(Array.isArray(data.cosmetics))data.cosmetics=owned.slice();
+    tx.update(userRef,{shop,cosmetics:owned,updatedAt:serverTimestamp()});
+    tx.update(giftRef,{status:'redeemed',redeemedBy:s.uid,redeemedAt:serverTimestamp()});
+  });
+  return {itemId};
+}
 async function readSocialPublicProfile(uid){ensureSocial();const p=await getDoc(doc(db,'publicProfiles',uid));if(!p.exists())throw new ChromaError('Perfil não encontrado.');return {uid,...p.data()};}
 async function createSocialClan(name,icon='shield'){
   const s=ensureSocial(); const clean=String(name||'').trim().replace(/\s+/g,' '); if(clean.length<3||clean.length>24||!/^[\p{L}\p{N} _-]+$/u.test(clean))throw new ChromaError('Use um nome de clã entre 3 e 24 caracteres.');
@@ -437,7 +479,7 @@ async function createSocialClan(name,icon='shield'){
   const myUser=await getDoc(doc(db,'users',s.uid)); if((myUser.data()?.clanId))throw new ChromaError('Você já está em um clã.');
   const dup=await getDocs(query(collection(db,'clans'),where('nameLower','==',clean.toLowerCase()),limit(1))); if(!dup.empty)throw new ChromaError('Esse nome de clã já está em uso.');
   if(!isCurrent(s))throw staleError();
-  const clan={name:clean,nameLower:clean.toLowerCase(),icon:['shield','sparkles','flame','crown','star'].includes(icon)?icon:'shield',leaderId:s.uid,level:1,xp:0,xpToNext:100,memberCount:1,members:{[s.uid]:{uid:s.uid,role:'leader',joinedAt:serverTimestamp(),contributionXp:0}},missions:[],rewards:[],events:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+  const clan={name:clean,nameLower:clean.toLowerCase(),icon:['shield','sparkles','flame','crown','star'].includes(icon)?icon:'shield',leaderId:s.uid,level:1,xp:0,xpToNext:100,currencyName:'Fragmentos do Clã',memberCount:1,members:{[s.uid]:{uid:s.uid,role:'leader',joinedAt:serverTimestamp(),contributionXp:0,clanCoins:0}},missions:[{id:'clan-games-10',title:'Primeira expedição',description:'O clã deve completar 10 partidas.',target:10,progress:0,reward:{coins:120,label:'120 Fragmentos do Clã'},completed:false},{id:'clan-games-25',title:'Força da comunidade',description:'O clã deve completar 25 partidas.',target:25,progress:0,reward:{coins:300,label:'300 Fragmentos do Clã + recompensa cosmética para todos'},completed:false},{id:'clan-wins-10',title:'Vitórias compartilhadas',description:'O clã deve conquistar 10 vitórias.',target:10,progress:0,reward:{coins:450,label:'450 Fragmentos do Clã + Poção de XP · 30 min para todos'},completed:false}],rewards:[],events:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
   let cid; await runTransaction(db,async tx=>{const ref=doc(collection(db,'clans'));cid=ref.id;tx.set(ref,clan);tx.update(doc(db,'users',s.uid),{clanId:cid,clanRole:'leader',updatedAt:serverTimestamp()});tx.set(doc(db,'publicProfiles',s.uid),{clanId:cid,clanName:clean,updatedAt:serverTimestamp()},{merge:true});});
   return {id:cid,...clan};
 }
@@ -445,6 +487,22 @@ async function listSocialClans(term=''){
   ensureSocial(); const text=String(term||'').trim().toLowerCase(); const snap=text?await getDocs(query(collection(db,'clans'),where('nameLower','>=',text),where('nameLower','<=',text+'\uf8ff'),limit(20))):await getDocs(query(collection(db,'clans'),orderBy('createdAt','desc'),limit(20))); return snap.docs.map(d=>({id:d.id,...d.data()}));
 }
 async function getSocialClan(id){ensureSocial();const c=await getDoc(doc(db,'clans',id));if(!c.exists())throw new ChromaError('Clã não encontrado.');return {id:c.id,...c.data()};}
-async function joinSocialClan(id){const s=ensureSocial();await runTransaction(db,async tx=>{const cref=doc(db,'clans',id),uref=doc(db,'users',s.uid),pref=doc(db,'publicProfiles',s.uid);const [cs,us]=await Promise.all([tx.get(cref),tx.get(uref)]);if(!cs.exists())throw new ChromaError('Clã não encontrado.');if(us.data()?.clanId)throw new ChromaError('Você já está em um clã.');const c=cs.data();tx.update(cref,{['members.'+s.uid]:{uid:s.uid,role:'member',joinedAt:serverTimestamp(),contributionXp:0},memberCount:Number(c.memberCount||0)+1,updatedAt:serverTimestamp()});tx.update(uref,{clanId:id,clanRole:'member',updatedAt:serverTimestamp()});tx.set(pref,{clanId:id,clanName:c.name,updatedAt:serverTimestamp()},{merge:true});});}
-async function leaveSocialClan(id){const s=ensureSocial();await runTransaction(db,async tx=>{const cref=doc(db,'clans',id),uref=doc(db,'users',s.uid),pref=doc(db,'publicProfiles',s.uid),cs=await tx.get(cref);if(!cs.exists())throw new ChromaError('Clã não encontrado.');const c=cs.data();if(c.leaderId===s.uid)throw new ChromaError('O líder precisa transferir a liderança antes de sair.');tx.update(cref,{['members.'+s.uid]:null,memberCount:Math.max(0,Number(c.memberCount||1)-1),updatedAt:serverTimestamp()});tx.update(uref,{clanId:null,clanRole:null,updatedAt:serverTimestamp()});tx.set(pref,{clanId:null,clanName:null,updatedAt:serverTimestamp()},{merge:true});});}
-window.chromaSocial={publishSocialProfile,searchPlayers:searchSocialPlayers,requests:socialRequests,friends:socialFriends,sendRequest:sendSocialFriendRequest,respondRequest:respondSocialFriendRequest,removeFriend:removeSocialFriend,publicProfile:readSocialPublicProfile,createClan:createSocialClan,listClans:listSocialClans,getClan:getSocialClan,joinClan:joinSocialClan,leaveClan:leaveSocialClan,isReady:()=>canWrite()};
+async function joinSocialClan(id){const s=ensureSocial();await runTransaction(db,async tx=>{const cref=doc(db,'clans',id),uref=doc(db,'users',s.uid),pref=doc(db,'publicProfiles',s.uid);const [cs,us]=await Promise.all([tx.get(cref),tx.get(uref)]);if(!cs.exists())throw new ChromaError('Clã não encontrado.');if(us.data()?.clanId)throw new ChromaError('Você já está em um clã.');const c=cs.data();tx.update(cref,{['members.'+s.uid]:{uid:s.uid,role:'member',joinedAt:serverTimestamp(),contributionXp:0,clanCoins:0},memberCount:Number(c.memberCount||0)+1,updatedAt:serverTimestamp()});tx.update(uref,{clanId:id,clanRole:'member',updatedAt:serverTimestamp()});tx.set(pref,{clanId:id,clanName:c.name,updatedAt:serverTimestamp()},{merge:true});});}
+async function leaveSocialClan(id){const s=ensureSocial();await runTransaction(db,async tx=>{const cref=doc(db,'clans',id),uref=doc(db,'users',s.uid),pref=doc(db,'publicProfiles',s.uid),cs=await tx.get(cref);if(!cs.exists())throw new ChromaError('Clã não encontrado.');const c=cs.data(),count=Number(c.memberCount||Object.keys(c.members||{}).length||0);if(c.leaderId===s.uid&&count>1)throw new ChromaError('O líder precisa transferir a liderança antes de sair.');if(c.leaderId===s.uid&&count<=1){tx.delete(cref);}else{tx.update(cref,{['members.'+s.uid]:null,memberCount:Math.max(0,count-1),updatedAt:serverTimestamp()});}tx.update(uref,{clanId:null,clanRole:null,updatedAt:serverTimestamp()});tx.set(pref,{clanId:null,clanName:null,updatedAt:serverTimestamp()},{merge:true});});}
+async function buySocialClanItem(clanId,item){
+  const s=ensureSocial(),catalog=window.CHROMA_CLAN_SHOP_CATALOG||{},valid=catalog[item?.id];
+  if(!valid||Number(valid.price)!==Number(item?.price))throw new ChromaError('Item da loja do clã inválido.');
+  const cref=doc(db,'clans',String(clanId)),uref=doc(db,'users',s.uid);let nextUser;
+  await runTransaction(db,async tx=>{
+    const [cs,us]=await Promise.all([tx.get(cref),tx.get(uref)]);if(!cs.exists()||!us.exists())throw new ChromaError('Clã ou perfil não encontrado.');
+    const c=cs.data(),u=us.data(),member=c.members?.[s.uid];if(u.clanId!==clanId||!member)throw new ChromaError('Você não pertence a este clã.');
+    const balance=Number(member.clanCoins||0);if(balance<Number(valid.price))throw new ChromaError('Fragmentos do Clã insuficientes.');
+    const shop={...defaultShop(),...(u.shop||{})};
+    if(valid.type==='potion'){shop.potions=[...(shop.potions||[]),{id:'xp2',minutes:Number(valid.minutes||30),receivedAt:Date.now(),source:'clan'}];}
+    else {shop.owned=Array.isArray(shop.owned)?shop.owned.slice():[];if(shop.owned.includes(valid.id))throw new ChromaError('Você já possui este cosmético.');shop.owned.push(valid.id);}
+    const members={...(c.members||{}),[s.uid]:{...member,clanCoins:balance-Number(valid.price)}};
+    tx.update(cref,{members,updatedAt:serverTimestamp()});nextUser={...u,shop,cosmetics:shop.owned||u.cosmetics||[],updatedAt:serverTimestamp()};tx.set(uref,nextUser,{merge:true});
+  });
+  return applyWritten(nextUser,s);
+}
+window.chromaSocial={publishSocialProfile,searchPlayers:searchSocialPlayers,requests:socialRequests,friends:socialFriends,sendRequest:sendSocialFriendRequest,respondRequest:respondSocialFriendRequest,removeFriend:removeSocialFriend,publicProfile:readSocialPublicProfile,gifts:socialGifts,sendGift:sendSocialGift,redeemGift:redeemSocialGift,createClan:createSocialClan,listClans:listSocialClans,getClan:getSocialClan,joinClan:joinSocialClan,leaveClan:leaveSocialClan,buyClanItem:buySocialClanItem,isReady:()=>canWrite()};

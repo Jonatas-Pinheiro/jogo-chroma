@@ -22,7 +22,7 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'uid','email','coins','xp','level','rank','cosmetics','equipped','shop','name','username','photo','gender','streak',
-          'levelRewards','redeemedCodes','missions','ranking','ranked','mailRead','friends','gameStats','showcaseAchievements','cardsPlayed','flags','updatedAt','clanId','clanRole'
+          'levelRewards','redeemedCodes','missions','ranking','ranked','mailRead','friends','battlePass','gameStats','showcaseAchievements','cardsPlayed','flags','updatedAt','clanId','clanRole'
         ]);
       allow delete: if false;
     }
@@ -70,6 +70,10 @@ service cloud.firestore {
           && resource.data.members[request.auth.uid].role == 'member'
           && request.resource.data.memberCount == resource.data.memberCount - 1
           && request.resource.data.members[request.auth.uid] == null)
+        // COMPRA: o próprio integrante pode atualizar o seu saldo de moeda do clã.
+        || (request.auth.uid in resource.data.members
+          && request.resource.data.memberCount == resource.data.memberCount
+          && request.resource.data.members[request.auth.uid].clanCoins <= resource.data.members[request.auth.uid].clanCoins)
       ) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','memberCount','updatedAt']);
       allow delete: if signedIn() && resource.data.leaderId == request.auth.uid;
     }
@@ -101,6 +105,29 @@ service cloud.firestore {
     match /mail/{mailId} {
       allow read: if signedIn() && request.auth.uid in resource.data.recipients;
       allow write: if false;
+    }
+    match /gifts/{giftId} {
+      allow read: if signedIn() && (request.auth.uid == resource.data.senderUid || request.auth.uid == resource.data.recipientUid);
+      allow create: if signedIn()
+        && request.resource.data.senderUid == request.auth.uid
+        && request.resource.data.recipientUid is string
+        && request.resource.data.recipientUid != request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.itemId is string
+        && request.resource.data.itemName is string
+        && request.resource.data.itemName.size() <= 100
+        && request.auth.uid in get(/databases/$(database)/documents/friendships/$(request.resource.data.friendshipId)).data.participants
+        && request.resource.data.recipientUid in get(/databases/$(database)/documents/friendships/$(request.resource.data.friendshipId)).data.participants
+        && request.resource.data.itemId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.shop.owned;
+      allow update: if signedIn()
+        && request.auth.uid == resource.data.recipientUid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'redeemed'
+        && request.resource.data.itemId == resource.data.itemId
+        && request.resource.data.senderUid == resource.data.senderUid
+        && request.resource.data.recipientUid == resource.data.recipientUid
+        && request.resource.data.redeemedBy == request.auth.uid;
+      allow delete: if false;
     }
   }
 }

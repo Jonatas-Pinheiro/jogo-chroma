@@ -55,6 +55,16 @@ const SHOP_ITEMS=[
  ];
  // Catálogo compartilhado com a camada Firebase; o preço é conferido antes da compra.
  window.CHROMA_SHOP_CATALOG=Object.fromEntries(SHOP_ITEMS.map(item=>[item.id,{id:item.id,price:Number(item.price)||0,type:item.type,levelOnly:item.levelOnly||null}]));
+// Loja exclusiva do clã: não há itens Míticos/Lendários neste catálogo.
+const CLAN_SHOP_ITEMS=[
+ {id:'clan-frame-ember',rarity:'Épico',type:'profile',name:'Moldura Brasa do Clã',desc:'Uma moldura exclusiva forjada nas vitórias do clã.',image:'Link da imagem aqui',price:180,css:'profile-frame-fire'},
+ {id:'clan-card-aurora',rarity:'Épico',type:'cards',name:'Cartas Aurora do Clã',desc:'Brilho aurora exclusivo para a sua coleção.',image:'Link da imagem aqui',price:220,css:'card-skin-aurora'},
+ {id:'clan-name-gold',rarity:'Épico',type:'name-effect',name:'Nome Dourado do Clã',desc:'Mostre o orgulho do clã no seu nome.',image:'Link da imagem aqui',price:160,css:'name-effect-gold'},
+ {id:'clan-xp-potion-15',rarity:'Comum',type:'potion',name:'Poção de XP do Clã · 15 min',desc:'Dobra o XP por 15 minutos.',image:'Link da imagem aqui',price:90,minutes:15},
+ {id:'clan-xp-potion-30',rarity:'Raro',type:'potion',name:'Poção de XP do Clã · 30 min',desc:'Dobra o XP por 30 minutos.',image:'Link da imagem aqui',price:160,minutes:30}
+];
+window.CHROMA_CLAN_SHOP_CATALOG=Object.fromEntries(CLAN_SHOP_ITEMS.map(item=>[item.id,{id:item.id,price:item.price,type:item.type,minutes:item.minutes||null}]));
+function findShopItem(id){return SHOP_ITEMS.find(x=>x.id===id)||CLAN_SHOP_ITEMS.find(x=>x.id===id);}
  const CHEST_PRIZES={simple:[
  {id:'coins-20',name:'20 moedas',image:'BAU-SIMPLES.png',kind:'coins',amount:20,weight:30},{id:'coins-40',name:'40 moedas',image:'BAU-SIMPLES.png',kind:'coins',amount:40,weight:25},{id:'xp-potion',name:'Poção 2× XP · 15 min',image:'BAU-SIMPLES.png',kind:'potion',amount:15,weight:15},{id:'frame-neon',name:'Moldura Neon',image:'Link da imagem aqui',kind:'item',weight:8},{id:'card-neon',name:'Cartas Neon',image:'Link da imagem aqui',kind:'item',weight:7},{id:'coins-80',name:'80 moedas',image:'BAU-SIMPLES.png',kind:'coins',amount:80,weight:15}],common:[
  {id:'coins-60',name:'60 moedas',image:'Link da imagem aqui',kind:'coins',amount:60,weight:30},{id:'xp-potion',name:'Poção 2× XP · 30 min',image:'Link da imagem aqui',kind:'potion',amount:30,weight:22},{id:'frame-neon',name:'Moldura Neon',image:'Link da imagem aqui',kind:'item',weight:9},{id:'card-neon',name:'Cartas Neon',image:'Link da imagem aqui',kind:'item',weight:9},{id:'frame-ice',name:'Moldura Gelo',image:'Link da imagem aqui',kind:'item',weight:8},{id:'frame-forest',name:'Moldura Floresta',image:'Link da imagem aqui',kind:'item',weight:8},{id:'card-fire',name:'Cartas Fogo',image:'Link da imagem aqui',kind:'item',weight:6},{id:'coins-150',name:'150 moedas',image:'Link da imagem aqui',kind:'coins',amount:150,weight:8}],royal:[

@@ -75,3 +75,22 @@ Executado com sucesso:
 - presença da UI Social e dos endpoints Firestore;
 - checagem estrutural das regras;
 - testes de regressão dos cenários de spam CHROMA e punição acumulada.
+
+
+## Presentes para amigos
+
+- O botão **Presente** aparece nos cards de **Meus amigos**.
+- O remetente escolhe um cosmético próprio; o item é transferido atomicamente do inventário do remetente para um documento `gifts/{giftId}`.
+- O destinatário vê o presente no **Correio** com o título `Você ganhou um presente!`, a descrição parametrizada e o botão **Resgatar item**.
+- O resgate usa transação Firestore: adiciona o item ao inventário do destinatário e marca o presente como `redeemed`, sem permitir resgate duplicado.
+- As regras validam amizade, posse do item no momento do envio e que somente o destinatário pode resgatar.
+
+
+## Clã: missões, moeda e loja
+
+- Um clã com apenas um integrante exibe a confirmação **“Deseja excluir este clã?”** e é removido atomicamente quando o líder confirma.
+- Clãs possuem a moeda separada **Fragmentos do Clã**, com saldo individual por membro.
+- As missões exibem progresso, objetivo e a indicação explícita de que a recompensa será entregue a **todos os membros**.
+- A loja do clã é acessível somente a integrantes do clã e oferece cosméticos exclusivos até a raridade **Épico**, além de poções de XP de 15 e 30 minutos.
+- Compras descontam Fragmentos do Clã e gravam o item no inventário sincronizado do membro.
+- O catálogo e a estrutura de missões são preparados para progressão automática via backend confiável/Cloud Functions; a interface não libera recompensas por escrita livre do navegador.
