@@ -73,6 +73,31 @@ service cloud.firestore {
       ) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','memberCount','updatedAt']);
       allow delete: if signedIn() && resource.data.leaderId == request.auth.uid;
     }
+    match /rankedBoard/{uid} {
+      allow read: if signedIn();
+      allow create, update: if owner(uid)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.points is int && request.resource.data.points >= 0
+        && request.resource.data.wins is int && request.resource.data.wins >= 0
+        && request.resource.data.losses is int && request.resource.data.losses >= 0
+        && request.resource.data.played is int && request.resource.data.played >= 0
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40;
+      allow delete: if false;
+    }
+    match /events/{eventId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /eventParticipants/{participantId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && participantId == request.resource.data.eventId + '__' + request.auth.uid
+        && request.resource.data.eventId is string
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
     match /mail/{mailId} {
       allow read: if signedIn() && request.auth.uid in resource.data.recipients;
       allow write: if false;

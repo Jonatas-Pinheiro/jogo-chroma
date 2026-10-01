@@ -28,7 +28,7 @@ const CACHE_OWNER='chroma-cache-owner';          // UID dono dos dados em cache 
 const CACHE_KEYS=[...Object.values(keys),'chroma-game-stats','chroma-showcase-achievements','chroma-cards-played','chroma-flag-psicopata','chroma-clan-id'];
 const SYNC_DEBOUNCE_MS=400, RETRY_DELAYS=[3000,10000,30000];
 let currentUser=null, authState=STATE.LOADING, sessionError=null, sessionToken=0, applyingRemote=false, pendingGoogle=null;
-let syncChain=Promise.resolve(), syncTimer=null, retryTimer=null, retryCount=0, lastPublishedSig='', lastToast='', publishInFlight=null;
+let syncChain=Promise.resolve(), syncTimer=null, retryTimer=null, retryCount=0, lastPublishedSig='', lastRankedBoardSig='', lastToast='', publishInFlight=null;
 const listeners=new Set();
 
 class ChromaError extends Error{constructor(message,code='chroma/validation'){super(message);this.name='ChromaError';this.code=code;}}
@@ -126,7 +126,7 @@ function updateAccountUI(){
 /* ===== CACHE LOCAL (espelho dos dados da conta) ===== */
 function withRemoteGuard(fn){const prev=applyingRemote;applyingRemote=true;try{return fn();}finally{applyingRemote=prev;}}
 function refreshGameAfterCloud(){try{if($('#inName'))$('#inName').value=localStorage.getItem(keys.name)||'';if($('#profileGender'))$('#profileGender').value=localStorage.getItem(keys.gender)||'';const photo=localStorage.getItem(keys.photo)||'';if(photo&&$('#profilePreview'))$('#profilePreview').innerHTML='<img src="'+photo.replace(/"/g,'&quot;')+'" alt="Foto de perfil">';if(typeof updateCoinHud==='function')updateCoinHud(false);if(typeof renderProfileXP==='function')renderProfileXP();if(typeof updateModeLockUI==='function')updateModeLockUI();if(typeof applyCosmetics==='function')applyCosmetics();if(typeof renderShop==='function')renderShop();if(typeof renderProfile==='function')renderProfile();if(typeof renderInventory==='function')renderInventory();if(typeof updateMailBadge==='function')updateMailBadge();}catch(e){reportError('refreshGameAfterCloud',e);}}
-function clearCloudCache(){withRemoteGuard(()=>{for(const k of CACHE_KEYS)localStorage.removeItem(k);localStorage.removeItem(CACHE_OWNER);window._socialSearch={};refreshGameAfterCloud();});lastPublishedSig='';}
+function clearCloudCache(){withRemoteGuard(()=>{for(const k of CACHE_KEYS)localStorage.removeItem(k);localStorage.removeItem(CACHE_OWNER);window._socialSearch={};refreshGameAfterCloud();});lastPublishedSig='';lastRankedBoardSig='';}
 function applyRemote(data,user){
   clearTimeout(syncTimer);syncTimer=null;                      // o que estava agendado partiu de dados locais antigos
   withRemoteGuard(()=>{if(localStorage.getItem(CACHE_OWNER)!==user.uid)clearCloudCache();writeLocal(data);localStorage.setItem(CACHE_OWNER,user.uid);refreshGameAfterCloud();});
@@ -166,6 +166,7 @@ async function loadAccount(user,token){
     setState(STATE.READY);
     accountMessage('Conectado. Seu progresso será salvo na nuvem.');
     publishSocialProfile().then(()=>{window.firebaseSocialError='';},e=>{if(isCurrent(s)){const info=backgroundFailure('publishSocialProfile',e,{what:'ao seu perfil público'});window.firebaseSocialError=info.message;}});
+    publishRankedBoardIfChanged(s).catch(e=>{if(isCurrent(s)&&!(e&&e.code==='chroma/stale-session'))backgroundFailure('publishRankedBoard',e,{what:'ao placar ranqueado'});});
   }catch(e){
     if(!isCurrent(s))return;
     const info=reportError('loadAccount',e,{what:'ao seu perfil'});
@@ -189,6 +190,7 @@ async function doPersist(s){
   await setDoc(doc(db,'users',s.uid),cloudPayload(s.uid),{merge:true});
   if(!isCurrent(s))return;
   await publishIfChanged(s);
+  await publishRankedBoardIfChanged(s);
 }
 function persistState(){
   assertWritable();
@@ -228,7 +230,7 @@ async function equipShopItem(itemId,type,equipped){assertWritable();const s=snap
 async function debitCoins(amount){assertWritable();const s=snapshot();const ref=doc(db,'users',s.uid);let next;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw new ChromaError('Perfil não encontrado.');const d=snap.data(),coins=Number(d.coins||0);if(coins<amount)throw new ChromaError('Moedas insuficientes.');next={...d,coins:coins-amount,updatedAt:serverTimestamp()};tx.set(ref,next,{merge:true});});return applyWritten(next,s);}
 
 const hasIdentity=()=>!!currentUser&&[STATE.PROFILE_LOADING,STATE.READY,STATE.PROFILE_ERROR].includes(authState);
-window.chromaCloud={canWrite,isReady:canWrite,persistState,syncToCloud,restoreFromServer,retryProfileLoad,purchaseShopItem,equipShopItem,debitCoins,getUser:()=>currentUser,getAuthState:()=>authState,getWriteMessage:authUnavailableMessage,isAuthenticated:hasIdentity,describeError,classifyError,subscribe,STATES:STATE};
+window.chromaCloud={canWrite,isReady:canWrite,persistState,syncToCloud,restoreFromServer,retryProfileLoad,purchaseShopItem,equipShopItem,debitCoins,readRankedBoard,listActiveEvents,eventParticipation,eventParticipantCount,joinEvent,leaveEvent,getUser:()=>currentUser,getAuthState:()=>authState,getWriteMessage:authUnavailableMessage,isAuthenticated:hasIdentity,describeError,classifyError,subscribe,STATES:STATE};
 window.chromaAuth={getState:()=>authState,getUser:()=>currentUser,getError:()=>sessionError,isLoading:()=>authState===STATE.LOADING||authState===STATE.PROFILE_LOADING,isAuthenticated:hasIdentity,isReady:canWrite,subscribe};
 
 /* ===== LOGIN: Google e e-mail/senha terminam no MESMO onAuthStateChanged -> mesma sessão -> mesmo users/{uid} ===== */
@@ -338,6 +340,44 @@ async function publishSocialProfile(){
   publishInFlight={token:s.token,promise};
   try{return await promise;}finally{if(publishInFlight&&publishInFlight.promise===promise)publishInFlight=null;}
 }
+function rankedBoardPayload(uid){
+  const local=localState(), name=String(local.name||currentUser?.displayName||'Jogador').slice(0,40);
+  const list=Array.isArray(local.ranked)?local.ranked:[];
+  const found=list.find(x=>String(x.name||'').toLowerCase()===name.toLowerCase())||{};
+  const nonNegative=v=>Math.max(0,Math.floor(Number(v)||0));
+  return {uid,name,username:String(local.username||usernameFromUser(currentUser||{})).slice(0,18),photo:String(local.photo||''),points:nonNegative(found.points),wins:nonNegative(found.wins),losses:nonNegative(found.losses),played:nonNegative(found.played),updatedAt:serverTimestamp()};
+}
+const rankedBoardSig=p=>JSON.stringify([p.uid,p.name,p.username,p.photo,p.points,p.wins,p.losses,p.played]);
+async function publishRankedBoardIfChanged(s){
+  if(!isCurrent(s)||!canWrite())return;
+  const payload=rankedBoardPayload(s.uid),sig=rankedBoardSig(payload);
+  if(sig===lastRankedBoardSig)return;
+  await setDoc(doc(db,'rankedBoard',s.uid),payload,{merge:true});
+  if(!isCurrent(s))throw staleError();
+  lastRankedBoardSig=sig;
+}
+async function readRankedBoard(){
+  const s=ensureSocial();
+  const snap=await getDocs(query(collection(db,'rankedBoard'),orderBy('points','desc'),limit(100)));
+  return snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+async function listActiveEvents(){
+  const s=ensureSocial();
+  const snap=await getDocs(query(collection(db,'events'),where('active','==',true),limit(100)));
+  return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>toMillis(a.startsAt)-toMillis(b.startsAt));
+}
+function toMillis(value){return value?.toMillis?value.toMillis():value?.seconds?value.seconds*1000:Number(value)||0;}
+async function eventParticipation(eventId){
+  const s=ensureSocial(),ref=doc(db,'eventParticipants',String(eventId)+'__'+s.uid),snap=await getDoc(ref);
+  return snap.exists();
+}
+async function eventParticipantCount(eventId){const s=ensureSocial();const snap=await getDocs(query(collection(db,'eventParticipants'),where('eventId','==',String(eventId)),limit(1000)));return snap.docs.length;}
+async function joinEvent(eventId){
+  const s=ensureSocial(),id=String(eventId),ref=doc(db,'eventParticipants',id+'__'+s.uid);
+  await setDoc(ref,{eventId:id,uid:s.uid,name:String(localStorage.getItem(keys.name)||currentUser?.displayName||'Jogador').slice(0,40),joinedAt:serverTimestamp()});
+  return true;
+}
+async function leaveEvent(eventId){const s=ensureSocial();await deleteDoc(doc(db,'eventParticipants',String(eventId)+'__'+s.uid));return true;}
 async function publishIfChanged(s){
   if(!isCurrent(s)||!canWrite())return;
   if(socialSig(socialProfileFromLocal(s.uid))===lastPublishedSig)return;

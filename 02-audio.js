@@ -11,7 +11,7 @@ function syncMusic(mode,playing=true){
   if(music&&musicMode===mode){music.volume=musicVolume;return;}
   stopMusic();
   music=new Audio(src);music.loop=true;music.volume=musicVolume;musicMode=mode;
-  const p=music.play();if(p&&p.catch)p.catch(()=>{});
+  const p=music.play();if(p&&p.catch)p.catch(e=>{const info=window.chromaCloud?.classifyError?.(e);console.warn('[CHROMA] áudio: '+(info?.message||e?.message||String(e)));});
 }
 function setMusicVolume(v){musicVolume=Math.max(0,Math.min(1,Number(v)||0));try{localStorage.setItem('chroma-music-volume',String(musicVolume));}catch(e){}if(music)music.volume=musicVolume;}
 function setSfxVolume(v){sfxVolume=Math.max(0,Math.min(1,Number(v)||0));try{localStorage.setItem('chroma-sfx-volume',String(sfxVolume));}catch(e){}if(master)master.gain.value=sfxVolume;}

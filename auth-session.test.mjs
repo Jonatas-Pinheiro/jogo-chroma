@@ -257,6 +257,19 @@ T('T16 erro do observador -> AUTH_ERROR; falha de publicProfiles não derruba a 
   assert.equal(states(),'AUTH_ERROR');assert.match(window.firebaseAuthError,/Configuração do Firebase/);
 });
 
+T('T17 publica rankedBoard com UID atual e expõe todos os jogadores',async()=>{
+  const {fb,states}=await boot();await until(()=>states()==='UNAUTHENTICATED');
+  fb.seedUser('uidA',{name:'Alice',username:'alice'});fb.emit(user('uidA'));await until(ready);
+  localStorage.setItem('chroma-name','Alice');localStorage.setItem('chroma-ranked',JSON.stringify([{name:'Alice',points:42,wins:2,losses:1,played:3}]));await window.chromaCloud.persistState();
+  assert.deepEqual(fb.store.get('rankedBoard/uidA'),{uid:'uidA',name:'Alice',username:'alice',photo:'',points:42,wins:2,losses:1,played:3,updatedAt:{__ts:true}});
+  fb.store.set('rankedBoard/uidB',{uid:'uidB',name:'Bob',username:'bob',photo:'',points:99,wins:4,losses:0,played:4});
+  assert.deepEqual((await window.chromaCloud.readRankedBoard()).map(x=>x.uid).sort(),['uidA','uidB']);
+});
+T('T18 eventos e participação usam o documento eventId__uid',async()=>{
+  const {fb}=await boot();await until(()=>window.firebaseAuthState==='UNAUTHENTICATED');fb.seedUser('uidA',{name:'Alice'});fb.emit(user('uidA'));await until(ready);
+  fb.store.set('events/e1',{title:'Guerra de Clãs',description:'Informativo',type:'clan-war',startsAt:1,endsAt:9999999999999,active:true});fb.store.set('events/e2',{title:'Oculto',active:false});
+  assert.equal((await window.chromaCloud.listActiveEvents()).length,1);assert.equal(await window.chromaCloud.eventParticipation('e1'),false);await window.chromaCloud.joinEvent('e1');assert.equal(fb.store.get('eventParticipants/e1__uidA').uid,'uidA');assert.equal(await window.chromaCloud.eventParticipation('e1'),true);await window.chromaCloud.leaveEvent('e1');assert.equal(fb.store.has('eventParticipants/e1__uidA'),false);
+});
 let failed=0;
 for(const [name,fn] of tests){
   logs.length=0;

@@ -90,6 +90,7 @@
       <button class="home-shortcut" id="homeMail" type="button"><i data-lucide="mail"></i><span>Correio</span></button>
       <button class="home-shortcut" id="homeAchievements" type="button"><i data-lucide="medal"></i><span>Conquistas</span></button>
       <button class="home-shortcut" id="homeRanking" type="button"><i data-lucide="trophy"></i><span>Ranqueado</span></button>
+      <button class="home-shortcut" id="homeEvents" type="button"><i data-lucide="calendar-days"></i><span>Eventos</span></button>
     </div>
   </div>
   <details class="rules">
@@ -117,6 +118,11 @@
     <div class="season-section"><h3>Recompensas por patente</h3><div class="rank-rewards-grid" id="rankRewards"></div></div>
     <div class="season-section"><h3>Classificação da temporada</h3><div class="rank-list" id="rankList"></div></div>
   </div>
+</div>
+
+<div id="events" class="screen">
+  <div class="rank-top"><button class="btn ghost" id="btnEventsBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="calendar-days"></i> EVENTOS</h1><button class="btn ghost" id="btnEventsRefresh" type="button">Atualizar</button></div>
+  <div class="rank-panel events-panel"><p class="events-intro">Participe dos eventos ativos da comunidade. A Guerra de Clãs é informativa nesta etapa; sua pontuação ainda não é afetada.</p><div id="eventsList" class="events-list" aria-live="polite"></div></div>
 </div>
 
 <!-- ===== LOBBY ===== -->
@@ -541,7 +547,7 @@ function syncMusic(mode,playing=true){
   if(music&&musicMode===mode){music.volume=musicVolume;return;}
   stopMusic();
   music=new Audio(src);music.loop=true;music.volume=musicVolume;musicMode=mode;
-  const p=music.play();if(p&&p.catch)p.catch(()=>{});
+  const p=music.play();if(p&&p.catch)p.catch(e=>{const info=window.chromaCloud?.classifyError?.(e);console.warn('[CHROMA] áudio: '+(info?.message||e?.message||String(e)));});
 }
 function setMusicVolume(v){musicVolume=Math.max(0,Math.min(1,Number(v)||0));try{localStorage.setItem('chroma-music-volume',String(musicVolume));}catch(e){}if(music)music.volume=musicVolume;}
 function setSfxVolume(v){sfxVolume=Math.max(0,Math.min(1,Number(v)||0));try{localStorage.setItem('chroma-sfx-volume',String(sfxVolume));}catch(e){}if(master)master.gain.value=sfxVolume;}
@@ -2023,15 +2029,31 @@ function showEyeView(name,cards){
 function formatTime(ms){const total=Math.ceil(Math.max(0,ms)/1000),m=Math.floor(total/60),s=String(total%60).padStart(2,'0');return m+':'+s;}
 
 
-function rankedData(){const a=readRanked(),name=cleanName($('#inName').value)||'Você';if(!a.some(x=>x.name.toLowerCase()===name.toLowerCase()))a.push({name,points:0,wins:0,losses:0,played:0});return a.sort((x,y)=>y.points-x.points||y.wins-x.wins||x.name.localeCompare(y.name));}
+let rankingRequest=0;
+function rankingName(){return cleanName($('#inName').value)||localStorage.getItem('chroma-name')||'Você';}
 const RANKED_REWARDS={Prata:'Moldura Dourada',Ametista:'Nome Dourado',Ouro:'Banner Dourado',Diamante:'Distintivo Dourado',Dominador:'Cartas Douradas',Soberano:'Pacote Dourado'};
-function renderRanking(){
-  const a=rankedData(),name=cleanName($('#inName').value)||'Você',me=a.find(x=>x.name.toLowerCase()===name.toLowerCase())||a[0],tier=rankedTier(me.points),idx=a.indexOf(me),next=tier.next?Math.max(0,tier.next-me.points):0;
-  $('#rankMe').innerHTML='<div><small>Sua posição</small><b>#'+(idx+1)+'</b></div><div><small>Patente</small><b>'+tier.name+' '+tier.level+'</b></div><div><small>Pontos</small><b>'+me.points+(tier.next?' · '+next+' para avançar':' · Máximo')+'</b></div>';
-  const rewards=$('#rankRewards');if(rewards)rewards.innerHTML=RANKED_TIERS.filter((x,i)=>i%4===3).map(t=>'<div class="rank-reward-card"><span class="reward-rank-icon">'+esc(t.name.slice(0,3).toUpperCase())+'</span><div><b>'+esc(t.name)+' IV</b><small>'+esc(RANKED_REWARDS[t.name])+' · cosmético dourado</small></div></div>').join('');
-  $('#rankList').innerHTML=a.map((p,i)=>{const t=rankedTier(p.points),pr=t.next?Math.min(100,Math.max(0,(p.points-t.min)/(t.next-t.min)*100)):100;return '<div class="rank-row '+(p.name.toLowerCase()===name.toLowerCase()?'me':'')+'"><div class="rank-pos">#'+(i+1)+'</div><div class="rank-who"><b>'+esc(p.name)+'</b><small>'+t.name+' '+t.level+' · '+(p.wins||0)+' vitórias</small><div class="rank-progress"><i style="width:'+pr+'%"></i></div></div><div class="rank-stat"><strong>'+p.points+'</strong>'+ (p.played||0)+' partidas</div></div>';}).join('');
+async function renderRanking(){
+  const request=++rankingRequest,list=$('#rankList'),meBox=$('#rankMe');
+  if(!window.chromaCloud?.isAuthenticated?.()){meBox.innerHTML='';list.innerHTML='<div class="cloud-state">Entre na conta para ver o placar.</div>';return;}
+  list.innerHTML='<div class="cloud-state">Carregando placar…</div>';meBox.innerHTML='';
+  try{
+    const top=await window.chromaCloud.readRankedBoard();if(request!==rankingRequest)return;
+    const name=rankingName(),uid=window.chromaCloud.getUser()?.uid||'',mine=top.find(p=>p.uid===uid), all=top.slice();
+    let myPosition=mine?top.indexOf(mine)+1:null;
+    if(!mine){const local=readRanked().find(x=>String(x.name||'').toLowerCase()===name.toLowerCase());if(local){const higher=top.filter(p=>Number(p.points||0)>Number(local.points||0)).length;myPosition=higher+1;all.push({...local,uid,name});}}
+    if(!all.length){list.innerHTML='<div class="cloud-state">Nenhum jogador no placar ainda.</div>';return;}
+    const me=mine||all[all.length-1],tier=rankedTier(Number(me.points||0)),next=tier.next?Math.max(0,tier.next-Number(me.points||0)):0;
+    meBox.innerHTML='<div><small>Sua posição</small><b>'+(myPosition?'#'+myPosition:'—')+'</b></div><div><small>Patente</small><b>'+tier.name+' '+tier.level+'</b></div><div><small>Pontos</small><b>'+Number(me.points||0)+(tier.next?' · '+next+' para avançar':' · Máximo')+'</b></div>';
+    const rewards=$('#rankRewards');if(rewards)rewards.innerHTML=RANKED_TIERS.filter((x,i)=>i%4===3).map(t=>'<div class="rank-reward-card"><span class="reward-rank-icon">'+esc(t.name.slice(0,3).toUpperCase())+'</span><div><b>'+esc(t.name)+' IV</b><small>'+esc(RANKED_REWARDS[t.name])+' · cosmético dourado</small></div></div>').join('');
+    list.innerHTML=top.map((p,i)=>{const t=rankedTier(Number(p.points||0)),pr=t.next?Math.min(100,Math.max(0,(Number(p.points||0)-t.min)/(t.next-t.min)*100)):100;return '<div class="rank-row '+(p.uid===uid?'me':'')+'"><div class="rank-pos">#'+(i+1)+'</div><div class="rank-who"><b>'+esc(p.name||p.username||'Jogador')+'</b><small>'+t.name+' '+t.level+' · '+(p.wins||0)+' vitórias</small><div class="rank-progress"><i style="width:'+pr+'%"></i></div></div><div class="rank-stat"><strong>'+Number(p.points||0)+'</strong>'+ (p.played||0)+' partidas</div></div>';}).join('')+(mine?'':'<div class="cloud-state rank-outside">Sua posição está fora do top 100: #'+myPosition+'</div>');
+  }catch(e){if(request===rankingRequest)list.innerHTML='<div class="cloud-state error">'+esc(window.chromaCloud.describeError(e,'carregar o placar'))+'</div>';}
 }
-function openRanking(){renderRanking();show('ranking');}
+function openRanking(){show('ranking');renderRanking();}
+function eventStatus(e){const now=Date.now(),start=toMillis(e.startsAt),end=toMillis(e.endsAt);return now<start?'Em breve':now<=end?'Ativo':'Encerrado';}
+function eventDate(v){const n=toMillis(v);return n?new Date(n).toLocaleDateString('pt-BR'):'—';}
+function eventDescription(e){return e.description|| (e.type==='clan-war'?'Una disputa amistosa entre clãs. Nesta etapa, a participação é informativa e não gera pontuação de guerra.':'Torneio especial organizado pelos administradores, com regras e premiação divulgadas no evento.');}
+async function renderEvents(){const list=$('#eventsList');if(!list)return;if(!window.chromaCloud?.isAuthenticated?.()){list.innerHTML='<div class="cloud-state">Entre na conta para ver os eventos.</div>';return;}list.innerHTML='<div class="cloud-state">Carregando eventos…</div>';try{const events=await window.chromaCloud.listActiveEvents();if(!events.length){list.innerHTML='<div class="cloud-state">Nenhum evento ativo no momento</div>';return;}const rows=await Promise.all(events.map(async e=>{const joined=await window.chromaCloud.eventParticipation(e.id);return {...e,joined};}));list.innerHTML=rows.map(e=>'<article class="event-card"><div class="event-card-head"><div><small>'+esc(e.type==='clan-war'?'GUERRA DE CLÃS':'TORNEIO DOS ADMINS')+'</small><h2>'+esc(e.title||'Evento Chroma')+'</h2></div><span class="event-status '+eventStatus(e).toLowerCase().replace(' ','-')+'">'+eventStatus(e)+'</span></div><p>'+esc(eventDescription(e))+'</p><div class="event-meta"><span>'+eventDate(e.startsAt)+' → '+eventDate(e.endsAt)+'</span><span class="event-count" data-event-count="'+esc(e.id)+'">Participantes: carregando…</span></div><button class="btn '+(e.joined?'good':'primary')+'" data-event-action="'+esc(e.id)+'" '+(eventStatus(e)==='Encerrado'?'disabled':'')+'>'+(e.joined?'Participando ✓':'Participar')+'</button></article>').join('');for(const e of rows){const count=await window.chromaCloud.eventParticipantCount(e.id);const countEl=document.querySelector('[data-event-count="'+CSS.escape(e.id)+'"]');if(countEl)countEl.textContent='Participantes: '+count;} }catch(e){list.innerHTML='<div class="cloud-state error">'+esc(window.chromaCloud.describeError(e,'carregar os eventos'))+'</div>';}}
+
 function renderHomeProfileCard(){
   const card=$('#homeProfileCard');if(!card)return;
   let name='';try{name=localStorage.getItem('chroma-name')||'';}catch(e){}
@@ -2218,6 +2240,10 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#homeMail').onclick=()=>{renderMail();show('mail');};
   $('#homeAchievements').onclick=()=>{renderAchievements();show('achievements');};
   $('#homeRanking').onclick=()=>openRanking();
+  $('#homeEvents').onclick=()=>{show('events');renderEvents();};
+  $('#btnEventsBack').onclick=()=>show('home');
+  $('#btnEventsRefresh').onclick=()=>renderEvents();
+  $('#eventsList').addEventListener('click',async e=>{const b=e.target.closest('[data-event-action]');if(!b)return;if(!window.chromaCloud?.isAuthenticated?.()){toast('Entre na conta para participar.');return;}const id=b.dataset.eventAction;try{if(b.textContent.includes('Participando'))await window.chromaCloud.leaveEvent(id);else await window.chromaCloud.joinEvent(id);await renderEvents();}catch(err){toast(window.chromaCloud.describeError(err,'alterar sua participação'));}});
   $('#homeProfileCard').onclick=()=>openProfileEdit(false);
   window.addEventListener('chroma-state-changed',()=>{renderHomeProfileCard();if(!$('#shopInventoryView')?.hidden)renderShopInventory();});
   $('#saveUsername').onclick=saveUsername;
@@ -2349,7 +2375,7 @@ function adminLockAll(){
 
 /* ===== ATALHOS DE TECLADO (PC) — mesmas ações dos botões da tela, só que pelo teclado ===== */
 (function(){
-  const BACK_BUTTONS={ranking:'btnRankBack',achievements:'achBack',profile:'profileBack',shop:'shopBack',rewards:'rewardsBack',settings:'settingsBack',mail:'mailBack',inventory:'inventoryBack',friends:'friendsBack'};
+  const BACK_BUTTONS={ranking:'btnRankBack',events:'btnEventsBack',achievements:'achBack',profile:'profileBack',shop:'shopBack',rewards:'rewardsBack',settings:'settingsBack',mail:'mailBack',inventory:'inventoryBack',friends:'friendsBack'};
   const isOn=sel=>{const el=$(sel);return !!el&&el.classList.contains('on');};
   const clickId=id=>{const el=document.getElementById(id);if(el)el.click();};
   const isTyping=t=>!!t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
