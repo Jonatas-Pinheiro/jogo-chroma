@@ -374,7 +374,10 @@ function toast(msg,ms){
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms||2200);
 }
 function cleanName(n){return (n||'').replace(/\s+/g,' ').trim().slice(0,14);}
-function saveName(n){if(!window.chromaCloud?.canWrite()){toast((window.chromaCloud?.getWriteMessage?.()||'Não foi possível realizar esta alteração.'));return false;}const previous=localStorage.getItem('chroma-name')||'';try{localStorage.setItem('chroma-name',n);}catch(e){return false;}window.chromaCloud.persistState().catch(()=>{try{localStorage.setItem('chroma-name',previous);}catch(_){}toast('Não foi possível salvar o nome no servidor.');renderProfile();});window.dispatchEvent(new Event('chroma-state-changed'));return true;}
+function cloudBlockedMessage(){return window.chromaCloud?.getWriteMessage?.()||(window.chromaCloudLoadFailed?'O módulo de conta do Firebase não carregou (firebase-auth.js ou o SDK em gstatic.com foi bloqueado ou está fora do ar). Recarregue a página.':'Iniciando o módulo de conta… aguarde um instante.');}
+function cloudErr(e,action){return window.chromaCloud?.describeError?.(e,action)||(e&&e.message)||'Erro inesperado sem detalhes.';}
+function cloudUnavailableHtml(unauthText){const st=window.firebaseAuthState||'AUTH_LOADING';const text=st==='UNAUTHENTICATED'?unauthText:cloudBlockedMessage();const retry=st==='AUTHENTICATED_PROFILE_ERROR'?' <button class="btn ghost" type="button" data-cloud-retry>Tentar novamente</button>':'';return socialEsc(text)+retry;}
+function saveName(n){if(!window.chromaCloud?.canWrite()){toast(cloudBlockedMessage());return false;}const previous=localStorage.getItem('chroma-name')||'';try{localStorage.setItem('chroma-name',n);}catch(e){return false;}window.chromaCloud.persistState().catch(e=>{try{localStorage.setItem('chroma-name',previous);}catch(storageErr){console.error('[CHROMA] falha ao restaurar o nome local',storageErr);}toast(cloudErr(e,'salvar o nome'));renderProfile();});window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 
 function startTraining(name,profile,count,difficulty){
   teardown('');

@@ -1,52 +1,54 @@
-# Investigação de autenticação e conectividade
+# Investigação de autenticação, sessão e conectividade (CHROMA)
 
-## Causas encontradas
+## Bugs reais encontrados
 
-A aplicação tinha uma única inicialização Firebase (`initializeApp`, `getAuth` e `getFirestore`) e um único `onAuthStateChanged`, mas a função `canWrite()` combinava três decisões diferentes: existência de `currentUser`, conclusão do carregamento da conta e `navigator.onLine !== false`. O último item é apenas uma heurística do navegador e não comprova que o Firebase está acessível. Por isso, uma leitura incorreta de conectividade podia bloquear recursos mesmo com Wi-Fi, dados móveis ou outra conexão funcionando.
+1. **Estado inconsistente**: `onAuthStateChanged` marcava `AUTHENTICATED` antes de `loadAccount()` terminar, mas `canWrite()` exigia `accountReady`. Resultado: conta "conectada" com `canWrite()==false`.
+2. **Falha de perfil virava falha de sessão**: se `users/{uid}` falhasse (permission-denied, unavailable), `accountReady` ficava `false` para sempre, sem estado de erro nem retry.
+3. **Leitura dependia de transação de escrita**: `ensureProfile` rodava `runTransaction` em todo login. Agora lê com `getDoc`; a transação só existe para *criar* o perfil.
+4. **`publishSocialProfile().catch(()=>{})`** engolia erros. Também reenviava `clanId: null` a cada login (a chave `chroma-clan-id` nunca era gravada), apagando o clã do perfil público.
+5. **Mensagens genéricas**: `getWriteMessage()||'Não foi possível realizar esta alteração.'` (5 pontos), `err.message||'Não foi possível concluir a operação.'` (Social/Clã) e `e.message` cru do Firebase em inglês. Se `firebase-auth.js`/SDK não carregasse (bloqueio de gstatic), `window.chromaCloud` ficava indefinido e o fallback genérico aparecia para sempre — agora há `onerror` no `<script type="module">` e mensagem própria.
+6. **Sincronização insegura**: `syncToCloud` sem fila (duas gravações simultâneas), sem guarda de sessão (resposta de uma conta antiga podia ser aplicada na nova), `restoreFromServer` reiniciava `accountReady=false` (bloqueando escritas durante o restore) e o `catch(()=>{})` escondia a falha. Nada limpava o `localStorage` ao trocar de conta/deslogar.
+7. **Vínculo Google + e-mail/senha**: usava `auth.currentUser` depois do login, não validava se o e-mail digitado era o da conta Google e não limpava a credencial pendente em caso de erro.
+8. **Salvar nome/username** engolia o erro real; e alterar username/nome/foto/nível **nunca atualizava `publicProfiles`** (busca social mostrava nome antigo).
+9. **Regra do Firestore (`firestore.rules`)**: a entrada em clã lia `members[uid].role` de quem ainda não estava no mapa → erro de avaliação → `permission-denied` em todo `joinClan`.
 
-O Social e o Clã também dependiam diretamente de `canWrite()`. Assim, durante a restauração assíncrona da sessão, `accountReady` ainda era `false`; o sistema tratava esse intervalo como se fosse logout. Uma falha de leitura/escrita no Firestore também podia acabar apresentada como problema de conexão ou login, em vez de indicar permissão, indisponibilidade ou erro de configuração.
+## Arquitetura atual (`firebase-auth.js`)
 
-## Correção aplicada
-
-`firebase-auth.js` continua sendo a única fonte de autenticação. A sessão agora usa persistência local do Firebase com `browserLocalPersistence` e é confirmada exclusivamente por `onAuthStateChanged(auth, user => ...)`.
-
-Foi introduzido um estado explícito:
-
-```text
-AUTH_LOADING
-AUTHENTICATED
-UNAUTHENTICATED
+```
+onAuthStateChanged  (único observador; ++sessionToken a cada mudança)
+  ├─ sem usuário → UNAUTHENTICATED (limpa cache da conta anterior)
+  └─ usuário → AUTHENTICATED_LOADING_PROFILE (UID já vale)
+        getDoc(users/{uid}) ── não existe → transação só para criar
+        ├─ ok   → AUTHENTICATED  (única condição de canWrite())
+        └─ erro → AUTHENTICATED_PROFILE_ERROR (currentUser preservado; erro real + botão "Tentar novamente")
+AUTH_LOADING = Firebase ainda restaurando a sessão · AUTH_ERROR = erro do próprio observador
 ```
 
-Durante `AUTH_LOADING`, a interface mostra “Verificando sessão…” e o Social mostra “Sincronizando sua sessão com o Firebase…”. O jogador não é tratado como deslogado. Depois que o Firebase retorna um usuário, o código usa `user.uid` e carrega o documento privado. Um token de carregamento evita que uma resposta antiga sobrescreva uma sessão mais nova.
+- Toda operação assíncrona captura `{token, uid}` e confere `isCurrent()` antes de aplicar resultado; respostas de sessão antiga são descartadas.
+- Cache local tem dono (`chroma-cache-owner` = UID). Ao trocar de conta/deslogar ele é limpo *antes* do novo perfil chegar. O marcador **não** é prova de login.
+- Sincronização: debounce (400 ms) + fila serial + guarda de sessão + `applyingRemote` (sem loop). Rede/indisponível: mantém o local e reenvia (3 s, 10 s, 30 s). Recusa do servidor: informa a causa e realinha com a nuvem.
+- `classifyError()` é a única fonte de mensagens; preserva o erro original (`info.original`) e loga no console.
+- Google e e-mail/senha terminam no mesmo `onAuthStateChanged` → mesmo `users/{uid}` → mesmo `publicProfiles/{uid}`.
+- Sem `navigator.onLine`: conectividade é o resultado real das operações Firebase.
 
-`canWrite()` não consulta mais `navigator.onLine` e não exige Wi-Fi. A operação real é enviada ao Firebase. Se o servidor estiver indisponível, a operação falha e o erro é convertido em “Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.”
+## Coleções e operações exigidas pelas regras
 
-Os erros agora são diferenciados:
+| Coleção | Leitura | Escrita |
+|---|---|---|
+| `users/{uid}` | só o dono | dono: criar (valores iniciais) e atualizar campos listados |
+| `publicProfiles/{uid}` | qualquer logado | dono: criar/atualizar |
+| `friendRequests/{id}` | remetente ou destinatário | logado: criar (`fromUid==uid`); destinatário aceita/recusa; remetente cancela |
+| `friendships/{id}` | participantes | participante cria/apaga (criada na aceitação) |
+| `clans/{id}` | qualquer logado | líder; membro entra/sai alterando só `members`, `memberCount`, `updatedAt` |
 
-- usuário não autenticado: solicitação de login;
-- sessão ainda carregando: mensagem de espera;
-- `permission-denied`: usuário autenticado, mas sem permissão nas regras;
-- `unavailable`, `deadline-exceeded` ou erro de rede: falha de comunicação;
-- `failed-precondition`: problema de configuração do Firebase;
-- outros erros: mensagem da operação ou erro interno.
+## Verificar no Console do Firebase (não dá para checar pelos arquivos)
 
-## Social e Clã
+- Authentication → Sign-in method: **Google** e **E-mail/senha** ativados.
+- Authentication → Settings → **Authorized domains**: o domínio onde o jogo está hospedado (ex.: `usuario.github.io`).
+- `authDomain` em `firebase-config.js` (`chroma-79384.firebaseapp.com`) é coerente com `projectId`.
+- Publicar `firestore.rules` atualizado e testar no Rules Playground/emulador (a regra de clã foi alterada e **não** foi testada num emulador).
+- Consultas com `where` + `orderBy` em campos diferentes podem pedir índice; o erro aparece como `failed-precondition` com link de criação.
 
-O Social e o Clã usam a mesma fonte `currentUser` derivada do callback do Firebase. Eles não criam login próprio, não separam Google de e-mail/senha e não consultam `auth.currentUser` apenas uma vez no carregamento da página.
+## Testes
 
-O UID utilizado em perfis públicos, solicitações, amizades e clãs é `currentUser.uid`, somente depois de o estado Auth estar confirmado e o perfil privado estar sincronizado. Se a sessão ainda estiver carregando, a tela permanece em estado de sincronização. Se o carregamento do perfil falhar por permissão, o erro real é mostrado, sem dizer que o usuário está deslogado.
-
-## Arquivos alterados
-
-- `firebase-auth.js`: persistência Auth, estados `AUTH_LOADING`/`AUTHENTICATED`/`UNAUTHENTICATED`, tratamento de erros, remoção do bloqueio por `navigator.onLine`, sincronização do Social após a sessão e exposição de estado Auth.
-- `index.html`: estados de carregamento e erro do Social/Clã, mensagens corretas durante restauração e falhas Firestore.
-- `05-correio-moedas.js`, `07-social-rede-p2p.js` e `08-render-ui.js`: mensagens de bloqueio atualizadas para usar a causa real fornecida pela camada Firebase.
-- `firestore.rules`: mantido como camada de autorização; não foi aberto acesso público nem usado `allow read, write: if true`.
-- `AUTH-CONNECTIVITY-INVESTIGATION.md`: este relatório.
-
-## Testes executados
-
-Foram executados com sucesso: validação HTTP local de `index.html`, `firebase-auth.js`, `firebase-config.js` e `firestore.rules`; sintaxe de todos os arquivos JavaScript; leitura estrutural do HTML; teste de regressão do motor de turnos; ausência de `navigator.onLine`, listeners `online`/`offline` e mensagens específicas de Wi-Fi; presença dos três estados Auth; presença de `onAuthStateChanged` e `browserLocalPersistence`; e checagem da separação entre erros de autenticação, autorização e conectividade.
-
-Não foi possível executar login real com Google, login real com e-mail/senha, teste em dados móveis ou desligamento físico da rede dentro do sandbox, porque ele não possui a sessão/credenciais do usuário nem um rádio de rede móvel. Esses testes devem ser realizados no navegador/dispositivo de uso, com o Firebase configurado. A implementação foi preparada para que ambos os métodos de login passem pelo mesmo `onAuthStateChanged` e para que Wi-Fi e dados móveis sejam tratados igualmente.
+`node auth-session.test.mjs` roda 15 cenários contra um Firebase **simulado em memória** (`auth-test-hooks.mjs`): estados, refresh, Google/vínculo, Social/Clã, permission-denied, unavailable, username, compra/equipar, troca de conta, logout, sessão antiga, fila de sincronização, classificação de erros. Eles provam a lógica, não as regras reais, o popup do Google nem a rede.

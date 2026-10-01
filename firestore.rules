@@ -60,9 +60,16 @@ service cloud.firestore {
         && request.resource.data.name.size() >= 3 && request.resource.data.name.size() <= 24;
       allow update: if signedIn() && (
         resource.data.leaderId == request.auth.uid
-        || (resource.data.members[request.auth.uid].role == 'member'
-          && ((request.resource.data.memberCount == resource.data.memberCount + 1 && request.resource.data.members[request.auth.uid].role == 'member')
-            || (request.resource.data.memberCount == resource.data.memberCount - 1 && request.resource.data.members[request.auth.uid] == null)))
+        // ENTRAR: ainda não é membro (ou saiu antes: o campo ficou null). A regra anterior lia members[uid].role de quem
+        // ainda NÃO estava no mapa; isso gera erro de avaliação e negava toda entrada em clã (permission-denied).
+        || ((!(request.auth.uid in resource.data.members) || resource.data.members[request.auth.uid] == null)
+          && request.resource.data.memberCount == resource.data.memberCount + 1
+          && request.resource.data.members[request.auth.uid].role == 'member')
+        // SAIR: é membro comum e remove a si mesmo
+        || ((request.auth.uid in resource.data.members) && resource.data.members[request.auth.uid] != null
+          && resource.data.members[request.auth.uid].role == 'member'
+          && request.resource.data.memberCount == resource.data.memberCount - 1
+          && request.resource.data.members[request.auth.uid] == null)
       ) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members','memberCount','updatedAt']);
       allow delete: if signedIn() && resource.data.leaderId == request.auth.uid;
     }
