@@ -406,7 +406,7 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   };
   $('#matchTime').onchange=updateRoomLimits;$('#maxPlayers').onchange=updateRoomLimits;$('#turnTime').onchange=updateRoomLimits;
   $('#modeWrap').addEventListener('change',e=>{
-    if(e.target.name==='mode'&&isHost&&room&&room.phase==='lobby'){if(isModeLocked(e.target.value)){toast('Este modo será desbloqueado somente no nível 5');updateModeLockUI();return;}const cfg=teamConfig(e.target.value);if(cfg&&room.players.length>cfg.players){toast('Este modo exige no máximo '+cfg.players+' jogadores');return;}room.opts.mode=e.target.value;room.opts.maxPlayers=cfg?cfg.players:Math.max(4,room.opts.maxPlayers||4);room.players.forEach((p,i)=>p.team=teamForIndex(i,room.opts.mode));broadcast();}
+    if(e.target.name==='mode'&&isHost&&room&&room.phase==='lobby'){const cfg=teamConfig(e.target.value);if(cfg&&room.players.length>cfg.players){toast('Este modo exige no máximo '+cfg.players+' jogadores');return;}room.opts.mode=e.target.value;room.opts.maxPlayers=cfg?cfg.players:Math.max(4,room.opts.maxPlayers||4);room.players.forEach((p,i)=>p.team=teamForIndex(i,room.opts.mode));broadcast();}
   });
   $('#btnBot').onclick=()=>{
     if(!isHost||!room||!room.opts.training){toast('Bots só estão disponíveis no Modo Treinamento');return;}
@@ -422,7 +422,6 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   });
   $('#btnStart').onclick=()=>{
     if(!isHost||!room)return;
-    if(isModeLocked(room.opts.mode)){toast('Este modo será desbloqueado somente no nível 5');return;}
     const cfg=teamConfig(room.opts.mode);
     if(cfg&&room.players.length!==cfg.players){toast('Para iniciar '+MODES[room.opts.mode]+', é necessário ter exatamente '+cfg.players+' jogadores');return;}
     if(room.players.length<MIN_PLAYERS){toast('Precisa de pelo menos 2 jogadores');return;}
