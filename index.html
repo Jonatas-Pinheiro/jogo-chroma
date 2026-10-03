@@ -4,10 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" id="viewportMeta" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#0c1024">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CHROMA">
 <title>Chroma · cartas com os amigos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Primeiro a cópia local; o CDN da MESMA versão só entra se ela faltar. -->
+<script src="lucide.min.js"></script>
+<script>window.lucide||document.write('<script src="https://cdn.jsdelivr.net/npm/lucide@1.48.0/dist/umd/lucide.min.js"><\/script>')</script>
 <link rel="stylesheet" href="style.css">
 <script>
 /* ===== MODO DE TELA (Celular · Tablet · Computador) =====
@@ -102,9 +108,14 @@
     <p><b>Bloqueio</b> pula o próximo. <b>Inverter</b> muda o sentido. <b>+2</b>: o próximo compra 2 e perde a vez. <b>Coringa</b> escolhe a cor. <b>Coringa +4</b>: escolhe a cor e o próximo compra 4, mas só vale se você não tiver nenhuma carta da cor atual.</p>
     <p>Ficou com <b>1 carta</b>? Aperte <b>CHROMA!</b> (pode apertar já com 2 cartas). Se esquecer e alguém te denunciar antes da próxima jogada, você compra 2.</p>
     <p><b>Modo Caos</b> (o host escolhe no lobby) adiciona <b>+6</b>, <b>+10</b>, <b>Bloqueio Duplo</b> (pula os 2 próximos), o <b>Coringa Troca</b>, que troca sua mão inteira com a de um adversário sorteado, e o <b>Olho do Paizin</b>, que permite observar a mão de um adversário escolhido por 3 segundos.</p>
+    <p><b>Escudo</b> (colorido): 1 por cor; dá 1 proteção contra compras forçadas +N e Chuva de cartas. Absorve o acúmulo inteiro, mas você ainda perde a vez. Não protege de tempo sem acúmulo, Cor Maldita nem CHROMA!.</p>
+    <p><b>Espelho</b> (coringa): 4 no baralho somente com acúmulo ligado; escolha a cor. Reflete a compra acumulada para quem jogou antes, sem inverter o sentido. Sem acúmulo, é um Coringa normal.</p>
+    <p><b>Cor Maldita</b>: a cor muda a cada 8 turnos; jogar uma carta colorida dessa cor faz você comprar 1 carta depois do efeito (a última carta da mão vence antes de comprar). Coringas não contam.</p>
+    <p><b>Eventos Aleatórios</b>: a cada 6 turnos livres surge um evento, sem repetir o anterior: Chuva de cartas, Maré inversa, Pintura surpresa, Ajuda ao azarado, Presente de escudo ou Passa-passa. Se há compra acumulada ou carta recém-comprada, ele espera o próximo turno livre.</p>
     <p><b>Modo Super Caos</b> inclui todas as cartas do Caos e também a carta <b>+99</b>, que faz o próximo jogador comprar 99 cartas. A opção <b>Efeitos</b> pode ser ativada separadamente no lobby para fazer as mãos passarem adiante quando alguém jogar um 0.</p>
     <p>Quando ativado, o <b>Descarte por cor</b> adiciona a carta <b>BURACO NEGRO</b> ao baralho. Ao jogá-la, todas as suas outras cartas da mesma cor voltam embaralhadas para o monte de compra.</p>
     <p><b>Modo Efeitos</b> dá poder ao número <b>0</b>: toda vez que alguém joga um 0, todas as mãos da mesa passam adiante, uma posição, no sentido do jogo.</p>
+    <button class="btn good" id="btnTutorial" type="button">Fazer tutorial rápido</button>
   </details>
 </div>
 
@@ -154,6 +165,16 @@
         <input type="radio" name="mode" value="supercaos">
         <div class="mode-card-img" style="background-image: url('https://i.ibb.co/kV82KqXM/IMG-20260924-170107.jpg');"><span class="mode-selected" aria-label="Modo selecionado"><i data-lucide="check"></i></span></div>
         <div class="mode-card-body"><span class="mode-card-title"><i data-lucide="flame"></i> Super Caos</span><small class="mode-card-desc">+99, +6, +10 e todas as cartas do Caos</small><span class="mode-lock" hidden><i data-lucide="lock"></i><span>Este modo será desbloqueado somente no nível 5.</span></span></div>
+      </label>
+      <label class="mode-card">
+        <input type="radio" name="mode" value="maldita">
+        <div class="mode-card-img mode-img-maldita"><span class="mode-selected" aria-label="Modo selecionado"><i data-lucide="check"></i></span></div>
+        <div class="mode-card-body"><span class="mode-card-title"><i data-lucide="skull"></i> Cor Maldita</span><small class="mode-card-desc">A cor muda a cada 8 turnos; jogá-la custa 1 carta</small></div>
+      </label>
+      <label class="mode-card">
+        <input type="radio" name="mode" value="eventos">
+        <div class="mode-card-img mode-img-eventos"><span class="mode-selected" aria-label="Modo selecionado"><i data-lucide="dices"></i></span></div>
+        <div class="mode-card-body"><span class="mode-card-title"><i data-lucide="dices"></i> Eventos Aleatórios</span><small class="mode-card-desc">Uma surpresa a cada 6 turnos livres</small></div>
       </label>
       <label class="mode-card">
         <input type="radio" name="mode" value="tournament">
@@ -213,6 +234,10 @@
       <div id="colorPill" class="pill"></div>
     </div>
   </div>
+  <div id="modeStatus" role="status" aria-live="polite" hidden></div>
+  <div id="modeNotice" role="status" aria-live="polite" hidden></div>
+  <div id="tutorialGuide" role="status" aria-live="polite" hidden></div>
+  <button class="btn ghost" id="btnTutorialSkip" type="button" hidden>Pular tutorial</button>
   <div id="banner"></div>
   <div id="turnTimer"></div>
   <div id="msg"></div>
@@ -290,7 +315,10 @@
 
 <div class="ov" id="rouletteOv"><div class="sheet roulette-sheet"><div style="font-size:48px" id="rouletteIcon"></div><h2 id="rouletteTitle">Baú de Roleta</h2><div class="roulette-sub">A roleta é aleatória. Boa sorte!</div><div class="roulette-window"><div class="roulette-pointer"></div><div class="roulette-track" id="rouletteTrack"></div></div><div class="roulette-result" id="rouletteResult"></div><button class="btn ghost" id="rouletteClose">Fechar</button></div></div>
 
+<div class="ov" id="tutorialDoneOv" role="dialog" aria-modal="true"><div class="sheet"><div class="trophy">★</div><h2>Tutorial concluído</h2><p>Você aprendeu as cartas principais! Agora é sua vez de jogar com os amigos.</p><button class="btn good" id="btnTutorialDone" type="button">Voltar ao menu</button></div></div>
+
 <div class="ov" id="endOv">
+  <div id="victoryConfetti" aria-hidden="true"></div>
   <div class="sheet">
     <div class="trophy" id="endIcon"></div>
     <h2 id="endTitle"></h2>
@@ -347,17 +375,26 @@
 </div>
 <div id="rewards" class="screen">
   <div class="rank-top"><button class="btn ghost" id="rewardsBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="coins"></i> RECOMPENSAS</h1><span></span></div>
-  <div class="rank-panel">
+  <div class="rank-panel rewards-panel">
+    <div class="rewards-hero">
+      <div class="rewards-hero-copy"><span class="rewards-kicker">CENTRAL DE RECOMPENSAS</span><h2>Volte amanhã. Ganhe mais.</h2><p>Construa sua sequência, cumpra missões e transforme cada partida em progresso.</p></div>
+      <div class="rewards-wallet"><i data-lucide="wallet-cards"></i><strong id="rewardCoinTotal">0</strong><span>moedas</span></div>
+    </div>
+    <div class="rewards-stat-grid" aria-label="Resumo das recompensas">
+      <div class="rewards-stat"><span class="rewards-stat-icon gold"><i data-lucide="flame"></i></span><span><small>Sequência atual</small><b id="rewardStreakValue">Dia 1</b></span></div>
+      <div class="rewards-stat"><span class="rewards-stat-icon blue"><i data-lucide="gift"></i></span><span><small>Próxima recompensa</small><b id="rewardNextAmount">+25 moedas</b></span></div>
+      <div class="rewards-stat rewards-stat-progress"><span class="rewards-stat-icon green"><i data-lucide="calendar-check-2"></i></span><span><small>Semana completada</small><b id="rewardWeekProgress">0/7 dias</b><i class="rewards-mini-track"><em id="rewardWeekFill"></em></i></span></div>
+    </div>
     <div class="reward-grid">
       <div class="reward-card">
-        <b>Login Diário</b>
-        <small>Entre no jogo todos os dias para ganhar moedas. Complete os 7 dias sem perder nenhum!</small>
+        <div class="reward-card-head"><div><span class="reward-eyebrow">TRILHA SEMANAL</span><b>Login diário</b></div><span class="reward-badge"><i data-lucide="sparkles"></i> 7 dias</span></div>
+        <small class="reward-description">Entre no jogo todos os dias para ganhar moedas. Complete os 7 dias sem perder nenhum!</small>
         <div class="streak-row" id="streakRow"></div>
-        <button class="btn primary" id="btnClaimDaily" type="button">Coletar</button>
+        <div class="reward-card-footer"><span class="reward-footnote"><i data-lucide="clock-3"></i> Renova diariamente</span><button class="btn primary" id="btnClaimDaily" type="button">Coletar</button></div>
       </div>
       <div class="reward-card">
-        <b>Missões Diárias</b>
-        <small>Complete missões jogando partidas para ganhar moedas extras. Renovam todo dia.</small>
+        <div class="reward-card-head"><div><span class="reward-eyebrow">DESAFIOS ATIVOS</span><b>Missões diárias</b></div><span class="reward-badge mission"><i data-lucide="target"></i> XP + moedas</span></div>
+        <small class="reward-description">Complete missões jogando partidas para ganhar moedas extras. Renovam todo dia.</small>
         <div class="mission-list" id="missionList"></div>
       </div>
     </div>
@@ -381,6 +418,7 @@
       <label class="settings-row"><span><b>Indicador de ping</b><small>Mostra a qualidade da conexão durante as partidas</small></span><input class="switch" type="checkbox" id="pingMode"></label>
       <div class="settings-row"><span><b>Tema</b><small>Escolha a aparência do jogo</small><div class="theme-choice"><button id="themeLight">Modo Claro</button><button id="themeDark">Modo Escuro (Padrão)</button><button id="themeOLED">Modo OLED</button></div></span></div>
       <div class="settings-row device-row"><span><b>Modo de tela</b><small>Ajusta o tamanho das cartas e a organização dos botões para o seu aparelho.</small><div class="device-choice" role="group" aria-label="Modo de tela"><button type="button" id="deviceMobile" data-device-mode="mobile" aria-pressed="false"><i data-lucide="smartphone"></i><span>Celular</span></button><button type="button" id="deviceTablet" data-device-mode="tablet" aria-pressed="false"><i data-lucide="tablet"></i><span>Tablet</span></button><button type="button" id="deviceDesktop" data-device-mode="desktop" aria-pressed="false"><i data-lucide="computer"></i><span>Computador</span></button></div></span></div>
+      <div class="settings-row install-settings-row"><span><b>Instalar o jogo</b><small>Instale para abrir o CHROMA direto da tela inicial, em tela cheia, e carregar mais rápido.</small><small id="installStatus" role="status" aria-live="polite"></small></span><button class="btn ghost" id="installGame" type="button">Como instalar</button></div>
       <div class="settings-row audio-settings"><span><b>Volume</b><small>Ajuste separadamente a música e os efeitos sonoros</small></span><div class="volume-controls"><label for="musicVolume">Música <output id="musicVolumeValue">35%</output></label><input id="musicVolume" type="range" min="0" max="100" value="35"><label for="sfxVolume">Efeitos <output id="sfxVolumeValue">90%</output></label><input id="sfxVolume" type="range" min="0" max="100" value="90"></div></div>
       <div class="settings-row"><span><b>Resgatar Códigos</b><small>Use um código promocional para receber moedas ou XP.</small></span></div>
       <div class="redeem-row"><input id="redeemCode" class="txt" maxlength="16" placeholder="Digite o código" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn primary" id="btnRedeem" type="button">Resgatar</button></div>
@@ -461,12 +499,13 @@
     </div>
     <button class="btn primary" id="btnCreate">Criar sala</button>
     <label class="opt training-opt" id="trainingOpt"><input type="checkbox" id="optTraining"><span>Modo Treinamento<small>Partida local contra bots; não usa código de sala nem ranking.</small></span></label>
-    <div class="training-controls" id="trainingControls" hidden><label for="trainingMode">Modo de jogo<select class="txt" id="trainingMode"><option value="classic" selected>Clássico</option><option value="caos">Caos</option><option value="supercaos">Super Caos</option><option value="tournament">Torneio</option><option value="team2x2">2×2 · Duplas</option><option value="team3x3">3×3 · Trios</option></select></label><label for="trainingBots">Quantidade de bots<select class="txt" id="trainingBots"><option value="1">1 bot</option><option value="2" selected>2 bots</option><option value="3">3 bots</option><option value="4">4 bots</option><option value="5">5 bots</option><option value="6">6 bots</option><option value="7">7 bots</option><option value="8">8 bots</option></select></label><label for="trainingDifficulty">Dificuldade<select class="txt" id="trainingDifficulty"><option value="easy">Fácil</option><option value="normal" selected>Normal</option><option value="hard">Difícil</option><option value="master">Mestre</option></select></label><button class="btn good" id="btnTraining" type="button">Iniciar Treinamento</button></div>
+    <div class="training-controls" id="trainingControls" hidden><label for="trainingMode">Modo de jogo<select class="txt" id="trainingMode"><option value="classic" selected>Clássico</option><option value="caos">Caos</option><option value="supercaos">Super Caos</option><option value="maldita">Cor Maldita</option><option value="eventos">Eventos Aleatórios</option><option value="tournament">Torneio</option><option value="team2x2">2×2 · Duplas</option><option value="team3x3">3×3 · Trios</option></select></label><label class="opt" for="trainingStack"><input type="checkbox" id="trainingStack"><span>Acúmulo (+N e Espelho)<small>Marque para incluir o Espelho no Treinamento.</small></span></label><label for="trainingBots">Quantidade de bots<select class="txt" id="trainingBots"><option value="1">1 bot</option><option value="2" selected>2 bots</option><option value="3">3 bots</option><option value="4">4 bots</option><option value="5">5 bots</option><option value="6">6 bots</option><option value="7">7 bots</option><option value="8">8 bots</option></select></label><label for="trainingDifficulty">Dificuldade<select class="txt" id="trainingDifficulty"><option value="easy">Fácil</option><option value="normal" selected>Normal</option><option value="hard">Difícil</option><option value="master">Mestre</option></select></label><button class="btn good" id="btnTraining" type="button">Iniciar Treinamento</button></div>
     <button class="btn good" id="btnRanking"><i data-lucide="trophy"></i> Ranqueado</button>
     <div class="or"><span>ou entre na sala de um amigo</span></div>
     <div class="row">
       <input id="inCode" class="txt" maxlength="5" placeholder="CÓDIGO" autocapitalize="characters" autocomplete="off" spellcheck="false">
       <button class="btn" id="btnJoin">Entrar</button>
+      <button class="btn ghost" id="btnWatch" type="button">Assistir</button>
     </div>
   </div>
   </div>
@@ -475,7 +514,7 @@
 
 
 <div id="toast"></div>
-
+<div id="updateNotice" class="update-notice" role="status" aria-live="polite" hidden><span>Nova versão disponível</span><button class="btn primary" id="updateGame" type="button">Atualizar</button></div>
 <div class="ping-badge" id="pingBadge" title="Qualidade da conexão">
   <span class="ping-dot" id="pingDot"></span><span id="pingText">--</span>
 </div>
@@ -484,6 +523,12 @@
 <script>
 /* ===== CONFIG & ESTADO GLOBAL — constantes do jogo, variáveis de sessão, helpers $/esc ===== */
 'use strict';
+// Os ícones são opcionais: o jogo precisa continuar mesmo sem o arquivo ou o CDN.
+function refreshIcons(){
+  if(typeof window.lucide?.createIcons!=='function')return;
+  try{window.lucide.createIcons();}
+  catch(e){console.warn('[CHROMA] Não foi possível desenhar os ícones Lucide:',e);}
+}
 /* =====================================================================
    CHROMA — jogo de cartas online (P2P via PeerJS)
    O host da sala roda o jogo; os outros jogadores se conectam a ele.
@@ -499,9 +544,21 @@ const ICE=[
 
 const MIN_PLAYERS=2,MAX_PLAYERS=10,MIN_MINUTES=5,MAX_MINUTES=20,TURN_SECONDS=6;
 const COLORS=['r','y','g','b'];
+/* ===== BALANCEAMENTO: CARTAS E MODOS (ajuste somente os números/tabelas abaixo) =====
+   Escudo: 1 carta por cor nos modos marcados; Espelho: 4 coringas apenas
+   quando a opção de acúmulo está ligada. Modos novos nunca são ranqueados. */
+const NOVAS_CARTAS={escudosPorCor:1,espelhos:4};
+const CARTAS_POR_MODO={classic:{shield:false,mirror:false},caos:{shield:true,mirror:true},supercaos:{shield:true,mirror:true},tournament:{shield:false,mirror:false},team2x2:{shield:false,mirror:false},team3x3:{shield:false,mirror:false},maldita:{shield:true,mirror:true},eventos:{shield:true,mirror:true}};
+const UNRANKED_MODES=['maldita','eventos'];
+const MALDITA_TURNOS=8; // Troca após este número de turnos concluídos.
+const EVENTOS_TURNOS=6; // Primeiro evento após este número de turnos concluídos.
+const BOT_ESPELHO_MIN=4; // Acúmulo mínimo que o bot prefere refletir.
+const BOT_ESPELHO_CHANCE=.85; // Chance de refletir quando há outras cartas de compra.
+
   const PLUS={'+2':2,'+4':4,'+6':6,'+10':10,'+99':99};
-  const MODES={classic:'Clássico',caos:'Caos',supercaos:'Super Caos',tournament:' Torneio',team2x2:'2×2 · Duplas',team3x3:'3×3 · Trios'};
+  const MODES={classic:'Clássico',caos:'Caos',supercaos:'Super Caos',maldita:'Cor Maldita',eventos:'Eventos Aleatórios',tournament:' Torneio',team2x2:'2×2 · Duplas',team3x3:'3×3 · Trios'};
   const QUICK_MESSAGES=['Boa jogada!','Vamos lá!','Cuidado!','Não acredito!','Foi por pouco!','CHROMA!','GG!'];
+const QUICK_EMOTES=['👏','🚀','⚠️','😮','😅','🌈','🏆'];
 const TOURNAMENT_POINTS=[100,75,55,40,30,20,10,5];
 const RANK_TIERS=[{name:'Bronze',icon:'',min:0,next:400},{name:'Prata',icon:'',min:400,next:800},{name:'Ouro',icon:'',min:800,next:1200},{name:'Platina',icon:'',min:1200,next:1700},{name:'Diamante',icon:'',min:1700,next:2300},{name:'Mestre',icon:'',min:2300,next:3000},{name:'Grão-Mestre',icon:'',min:3000,next:null}];
 const RANK_IMAGE_BY_NAME={Prata:'PRATA.png',Ametista:'AMETISTA.png',Ouro:'OURO.png',Diamante:'DIAMANTE.png',Dominador:'DOMINADOR.png',Soberano:'SOBERANO.png'};
@@ -531,6 +588,7 @@ let turnWarningKey='';
 let eyeTargetCb=null,eyeViewTimer=null;
 const CHAT_BUBBLE_MS=4000;
 const conns={};
+const spectators={}; // Conexões somente de leitura; nunca entram em room.players.
 
 /* ---------------------------------------------------------------
    SOM (sintetizado com WebAudio, sem arquivos) E ANIMAÇÕES DE CARTA
@@ -718,7 +776,7 @@ function sfxDiff(prev,v,d0){
 /* ---------------------------------------------------------------
    MOTOR DO JOGO (roda só no host)
 --------------------------------------------------------------- */
-function makeDeck(mode,dumpColor){
+function makeDeck(mode,dumpColor,stack=false){
   const d=[];let n=0;const add=(c,v)=>d.push({id:'k'+(n++),c,v});
   for(const c of COLORS){
     add(c,'0');
@@ -726,40 +784,95 @@ function makeDeck(mode,dumpColor){
     for(const v of ['skip','rev','+2']){add(c,v);add(c,v);}
     if(mode==='caos'||mode==='supercaos'){add(c,'skip2');add(c,'+10');}
     if(dumpColor)add(c,'blackhole');
+    if(CARTAS_POR_MODO[mode]?.shield)for(let k=0;k<NOVAS_CARTAS.escudosPorCor;k++)add(c,'shield');
   }
   for(let k=0;k<4;k++){add('w','wild');add('w','+4');}
   if(mode==='caos'||mode==='supercaos')for(let k=0;k<2;k++){add('w','+6');add('w','swap');add('w','eye');}
   if(mode==='supercaos'){for(let k=0;k<2;k++)add('w','+99');for(let k=0;k<2;k++)add('w','confuse');}
+  if(stack&&CARTAS_POR_MODO[mode]?.mirror)for(let k=0;k<NOVAS_CARTAS.espelhos;k++)add('w','mirror');
   return d;
 }
 /* ===== ESTADO DA SALA — turno, compra, início de rodada, legalidade de jogadas, ranking local ===== */
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function cardName(c){
-  const v={skip:'Bloqueio',skip2:'Bloqueio Duplo',rev:'Inverter','+2':'+2','+4':'Coringa +4','+6':'+6','+10':'+10','+99':'+99',wild:'Coringa',swap:'Coringa Troca',eye:'Olho do Paizin',blackhole:'BURACO NEGRO',confuse:'Confusão'}[c.v]||c.v;
+  const v={skip:'Bloqueio',skip2:'Bloqueio Duplo',rev:'Inverter','+2':'+2','+4':'Coringa +4','+6':'+6','+10':'+10','+99':'+99',wild:'Coringa',swap:'Coringa Troca',eye:'Olho do Paizin',blackhole:'BURACO NEGRO',confuse:'Confusão',shield:'Escudo',mirror:'Espelho'}[c.v]||c.v;
   return c.c==='w'?v:v+' '+CNAME[c.c].toLowerCase();
 }
 function newRoom(code,hostName,profile={}){
   return{
     code,phase:'lobby',opts:{stack:false,effects:false,ranked:false,mode:'classic',dumpColor:false,minutes:10,maxPlayers:4,turnSeconds:6},
-    players:[{id:'host',name:hostName,photo:profile.photo||'',gender:profile.gender||'',frame:profile.frame||'',nameEffect:profile.nameEffect||'',showcase:Array.isArray(profile.showcase)?profile.showcase.slice(0,3):[],hand:[],bot:false,wins:0,called:false,team:0}],
+    players:[{id:'host',name:hostName,uid:window.firebaseCurrentUserUid||'',username:localStorage.getItem('chroma-username')||'',photo:profile.photo||'',gender:profile.gender||'',frame:profile.frame||'',nameEffect:profile.nameEffect||'',showcase:Array.isArray(profile.showcase)?profile.showcase.slice(0,3):[],hand:[],bot:false,wins:0,called:false,team:0}],
     tournament:{round:0,maxRounds:5,scores:{},finished:false,id:null},
     deckSerial:0,
     draw:[],discard:[],turn:0,dir:1,color:'r',pending:0,drawnId:null,vulnerable:null,winner:null,winnerTeam:null,turnEndsAt:null,endsAt:null,roundId:null,log:[],chat:[],
     // Controle transacional do turno: cada época só pode ser resolvida uma vez.
-    turnEpoch:0,resolvedTurnEpoch:null,actionLock:null,seenActionIds:[]
+    turnEpoch:0,resolvedTurnEpoch:null,actionLock:null,seenActionIds:[],roundStats:null,normalEnd:false,
+    turnCount:0,cursedColor:null,nextEventAt:EVENTOS_TURNOS,lastEvent:null,modeNotice:null
   };
 }
 const cur=()=>room.players[room.turn];
 const byId=id=>room.players.find(p=>p.id===id);
 function log(m){room.log.push(m);if(room.log.length>30)room.log.shift();}
 function peekP(k){const n=room.players.length;return room.players[((room.turn+room.dir*k)%n+n)%n];}
-function advance(k){
+function advance(k,deferStart=false){
   const n=room.players.length;
   room.turn=((room.turn+room.dir*k)%n+n)%n;
   room.turnEpoch=(room.turnEpoch||0)+1;
   room.resolvedTurnEpoch=null;
   room.actionLock=null;
+  room.turnCount++;
   room.turnEndsAt=Date.now()+(Number(room.opts.turnSeconds)||TURN_SECONDS)*1000;
+  if(!deferStart)beginTurn();
+}
+// Escolhe entre as outras três cores; a mesma nunca sai duas vezes seguidas.
+function anotherColor(old){return COLORS.filter(c=>c!==old)[Math.floor(Math.random()*(COLORS.length-1))];}
+function uniqueMostCards(){
+  const sorted=room.players.slice().sort((a,b)=>b.hand.length-a.hand.length);
+  return sorted[0]&&(!sorted[1]||sorted[0].hand.length>sorted[1].hand.length)?sorted[0]:null;
+}
+function eventRain(){room.players.forEach(p=>drawForced(p,1,'a Chuva de cartas',false));log('Chuva de cartas: cada jogador sem Escudo comprou 1 carta.');}
+function eventReverse(){room.dir*=-1;log('Maré inversa: o sentido do jogo mudou.');}
+function eventPaint(){room.color=anotherColor(room.color);log('Pintura surpresa: a cor da mesa agora é '+CNAME[room.color]+'.');}
+function eventHelp(){
+  const p=uniqueMostCards();if(!p||p.hand.length<=1){log('Ajuda ao azarado: empate ou ninguém pode devolver carta.');return;}
+  const [card]=p.hand.splice(Math.floor(Math.random()*p.hand.length),1);
+  room.draw.push(card);shuffle(room.draw);log('Ajuda ao azarado: '+p.name+' devolveu 1 carta ao monte.');
+}
+function eventGift(){
+  const p=uniqueMostCards();if(!p){log('Presente de escudo: empate; ninguém recebeu Escudo.');return;}
+  if(!p.shield){p.shield=true;log('Presente de escudo: '+p.name+' ganhou um Escudo.');}
+  else log('Presente de escudo: '+p.name+' já tinha um Escudo.');
+}
+function eventPass(){
+  const n=room.players.length;if(room.players.some(p=>!p.hand.length))return;
+  const passing=room.players.map(p=>p.hand.splice(Math.floor(Math.random()*p.hand.length),1)[0]);
+  passing.forEach((card,i)=>room.players[(i+room.dir+n)%n].hand.push(card));
+  log('Passa-passa: todos passaram 1 carta para o próximo no sentido atual.');
+}
+const RANDOM_EVENTS=[
+  {id:'rain',name:'Chuva de cartas',run:eventRain},
+  {id:'reverse',name:'Maré inversa',run:eventReverse},
+  {id:'paint',name:'Pintura surpresa',run:eventPaint},
+  {id:'help',name:'Ajuda ao azarado',run:eventHelp},
+  {id:'gift',name:'Presente de escudo',run:eventGift},
+  {id:'pass',name:'Passa-passa',run:eventPass}
+];
+function beginTurn(){
+  if(room.phase!=='playing')return;
+  room.modeNotice=null;
+  if(room.opts.mode==='maldita'&&room.turnCount>0&&room.turnCount%MALDITA_TURNOS===0){
+    room.cursedColor=anotherColor(room.cursedColor);
+    room.modeNotice={text:'Cor Maldita: '+CNAME[room.cursedColor]+'!',epoch:room.turnEpoch};
+    log('Cor Maldita mudou para '+CNAME[room.cursedColor]+'!');
+  }
+  // Se o turno está ocupado, mantemos a pendência para o próximo início livre.
+  if(room.opts.mode==='eventos'&&room.turnCount>=room.nextEventAt&&!room.pending&&!room.drawnId){
+    const choices=RANDOM_EVENTS.filter(e=>e.id!==room.lastEvent);
+    const event=choices[Math.floor(Math.random()*choices.length)];
+    room.lastEvent=event.id;room.nextEventAt=room.turnCount+EVENTOS_TURNOS;
+    room.modeNotice={text:'Evento: '+event.name+'!',epoch:room.turnEpoch};
+    log('EVENTO: '+event.name+'!');event.run();
+  }
 }
 /*
  * Resolve o timeout como uma transação idempotente. O timer e qualquer outro
@@ -774,11 +887,11 @@ function resolveExpiredTurn(epoch=room&&room.turnEpoch){
   room.vulnerable=null;room.drawnId=null;p.called=false;
   const accumulated=Math.max(0,Number(room.pending)||0);
   const amount=accumulated>0?accumulated:1;
-  const penalty=drawCards(p,amount);
+  const penalty=accumulated>0?drawForced(p,amount,'a compra acumulada'):drawCards(p,amount);
   const limit=Number(room.opts.turnSeconds)||TURN_SECONDS;
   if(accumulated>0){
     room.pending=0;
-    log(p.name+' ficou sem jogar em '+limit+' segundos e comprou '+penalty.length+' cartas da punição acumulada.');
+    log(p.name+' ficou sem jogar em '+limit+' segundos e '+(penalty.length?'comprou '+penalty.length+' cartas da punição acumulada.':'teve a compra acumulada absorvida pelo Escudo.'));
   }else{
     log(p.name+' ficou sem jogar em '+limit+' segundos e '+(penalty.length?'recebeu 1 carta aleatória de penalidade e passou a vez.':'passou a vez (o baralho estava vazio).'));
   }
@@ -786,6 +899,7 @@ function resolveExpiredTurn(epoch=room&&room.turnEpoch){
   return true;
 }
 function expireTurn(){
+  if(room?.opts?.tutorial)return false;
   if(!room||room.phase!=='playing'||!room.turnEndsAt||Date.now()<room.turnEndsAt)return false;
   const changed=resolveExpiredTurn(room.turnEpoch);
   if(changed)broadcast();
@@ -796,12 +910,17 @@ function refill(){
   const top=room.discard.pop();
   if((room.opts.mode==='caos'||room.opts.mode==='supercaos') && !room.discard.length){
     room.deckSerial=(room.deckSerial||0)+1;
-    room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor).map((c,i)=>({...c,id:'r'+room.deckSerial+'-'+i})));
+    room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor,room.opts.stack).map((c,i)=>({...c,id:'r'+room.deckSerial+'-'+i})));
     room.discard=top?[top]:[];
     return;
   }
   room.draw=shuffle(room.discard);
   room.discard=top?[top]:[];
+}
+// Só o host resolve compras forçadas; outras punições ignoram o Escudo.
+function drawForced(p,n,source,losesTurn=true){
+  if(p.shield){p.shield=false;log('Escudo de '+p.name+' absorveu '+source+' ('+n+' carta'+(n===1?'':'s')+')'+(losesTurn?'; '+p.name+' perdeu a vez.':'.'));return [];}
+  return drawCards(p,n);
 }
 function drawCards(p,n){
   const out=[];
@@ -809,18 +928,25 @@ function drawCards(p,n){
     if(!room.draw.length)refill();
     if(!room.draw.length)break;
     const c=room.draw.pop();p.hand.push(c);out.push(c);
+    if(room.roundStats&&room.phase==='playing')statFor(p.id).drawn++;
   }
   return out;
 }
+// O resumo guarda apenas contadores, nunca cartas da mão.
+function statFor(id){return room.roundStats.players[id]||(room.roundStats.players[id]={played:0,drawn:0,chroma:0,specialRun:0,bestSpecial:0});}
+function finishStats(){if(room.roundStats)room.roundStats.durationMs=Math.max(0,Date.now()-room.roundStats.startedAt);room.normalEnd=true;}
 function startRound(){
+  room.roundStats={startedAt:Date.now(),durationMs:0,players:{}};room.normalEnd=false;
   room.deckSerial=(room.deckSerial||0)+1;
-  room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor).map((c,i)=>({...c,id:'r'+room.deckSerial+'-'+i})));room.discard=[];
-  room.players.forEach(p=>{p.hand=[];p.called=false;});
+  room.draw=shuffle(makeDeck(room.opts.mode,room.opts.dumpColor,room.opts.stack).map((c,i)=>({...c,id:'r'+room.deckSerial+'-'+i})));room.discard=[];
+  room.players.forEach(p=>{p.hand=[];p.called=false;p.shield=false;});
   for(let k=0;k<7;k++)room.players.forEach(p=>p.hand.push(room.draw.pop()));
   let c,guard=0;
   do{c=room.draw.pop();if(/^\d$/.test(c.v))break;room.draw.unshift(c);}while(++guard<200);
   room.discard.push(c);
   room.color=c.c;room.dir=1;room.pending=0;room.drawnId=null;room.vulnerable=null;room.winner=null;room.winnerTeam=null;
+  room.turnCount=0;room.nextEventAt=EVENTOS_TURNOS;room.lastEvent=null;room.modeNotice=null;
+  room.cursedColor=room.opts.mode==='maldita'?COLORS[Math.floor(Math.random()*COLORS.length)]:null;
   room.turnEpoch=(room.turnEpoch||0)+1;room.resolvedTurnEpoch=null;room.actionLock=null;room.seenActionIds=[];
   room.turn=Math.floor(Math.random()*room.players.length);room.turnEndsAt=Date.now()+(Number(room.opts.turnSeconds)||TURN_SECONDS)*1000;
   room.roundId=room.code+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
@@ -835,10 +961,11 @@ function startRound(){
   room.log=[];room.chat=[];
   if(room.opts.mode==='tournament'){room.tournament.round++;room.tournament.id=room.code+'-'+Date.now();room.players.forEach(p=>{if(room.tournament.scores[p.id]==null)room.tournament.scores[p.id]=0;});}
   log('Rodada iniciada! '+cur().name+' começa.');
+  if(room.cursedColor){log('Cor Maldita inicial: '+CNAME[room.cursedColor]+'!');room.modeNotice={text:'Cor Maldita: '+CNAME[room.cursedColor]+'!',epoch:room.turnEpoch};}
 }
 function isLegal(p,c){
   const top=room.discard[room.discard.length-1];
-  if(room.pending>0)return room.opts.stack&&(c.v in PLUS);
+  if(room.pending>0)return room.opts.stack&&((c.v in PLUS)||c.v==='mirror');
   if(c.c==='w'){
     if(c.v==='+4'||c.v==='+6')return !p.hand.some(x=>x.c===room.color);
     return true;
@@ -1077,7 +1204,10 @@ function redeemCode(){
 }
 function xpMultiplier(){const st=readShop(),now=Date.now();return Number(st.activePotionUntil)>now?2:1;}
 function awardMatchXP(v,prev){
+  if(v?.opts?.tutorial||v?.spectator||v?.normalEnd===false)return;
   if(!v||v.phase!=='ended'||!prev||prev.phase!=='playing'||!v.roundId)return;
+  // A missão possui histórico por UID próprio, independente do histórico antigo de XP.
+  if(!v.opts.training&&v.normalEnd===true)creditFriendMatch(v);
   const key='chroma-xp-awarded-'+v.roundId;
   try{if(localStorage.getItem(key)==='1')return;localStorage.setItem(key,'1');}catch(e){}
   const mePlayer=Array.isArray(v.players)?v.players.find(p=>p.id===v.me):null;
@@ -1092,13 +1222,40 @@ function awardMatchXP(v,prev){
   if(v.opts.mode==='team2x2'||v.opts.mode==='team3x3')bumpMissionStat('team',1);
   if(won){if(v.opts.training)bumpGameStat('trainingWins',1);if(v.opts.mode==='caos')bumpGameStat('chaosWins',1);if(v.opts.mode==='supercaos')bumpGameStat('superChaosWins',1);if(v.opts.mode==='team2x2'||v.opts.mode==='team3x3')bumpGameStat('teamWins',1);if(v.opts.ranked)bumpGameStat('rankedPlayed',1);bumpGameStat('winStreak',1);const n=readGameStats();n.bestWinStreak=Math.max(n.bestWinStreak,n.winStreak);try{localStorage.setItem('chroma-game-stats',JSON.stringify(n));}catch(e){}}else{const n=readGameStats();n.winStreak=0;try{localStorage.setItem('chroma-game-stats',JSON.stringify(n));}catch(e){}}
 }
+// A amizade vem de friendships. O espelho local só é usado se a consulta falhar.
+// O ID da rodada é deduplicado por conta, inclusive se o mesmo estado chegar de novo.
+async function creditFriendMatch(v){
+  const uid=window.firebaseCurrentUserUid,others=(v.players||[]).filter(p=>!p.bot&&p.id!==v.me);
+  if(!uid||!window.chromaSocial?.isReady()||!others.length||!v.players.some(p=>p.id===v.me))return;
+  const key='chroma-friends-matches-'+uid,round=String(v.roundId||'').slice(0,100);
+  if(!round)return;
+  let seen=[];try{seen=JSON.parse(localStorage.getItem(key)||'[]');if(!Array.isArray(seen))seen=[];}catch(e){console.warn('[CHROMA] histórico de amigos',e);}
+  if(seen.includes(round))return;
+  let qualifies=false;
+  try{
+    const friendships=await window.chromaSocial.friends();
+    if(window.firebaseCurrentUserUid!==uid)return;
+    const ids=new Set(friendships.flatMap(f=>f.participants||[]).filter(id=>id!==uid));
+    qualifies=others.some(p=>p.uid&&ids.has(p.uid));
+  }catch(e){
+    console.warn('[CHROMA] amizades do Firestore indisponíveis; usando espelho local',e);
+    const names=new Set((readFriends().friends||[]).map(x=>String(x).toLowerCase()));
+    qualifies=others.some(p=>p.username&&names.has(p.username));
+  }
+  if(!qualifies||window.firebaseCurrentUserUid!==uid||!window.chromaCloud?.canWrite())return;
+  // Não incrementa duas vezes se duas consultas paralelas terminarem juntas.
+  try{let latest=JSON.parse(localStorage.getItem(key)||'[]');if(!Array.isArray(latest))latest=[];if(latest.includes(round))return;
+    localStorage.setItem(key,JSON.stringify([...latest.slice(-79),round]));
+  }catch(e){console.warn('[CHROMA] não foi possível salvar a deduplicação da missão',e);return;}
+  battlePassActivity({friends:1});
+}
 function canClaimDaily(){const s=readStreak();return s.lastClaim!==todayKey();}
 // ===== PASSE DE BATALHA =====
 const BATTLE_PASS_REWARDS=[
  {level:1,label:'25 Moedas',type:'coins',amount:25,icon:''},{level:2,label:'Poção de XP · 15 min',type:'potion',amount:15,icon:''},{level:3,label:'40 Moedas',type:'coins',amount:40,icon:''},{level:4,label:'50 XP de Perfil',type:'xp',amount:50,icon:''},{level:5,label:'Moldura Neon',type:'item',item:'frame-neon',icon:''},{level:6,label:'60 Moedas',type:'coins',amount:60,icon:''},{level:7,label:'Poção de XP · 30 min',type:'potion',amount:30,icon:''},{level:8,label:'100 XP de Perfil',type:'xp',amount:100,icon:''},{level:9,label:'Cartas Fogo',type:'item',item:'card-fire',icon:''},{level:10,label:'75 Moedas',type:'coins',amount:75,icon:''},{level:11,label:'Nome Dourado',type:'item',item:'name-gold',icon:''},{level:12,label:'Poção de XP · 45 min',type:'potion',amount:45,icon:''},{level:13,label:'150 XP de Perfil',type:'xp',amount:150,icon:''},{level:14,label:'90 Moedas',type:'coins',amount:90,icon:''},{level:15,label:'Distintivo Raio',type:'item',item:'badge-bolt',icon:''},{level:16,label:'Poção de XP · 60 min',type:'potion',amount:60,icon:''},{level:17,label:'110 Moedas',type:'coins',amount:110,icon:''},{level:18,label:'200 XP de Perfil',type:'xp',amount:200,icon:''},{level:19,label:'Moldura Gelo',type:'item',item:'frame-ice',icon:''},{level:20,label:'125 Moedas',type:'coins',amount:125,icon:''},{level:21,label:'Poção de XP · 90 min',type:'potion',amount:90,icon:''},{level:22,label:'Cartas Sombra',type:'item',item:'card-shadow',icon:''},{level:23,label:'250 XP de Perfil',type:'xp',amount:250,icon:''},{level:24,label:'150 Moedas',type:'coins',amount:150,icon:''},{level:25,label:'Banner Aurora',type:'item',item:'theme-aurora',icon:''},{level:26,label:'Poção de XP · 120 min',type:'potion',amount:120,icon:''},{level:27,label:'175 Moedas',type:'coins',amount:175,icon:''},{level:28,label:'300 XP de Perfil',type:'xp',amount:300,icon:''},{level:29,label:'Distintivo Estrela',type:'item',item:'badge-star',icon:''},{level:30,label:'Moldura Dourada · Recompensa especial',type:'item',item:'frame-gold',icon:''}
 ];
-const BATTLE_PASS_DAILY=[{id:'bp-daily-play',desc:'Jogue 1 partida',goal:1,stat:'played',xp:20,icon:''},{id:'bp-daily-win',desc:'Vença 1 partida',goal:1,stat:'wins',xp:35,icon:''},{id:'bp-daily-team',desc:'Jogue em equipe',goal:1,stat:'team',xp:25,icon:''}];
-const BATTLE_PASS_WEEKLY=[{id:'bp-weekly-play',desc:'Jogue 5 partidas',goal:5,stat:'played',xp:100,icon:''},{id:'bp-weekly-win',desc:'Vença 3 partidas',goal:3,stat:'wins',xp:150,icon:''},{id:'bp-weekly-team',desc:'Jogue 3 partidas em equipe',goal:3,stat:'team',xp:125,icon:''}];
+const BATTLE_PASS_DAILY=[{id:'bp-daily-friends',desc:'Jogue 1 partida com amigo',goal:1,stat:'friends',xp:30,icon:'✦'},{id:'bp-daily-play',desc:'Jogue 1 partida',goal:1,stat:'played',xp:20,icon:''},{id:'bp-daily-win',desc:'Vença 1 partida',goal:1,stat:'wins',xp:35,icon:''},{id:'bp-daily-team',desc:'Jogue em equipe',goal:1,stat:'team',xp:25,icon:''}];
+const BATTLE_PASS_WEEKLY=[{id:'bp-weekly-friends',desc:'Jogue 3 partidas com amigos',goal:3,stat:'friends',xp:130,icon:'✦'},{id:'bp-weekly-play',desc:'Jogue 5 partidas',goal:5,stat:'played',xp:100,icon:''},{id:'bp-weekly-win',desc:'Vença 3 partidas',goal:3,stat:'wins',xp:150,icon:''},{id:'bp-weekly-team',desc:'Jogue 3 partidas em equipe',goal:3,stat:'team',xp:125,icon:''}];
 function battlePassWeekKey(){const d=new Date(),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function battlePassDefault(){return {season:'s1',xp:0,claimed:[],daily:{period:todayKey(),progress:{},claimed:[]},weekly:{period:battlePassWeekKey(),progress:{},claimed:[]}};}
 function readBattlePass(){let st;try{st=JSON.parse(localStorage.getItem('chroma-battle-pass')||'null');}catch(e){st=null;}const base=battlePassDefault();st={...base,...(st||{}),claimed:Array.isArray(st?.claimed)?[...new Set(st.claimed.map(Number).filter(n=>n>=1&&n<=30))]:[],daily:{...base.daily,...(st?.daily||{}),progress:{...(st?.daily?.progress||{})},claimed:Array.isArray(st?.daily?.claimed)?[...new Set(st.daily.claimed)]:[]},weekly:{...base.weekly,...(st?.weekly||{}),progress:{...(st?.weekly?.progress||{})},claimed:Array.isArray(st?.weekly?.claimed)?[...new Set(st.weekly.claimed)]:[]}};let changed=false;if(st.daily.period!==base.daily.period){st.daily=base.daily;changed=true;}if(st.weekly.period!==base.weekly.period){st.weekly=base.weekly;changed=true;}if(changed){try{localStorage.setItem('chroma-battle-pass',JSON.stringify(st));}catch(e){}}return st;}
@@ -1158,6 +1315,13 @@ function renderMissions(){
 
 function renderRewards(){
   const s=readStreak();const today=todayKey();
+  const coinTotal=$('#rewardCoinTotal');if(coinTotal)coinTotal.textContent=readCoins().toLocaleString('pt-BR');
+  const streakValue=$('#rewardStreakValue');if(streakValue)streakValue.textContent='Dia '+Math.max(1,Math.min(7,s.day||1));
+  const nextDay=canClaimDaily()?((s.day%7)+1):Math.min(7,(s.day||1));
+  const nextAmount=DAILY_REWARD_AMOUNTS[nextDay-1]||DAILY_REWARD_AMOUNTS[0];
+  const nextAmountEl=$('#rewardNextAmount');if(nextAmountEl)nextAmountEl.textContent=canClaimDaily()?('+'+nextAmount+' moedas'):'Coletado hoje';
+  const weekProgress=$('#rewardWeekProgress');if(weekProgress)weekProgress.textContent=(s.day||0)+'/7 dias';
+  const weekFill=$('#rewardWeekFill');if(weekFill)weekFill.style.width=Math.min(100,((s.day||0)/7)*100)+'%';
   const row=$('#streakRow');if(row){
     row.innerHTML=DAILY_REWARD_AMOUNTS.map((amt,i)=>{
       const dayNum=i+1;
@@ -1264,6 +1428,9 @@ async function renderSocial(){
     $('#friendRequests').innerHTML=req.incoming.length?req.incoming.map(r=>socialProfileCard({...r.from,uid:r.fromUid},'<button class="btn primary" data-friend-accept="'+socialEsc(r.id)+'">Aceitar</button><button class="btn ghost" data-friend-decline="'+socialEsc(r.id)+'">Recusar</button>')).join(''):empty;
     $('#friendSent').innerHTML=req.outgoing.length?req.outgoing.map(r=>socialProfileCard({...r.to,uid:r.toUid},'<small>Solicitação enviada</small>')).join(''):empty;
     $('#friendList').innerHTML=fs.length?fs.map(f=>{const uid=(f.participants||[]).find(x=>x!==window.firebaseCurrentUserUid)||Object.keys(f.profiles||{}).find(x=>x!==window.firebaseCurrentUserUid);const pr=f.profiles?.[uid]||{};return socialProfileCard({...pr,uid},'<button class="btn primary" data-send-gift="'+socialEsc(uid)+'">Presente</button><button class="btn ghost" data-friend-profile="'+socialEsc(uid)+'">Perfil</button><button class="btn ghost" data-friend-remove="'+socialEsc(f.id)+'">Remover</button>');}).join(''):empty;
+    // Espelho local por nome de usuário, usado apenas se o Firestore falhar mais tarde.
+    const mirror=fs.map(f=>{const uid=(f.participants||[]).find(x=>x!==window.firebaseCurrentUserUid);return String(f.profiles?.[uid]?.username||'').toLowerCase();}).filter(Boolean);
+    if(JSON.stringify(readFriends().friends)!==JSON.stringify(mirror))writeFriends({friends:mirror,requests:[],sent:[]});
     window._socialFriends=Object.fromEntries(fs.map(f=>{const uid=(f.participants||[]).find(x=>x!==window.firebaseCurrentUserUid)||Object.keys(f.profiles||{}).find(x=>x!==window.firebaseCurrentUserUid);return [uid,{...(f.profiles?.[uid]||{}),uid}];}));
     renderClan();
   }catch(e){socialMsg(cloudErr(e,'carregar o Social'),true);}
@@ -1293,7 +1460,7 @@ function readRanked(){try{return JSON.parse(localStorage.getItem('chroma-ranked'
 function writeRanked(a){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-ranked',JSON.stringify(a))}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function rankedStats(name){const a=readRanked(),p=a.find(x=>x.name.toLowerCase()===String(name||'').toLowerCase());return p||{name:name||'Você',points:0,wins:0,losses:0,played:0};}
 function recordRanked(name,delta,won){const a=readRanked();let p=a.find(x=>x.name.toLowerCase()===name.toLowerCase());if(!p){p={name,points:0,wins:0,losses:0,played:0};a.push(p);}p.points=Math.max(0,Math.round(p.points+delta));p.wins+=won?1:0;p.losses+=won?0:1;p.played++;p.updated=Date.now();writeRanked(a);return p;}
-function settleRankedView(v){if(!v||!v.opts||!v.opts.ranked||!v.roundId||!v.winner)return;if(v.opts.mode==='tournament'&&v.tournament&&!v.tournament.finished)return;let done=[];try{done=JSON.parse(localStorage.getItem('chroma-ranked-settled')||'[]')}catch(e){}const key=v.code+'|'+v.roundId;if(done.includes(key))return;const me=v.players.find(p=>p.id===v.me),winner=v.players.find(p=>p.id===v.winner);if(!me)return;const won=v.winnerTeam!=null?me.team===v.winnerTeam:me.id===v.winner;const tier=rankedTier(rankedStats(me.name).points),idx=RANKED_TIERS.indexOf(tier),base=won?RANKED_WIN_POINTS[Math.floor(idx/4)]:-RANKED_LOSS_POINTS[Math.floor(idx/4)],delta=won&&v.opts.mode==='supercaos'?Math.round(base*1.5):base;recordRanked(me.name,delta,won);done.push(key);if(done.length>40)done=done.slice(-40);try{localStorage.setItem('chroma-ranked-settled',JSON.stringify(done));}catch(e){}if(me.id===v.me)toast((won?'+':'')+delta+' pontos ranqueados');}
+function settleRankedView(v){if(v?.opts?.tutorial||v?.spectator||v?.normalEnd===false)return;if(!v||!v.opts||!v.opts.ranked||!v.roundId||!v.winner)return;if(v.opts.mode==='tournament'&&v.tournament&&!v.tournament.finished)return;let done=[];try{done=JSON.parse(localStorage.getItem('chroma-ranked-settled')||'[]')}catch(e){}const key=v.code+'|'+v.roundId;if(done.includes(key))return;const me=v.players.find(p=>p.id===v.me),winner=v.players.find(p=>p.id===v.winner);if(!me)return;const won=v.winnerTeam!=null?me.team===v.winnerTeam:me.id===v.winner;const tier=rankedTier(rankedStats(me.name).points),idx=RANKED_TIERS.indexOf(tier),base=won?RANKED_WIN_POINTS[Math.floor(idx/4)]:-RANKED_LOSS_POINTS[Math.floor(idx/4)],delta=won&&v.opts.mode==='supercaos'?Math.round(base*1.5):base;recordRanked(me.name,delta,won);done.push(key);if(done.length>40)done=done.slice(-40);try{localStorage.setItem('chroma-ranked-settled',JSON.stringify(done));}catch(e){}if(me.id===v.me)toast((won?'+':'')+delta+' pontos ranqueados');}
 function tournamentResults(){
   if(!room)return [];
   return room.players.slice().sort((a,b)=>(room.tournament.scores[b.id]||0)-(room.tournament.scores[a.id]||0)||a.name.localeCompare(b.name)).map((p,i)=>({id:p.id,name:p.name,points:room.tournament.scores[p.id]||0,place:i+1}));
@@ -1319,13 +1486,13 @@ function finishByTime(){
   if(!room||room.phase!=='playing')return;
   clearInterval(clockTimer);clockTimer=null;
   const winner=room.players.slice().sort((a,b)=>a.hand.length-b.hand.length||a.name.localeCompare(b.name))[0];
-  room.phase='ended';room.winner=winner?winner.id:null;room.winnerTeam=isTeamMode(room.opts.mode)?teamOf(winner):null;room.vulnerable=null;room.pending=0;room.drawnId=null;room.endsAt=null;
+  finishStats();room.phase='ended';room.winner=winner?winner.id:null;room.winnerTeam=isTeamMode(room.opts.mode)?teamOf(winner):null;room.vulnerable=null;room.pending=0;room.drawnId=null;room.endsAt=null;
   if(winner){winner.wins++;log(room.winnerTeam!=null?'Tempo encerrado! '+teamLabel(room.winnerTeam)+' venceu.':'Tempo encerrado! '+winner.name+' venceu com menos cartas.');}
   scoreTournamentRound();
 }
 function endRound(p){
   clearInterval(clockTimer);clockTimer=null;
-  room.phase='ended';room.winner=p.id;room.winnerTeam=isTeamMode(room.opts.mode)?teamOf(p):null;p.wins++;room.vulnerable=null;room.pending=0;room.drawnId=null;room.endsAt=null;
+  finishStats();room.phase='ended';room.winner=p.id;room.winnerTeam=isTeamMode(room.opts.mode)?teamOf(p):null;p.wins++;room.vulnerable=null;room.pending=0;room.drawnId=null;room.endsAt=null;
   log(room.winnerTeam!=null?teamLabel(room.winnerTeam)+' venceu! '+p.name+' terminou primeiro.':p.name+' venceu a rodada!');
   scoreTournamentRound();
 }
@@ -1358,6 +1525,12 @@ function doAct(pid,a){
 }
 function doActCore(pid,a){
   if(!room||room.phase!=='playing')return 'A partida não está em andamento';
+  if(room.opts.tutorial){
+    const step=TUTORIAL_STEPS[room.tutorialStep];
+    if(pid!=='host'||room.tutorialWaiting)return 'Aguarde o próximo passo do tutorial';
+    if(a.type==='chroma'&&step.action==='chroma'&&!room.tutorialCalled){room.tutorialCalled=true;room.tutorialFeedback='Isso! Agora jogue a carta indicada, ficando com uma carta na mão.';}
+    else if(a.type!=='play'||a.cardId!=='tutorial-'+room.tutorialStep+'-alvo'||(step.action==='chroma'&&!room.tutorialCalled))return step.action==='chroma'?'Primeiro aperte CHROMA! e depois jogue a carta indicada.':'Jogue a carta em destaque para continuar.';
+  }
   const i=room.players.findIndex(p=>p.id===pid);
   if(i<0)return 'Jogador inválido';
   const p=room.players[i];
@@ -1373,17 +1546,19 @@ function doActCore(pid,a){
   }
   if(a.type==='chat'){
     if(room.phase!=='playing')return 'O chat só está disponível durante a partida';
-    if(!QUICK_MESSAGES.includes(a.message))return 'Mensagem inválida';
-    if(p.lastChatAt&&Date.now()-p.lastChatAt<1200)return;
+    const emoteIndex=QUICK_MESSAGES.indexOf(a.message);
+    if(emoteIndex<0||a.emote!==undefined&&a.emote!==QUICK_EMOTES[emoteIndex])return 'Mensagem ou emote inválido';
+    if(p.lastChatAt&&Date.now()-p.lastChatAt<1500)return 'Aguarde antes de enviar outro emote';
     p.lastChatAt=Date.now();
-    room.chat.push({pid,text:a.message,at:Date.now()});
+    room.chat.push({pid,text:a.message,emote:QUICK_EMOTES[emoteIndex],at:Date.now()});
     if(room.chat.length>30)room.chat.shift();
     return null;
   }
 
   if(a.type==='chroma'){
-    if(room.vulnerable===pid){room.vulnerable=null;p.called=true;log(p.name+' gritou CHROMA!');return null;}
-    if(p.hand.length<=2){p.called=true;return null;}
+    if(room.opts.tutorial&&room.tutorialCalled){p.called=true;return null;}
+    if(room.vulnerable===pid){room.vulnerable=null;p.called=true;statFor(pid).chroma++;log(p.name+' gritou CHROMA!');return null;}
+    if(p.hand.length<=2){if(!p.called)statFor(pid).chroma++;p.called=true;return null;}
     return 'Você ainda tem cartas demais';
   }
   if(a.type==='catch'){
@@ -1408,6 +1583,7 @@ function doActCore(pid,a){
     }else if(c.c==='w'&&!COLORS.includes(a.color))return 'Escolha uma cor';
     room.vulnerable=null;
     p.hand.splice(idx,1);room.discard.push(c);
+    const counts=statFor(pid);counts.played++;counts.specialRun=/^\d$/.test(c.v)?0:counts.specialRun+1;counts.bestSpecial=Math.max(counts.bestSpecial,counts.specialRun);
     if(c.c==='w'&&c.v!=='eye')room.color=a.color;else if(c.c!=='w')room.color=c.c;
     room.drawnId=null;
     log(p.name+' jogou '+cardName(c)+(c.c==='w'&&c.v!=='eye'?' → '+CNAME[a.color]:''));
@@ -1419,6 +1595,12 @@ function doActCore(pid,a){
         log(p.name+' abriu o BURACO NEGRO e devolveu '+same.length+' carta'+(same.length>1?'s':'')+' '+CNAME[c.c].toLowerCase()+' pro monte');
       }
     }
+    if(room.opts.tutorial){room.tutorialWaiting=true;room.tutorialFeedback=TUTORIAL_STEPS[room.tutorialStep].result;setTimeout(()=>{
+      if(!room||!room.opts.tutorial||room.phase!=='playing')return;
+      room.tutorialStep++;
+      if(room.tutorialStep===TUTORIAL_STEPS.length){teardown();$('#tutorialDoneOv').classList.add('on');}
+      else{prepareTutorialStep();broadcast();}
+    },1100);}
     if(p.hand.length===0){endRound(p);return null;}
     if(p.hand.length===1){
       if(p.called)log(p.name+': CHROMA! (1 carta)');
@@ -1427,19 +1609,30 @@ function doActCore(pid,a){
     if(p.hand.length!==1)p.called=false;
     const n=room.players.length;
     switch(c.v){
-      case 'skip':{const s=peekP(1);log(s.name+' perdeu a vez');advance(2);break;}
+      case 'skip':{const s=peekP(1);log(s.name+' perdeu a vez');advance(2,true);break;}
       case 'skip2':{
         const k=Math.min(2,n-1);
         const names=[];for(let i=1;i<=k;i++)names.push(peekP(i).name);
-        log(names.join(' e ')+' perderam a vez (Bloqueio Duplo)');advance(k+1);break;
+        log(names.join(' e ')+' perderam a vez (Bloqueio Duplo)');advance(k+1,true);break;
       }
-      case 'rev':room.dir*=-1;log('Sentido invertido');advance(n===2?2:1);break;
+      case 'rev':room.dir*=-1;log('Sentido invertido');advance(n===2?2:1,true);break;
       case '+2':case '+4':case '+6':case '+10':case '+99':{
         const k=PLUS[c.v];
-        if(room.opts.stack){room.pending+=k;advance(1);}
-        else{const t=peekP(1);drawCards(t,k);log(t.name+' comprou '+k+' e perdeu a vez');advance(2);}
+        if(room.opts.stack){room.pending+=k;advance(1,true);}
+        else{const t=peekP(1);const hadShield=t.shield;drawForced(t,k,'a carta '+c.v);if(!hadShield)log(t.name+' comprou '+k+' e perdeu a vez');advance(2,true);}
         break;
       }
+      case 'shield':
+        if(!p.shield){p.shield=true;log(p.name+' ganhou um Escudo.');}
+        else log(p.name+' já tinha um Escudo (limite de 1).');
+        advance(1,true);break;
+      case 'mirror':
+        if(room.pending>0){
+          // O jogador anterior recebe TODO o acúmulo; a direção não muda.
+          const target=peekP(-1),total=room.pending;
+          log(p.name+' refletiu +'+total+' para '+target.name+' com Espelho!');advance(-1,true);
+        }else advance(1,true);
+        break;
       case 'swap':{
         const others=room.players.filter(x=>x.id!==p.id);
         if(others.length){
@@ -1447,7 +1640,7 @@ function doActCore(pid,a){
           const tmp=p.hand;p.hand=t.hand;t.hand=tmp;
           log(p.name+' trocou de mão com '+t.name+'!');
         }
-        advance(1);break;
+        advance(1,true);break;
       }
       case 'confuse':{
         const pool=shuffle(room.players.reduce((acc,q)=>acc.concat(q.hand),[]));
@@ -1460,7 +1653,7 @@ function doActCore(pid,a){
           q.hand=pool.splice(0,take);
         });
         log('CONFUSÃO! As cartas de todos foram embaralhadas e redistribuídas ('+base+(total%n?'-'+(base+1):'')+' cada)');
-        advance(1);break;
+        advance(1,true);break;
       }
       case 'eye':{
         const target=byId(a.targetId);
@@ -1470,7 +1663,7 @@ function doActCore(pid,a){
           else if(conns[pid]&&conns[pid].open){try{conns[pid].send({t:'eye',name:target.name,hand:cards});}catch(_){} }
           log(p.name+' observou as cartas de '+target.name+' por 3 segundos');
         }
-        advance(1);break;
+        advance(1,true);break;
       }
       case '0':{
         if(room.opts.effects&&n>=2){
@@ -1478,17 +1671,22 @@ function doActCore(pid,a){
           room.players.forEach((q,j)=>{q.hand=old[((j-room.dir)%n+n)%n];});
           log('Todas as mãos giraram '+(room.dir===1?'em sentido horário':'em sentido anti-horário')+'!');
         }
-        advance(1);break;
+        advance(1,true);break;
       }
-      default:advance(1);
+      default:advance(1,true);
     }
-    if(room.phase==='playing'){const zero=room.players.find(q=>q.hand.length===0);if(zero)endRound(zero);}
+    // O Escudo não absorve a maldição. A última carta já venceu antes deste ponto.
+    if(room.opts.mode==='maldita'&&c.c===room.cursedColor){
+      drawCards(p,1);log(p.name+' jogou a cor maldita '+CNAME[c.c]+' e comprou 1 carta.');
+      if(p.hand.length!==1){if(room.vulnerable===p.id)room.vulnerable=null;p.called=false;}
+    }
+    if(room.phase==='playing'){const zero=room.players.find(q=>q.hand.length===0);if(zero)endRound(zero);else beginTurn();}
     return null;
   }
   if(a.type==='draw'){
     room.vulnerable=null;p.called=false;
     if(room.pending>0){
-      drawCards(p,room.pending);log(p.name+' comprou '+room.pending+' cartas');
+      const amount=room.pending,hadShield=p.shield;drawForced(p,amount,'a compra acumulada');if(!hadShield)log(p.name+' comprou '+amount+' cartas e perdeu a vez');
       room.pending=0;room.drawnId=null;advance(1);return null;
     }
     if(room.drawnId)return 'Você já comprou: jogue a carta ou passe a vez';
@@ -1532,16 +1730,17 @@ function removePlayer(id){
 /* ---------- bots ---------- */
 function scheduleBot(){
   clearTimeout(botTimer);
-  if(!room||room.phase!=='playing')return;
+  if(!room||room.phase!=='playing'||room.opts.tutorial)return;
   const p=cur();if(!p||!p.bot)return;
   botTimer=setTimeout(botMove,BOT_MIN+Math.random()*BOT_VAR);
 }
 function botMove(){
-  if(!room||room.phase!=='playing')return;
+  if(!room||room.phase!=='playing'||room.opts.tutorial)return;
   const p=cur();if(!p||!p.bot)return;
   const legal=legalCards(p);
   let a;
   if(!legal.length)a={type:'draw'};
+  else if(room.pending>0&&legal.every(c=>c.v==='mirror')&&room.pending<BOT_ESPELHO_MIN)a={type:'draw'};
   else{
     const nonW=legal.filter(c=>c.c!=='w');
     let pool=nonW.length?nonW:legal;
@@ -1550,6 +1749,19 @@ function botMove(){
     else if(difficulty==='hard'){pool=pool.slice().sort((a,b)=>(/^\d$/.test(a.v)?0:2)-(/^\d$/.test(b.v)?0:2)||b.v.length-a.v.length);}
     else if(difficulty==='master'){pool=pool.slice().sort((a,b)=>{const score=c=>((/^\d$/.test(c.v)?0:5)+(c.c==='w'?3:0)+(c.v in PLUS?4:0)+(p.hand.filter(x=>x.c===c.c).length*.15));return score(b)-score(a);});}
     else{const act=pool.filter(c=>!/^\d$/.test(c.v));if(act.length&&(peekP(1).hand.length<=3||Math.random()<.4))pool=act;}
+    if(room.pending>0){
+      const mirrors=legal.filter(c=>c.v==='mirror'),pluses=legal.filter(c=>c.v in PLUS);
+      if(mirrors.length&&room.pending>=BOT_ESPELHO_MIN&&(!pluses.length||Math.random()<BOT_ESPELHO_CHANCE))pool=mirrors;
+      else if(pluses.length)pool=pluses;
+    }else{
+      if(room.opts.mode==='maldita'&&p.hand.length>1){
+        const safe=pool.filter(c=>c.c!==room.cursedColor);
+        if(safe.length)pool=safe;
+        else{const allSafe=legal.filter(c=>c.c!==room.cursedColor);if(allSafe.length)pool=allSafe;}
+      }
+      const shields=pool.filter(c=>c.v==='shield');
+      if(!p.shield&&shields.length)pool=shields;
+    }
     const c=pool[Math.floor(Math.random()*pool.length)];
     if(p.hand.length===2&&Math.random()<(difficulty==='easy'?.45:difficulty==='master'?.98:.85))p.called=true;
     let color,targetId;
@@ -1576,16 +1788,23 @@ function viewFor(p){
   const mine=turnId===p.id;
   return{
     phase:room.phase,code:room.code,me:p.id,opts:room.opts,
+    tutorial:room.opts.tutorial?{step:room.tutorialStep,called:room.tutorialCalled,feedback:room.tutorialFeedback}:null,
     winnerTeam:room.winnerTeam==null?null:room.winnerTeam,team:p.team==null?null:p.team,turnEndsAt:room.turnEndsAt,
-    players:room.players.map(q=>({id:q.id,name:q.name,photo:q.photo||'',gender:q.gender||'',count:q.hand.length,called:!!q.called,bot:q.bot,wins:q.wins,team:q.team==null?null:q.team,frame:safeFrameClass(q.frame),nameEffect:safeNameEffect(q.nameEffect),showcase:Array.isArray(q.showcase)?q.showcase.slice(0,3):[]})),
+    players:room.players.map(q=>({id:q.id,name:q.name,uid:q.uid||'',username:q.username||'',photo:q.photo||'',gender:q.gender||'',count:q.hand.length,shield:!!q.shield,called:!!q.called,bot:q.bot,wins:q.wins,team:q.team==null?null:q.team,frame:safeFrameClass(q.frame),nameEffect:safeNameEffect(q.nameEffect),showcase:Array.isArray(q.showcase)?q.showcase.slice(0,3):[]})),
     hand:p.hand,
     legal:mine?legalCards(p).map(c=>c.id):[],
     drawnId:mine?room.drawnId:null,
     top:room.discard[room.discard.length-1]||null,
     color:room.color,turn:turnId,dir:room.dir,pending:room.pending,
+    cursedColor:room.cursedColor,turnCount:room.turnCount,nextEventAt:room.nextEventAt,lastEvent:room.lastEvent,modeNotice:room.modeNotice,turnEpoch:room.turnEpoch,
     drawLeft:room.draw.length,vulnerable:room.vulnerable,endsAt:room.endsAt,roundId:room.roundId,
-    log:room.log.slice(-4),chat:room.chat.slice(-30),winner:room.winner,tournament:room.tournament
+    log:room.log.slice(-4),chat:room.chat.slice(-30),winner:room.winner,tournament:room.tournament,
+    roundStats:room.roundStats,normalEnd:room.normalEnd
   };
+}
+function spectatorView(){
+  // viewFor inclui a mão do jogador receptor: apagamos ANTES de enviar pela rede.
+  const base=viewFor(room.players[0]);return {...base,me:null,team:null,hand:[],legal:[],drawnId:null,spectator:true};
 }
 function broadcast(){
   if(!room)return;
@@ -1594,6 +1813,7 @@ function broadcast(){
     const c=conns[p.id];
     if(c&&c.open){try{c.send({t:'state',s:viewFor(p)});}catch(e){console.warn(e);}}
   }
+  for(const c of Object.values(spectators))if(c.open){try{c.send({t:'state',s:spectatorView()});}catch(e){console.warn('[CHROMA] espectador',e);}}
   render(viewFor(room.players.find(p=>p.id==='host')));
   scheduleBot();
 }
@@ -1642,7 +1862,7 @@ function sendPings(){
 --------------------------------------------------------------- */
 function genCode(){let s='';for(let i=0;i<5;i++)s+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return s;}
 function busy(msg){$('#busy').classList.toggle('on',!!msg);if(msg)$('#busyTxt').textContent=msg;}
-let chatExpiryTimer=null;
+let chatExpiryTimer=null,lastCelebratedRound=null;
 function scheduleChatExpiry(at){
   const fireAt=at+CHAT_BUBBLE_MS;
   const delay=fireAt-Date.now();
@@ -1658,19 +1878,55 @@ function toast(msg,ms){
 }
 function cleanName(n){return (n||'').replace(/\s+/g,' ').trim().slice(0,14);}
 function cloudBlockedMessage(){return window.chromaCloud?.getWriteMessage?.()||(window.chromaCloudLoadFailed?'O módulo de conta do Firebase não carregou (firebase-auth.js ou o SDK em gstatic.com foi bloqueado ou está fora do ar). Recarregue a página.':'Iniciando o módulo de conta… aguarde um instante.');}
-function cloudErr(e,action){return window.chromaCloud?.describeError?.(e,action)||(e&&e.message)||'Erro inesperado sem detalhes.';}
+function cloudErr(e,action){
+  // Não dependemos só de navigator.onLine: usamos também o erro real do Firebase.
+  if(/network-request-failed|failed to fetch|network error|unavailable/i.test(String(e?.code||'')+' '+String(e?.message||'')))
+    return 'Sem conexão com o serviço. Login, amigos e progresso online precisam de internet. Tente novamente quando a rede voltar.';
+  return window.chromaCloud?.describeError?.(e,action)||(e&&e.message)||'Erro inesperado sem detalhes.';
+}
 function cloudUnavailableHtml(unauthText){const st=window.firebaseAuthState||'AUTH_LOADING';const text=st==='UNAUTHENTICATED'?unauthText:cloudBlockedMessage();const retry=st==='AUTHENTICATED_PROFILE_ERROR'?' <button class="btn ghost" type="button" data-cloud-retry>Tentar novamente</button>':'';return socialEsc(text)+retry;}
 function saveName(n){if(!window.chromaCloud?.canWrite()){toast(cloudBlockedMessage());return false;}const previous=localStorage.getItem('chroma-name')||'';try{localStorage.setItem('chroma-name',n);}catch(e){return false;}window.chromaCloud.persistState().catch(e=>{try{localStorage.setItem('chroma-name',previous);}catch(storageErr){console.error('[CHROMA] falha ao restaurar o nome local',storageErr);}toast(cloudErr(e,'salvar o nome'));renderProfile();});window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 
 function startTraining(name,profile,count,difficulty,mode){
   teardown('');
   room=newRoom('TRAINING',name,profile);isHost=true;joined=true;peer=null;hostConn=null;
-  mode=MODES[mode]?mode:'classic';const cfg=teamConfig(mode);const requiredBots=cfg?cfg.players-1:Math.max(1,Math.min(8,Number(count)||2));
-  room.opts.training=true;room.opts.mode=mode;room.opts.botCount=requiredBots;room.opts.botDifficulty=['easy','normal','hard','master'].includes(difficulty)?difficulty:'normal';room.opts.maxPlayers=cfg?cfg.players:requiredBots+1;
+  mode=MODES[mode]?mode:'classic';const cfg=teamConfig(mode);const requiredBots=cfg?cfg.players-1:Math.max(1,Math.min(UNRANKED_MODES.includes(mode)?3:8,Number(count)||2));
+  room.opts.training=true;room.opts.mode=mode;room.opts.stack=!!$('#trainingStack').checked;room.opts.botCount=requiredBots;room.opts.botDifficulty=['easy','normal','hard','master'].includes(difficulty)?difficulty:'normal';room.opts.maxPlayers=cfg?cfg.players:requiredBots+1;
   room.players[0].id='host';
   room.players[0].team=teamForIndex(0,mode);
   for(let i=0;i<room.opts.botCount;i++){const base=BOT_NAMES[i%BOT_NAMES.length];room.players.push({id:'bot-'+Math.random().toString(36).slice(2,7),name:base,hand:[],bot:true,botDifficulty:room.opts.botDifficulty,wins:0,called:false,team:teamForIndex(i+1,mode)});}
-  startRound();render(viewFor(room.players[0]));
+  startRound();render(viewFor(room.players[0]));scheduleBot();
+}
+
+/* Cada exercício oferece uma mão conhecida; os bots são os do Treinamento,
+   mas ficam parados para o jogador poder ler com calma. Nenhum exercício vira rodada premiada. */
+const TUTORIAL_STEPS=[
+  {top:['r','3'],target:['r','5'],text:'Regra básica: jogue a carta VERMELHA com a mesma cor do topo (número diferente).',result:'Mesma cor: jogada válida!'},
+  {top:['r','5'],target:['g','5'],text:'Regra básica: agora jogue o número 5 VERDE. A cor é diferente, mas o número é igual.',result:'Mesmo número também funciona!'},
+  {top:['g','4'],target:['g','skip'],text:'Bloqueio: jogue o Bloqueio verde para pular a vez do próximo jogador.',result:'O próximo jogador perdeu a vez.'},
+  {top:['r','3'],target:['r','rev'],text:'Inverter: jogue a carta vermelha para mudar o sentido da mesa.',result:'O sentido de jogo foi invertido.'},
+  {top:['y','8'],target:['y','+2'],text:'+2: jogue a carta amarela. O próximo jogador compra duas e perde a vez.',result:'O próximo jogador comprou duas cartas.'},
+  {top:['b','3'],target:['w','wild'],text:'Coringa: jogue a carta de quatro cores e escolha uma cor na janela.',result:'Você escolheu a nova cor da mesa.'},
+  {top:['g','6'],target:['g','7'],action:'chroma',text:'CHROMA!: com duas cartas, aperte CHROMA! ANTES de jogar a carta verde. Assim ninguém pode denunciar você quando sobrar uma carta.',result:'CHROMA! protegeu você da denúncia.'},
+  {top:['r','2'],target:['w','eye'],text:'Olho do Paizin: jogue a carta e escolha um bot para ver a mão dele por 3 segundos.',result:'Você pôde observar a mão do bot por 3 segundos.'},
+  {top:['g','4'],target:['g','blackhole'],extra:[['g','8'],['r','1']],text:'BURACO NEGRO: jogue a carta verde. As outras cartas verdes da sua mão voltam ao monte.',result:'A carta verde 8 voltou ao monte de compra.'},
+  {top:['b','3'],target:['w','confuse'],text:'Coringa Confusão: jogue a carta e escolha uma cor. As mãos de TODOS são embaralhadas e redistribuídas.',result:'As cartas de todos foram embaralhadas e redistribuídas.'}
+];
+function prepareTutorialStep(){
+  const step=TUTORIAL_STEPS[room.tutorialStep],p=room.players[0];
+  const card=(pair,id)=>({id,c:pair[0],v:pair[1]});
+  room.discard=[card(step.top,'tutorial-top-'+room.tutorialStep)];room.color=step.top[0];room.dir=1;room.pending=0;room.drawnId=null;room.vulnerable=null;
+  p.hand=[card(step.target,'tutorial-'+room.tutorialStep+'-alvo'),...(step.extra||[['b','9']]).map((c,i)=>card(c,'tutorial-extra-'+room.tutorialStep+'-'+i))];p.called=false;
+  room.players.slice(1).forEach((bot,i)=>{bot.hand=[card(['y','1'],'tutorial-bot-'+i+'-1'),card(['b','6'],'tutorial-bot-'+i+'-2'),card(['r','8'],'tutorial-bot-'+i+'-3')];bot.called=false;});
+  room.draw=shuffle(makeDeck('supercaos',true).map((c,i)=>({...c,id:'tutorial-draw-'+room.tutorialStep+'-'+i})));
+  room.turn=0;room.turnEpoch++;room.turnEndsAt=null;room.endsAt=null;room.tutorialWaiting=false;room.tutorialCalled=false;room.tutorialFeedback='';
+  room.log=['Tutorial: '+step.text];
+}
+function startTutorial(){
+  const name=cleanName($('#inName').value)||'Você';
+  startTraining(name,profileData(),2,'easy','supercaos');
+  clearInterval(clockTimer);clockTimer=null;room.opts.tutorial=true;room.opts.ranked=false;room.opts.dumpColor=true;room.tutorialStep=0;
+  prepareTutorialStep();broadcast();
 }
 
 function createRoom(name,profile){
@@ -1701,26 +1957,31 @@ function createRoom(name,profile){
 function onGuestConn(conn){
   conn.on('data',d=>{
     if(!room||!d)return;
-    if(d.t==='join'){
+    if(d.t==='watch'){
+      if(conn.metadata?.role!=='spectator'||conns[conn.peer]||Object.keys(spectators).length>=20)return refuse(conn,'Não foi possível assistir a esta sala.');
+      spectators[conn.peer]=conn;try{conn.send({t:'state',s:spectatorView()});}catch(e){console.warn('[CHROMA] espectador',e);}
+    }else if(d.t==='join'){
+      if(conn.metadata?.role==='spectator'||spectators[conn.peer]||conns[conn.peer])return refuse(conn,'Esta conexão é apenas para assistir.');
       if(room.phase!=='lobby')return refuse(conn,'A partida já começou.');
       if(room.players.length>=room.opts.maxPlayers)return refuse(conn,'A sala está cheia.');
       if(room.players.some(p=>p.id===conn.peer))return;
-      const p={id:conn.peer,name:uniqueName(cleanName(d.name)||'Jogador'),photo:typeof d.photo==='string'?d.photo.slice(0,350000):'',gender:GENDER_EMOJI[d.gender]?d.gender:'',frame:safeFrameClass(d.frame),nameEffect:safeNameEffect(d.nameEffect),showcase:Array.isArray(d.showcase)?d.showcase.filter(id=>ACHIEVEMENTS.some(a=>a.id===id)).slice(0,3):[],hand:[],bot:false,wins:0,called:false,team:teamForIndex(room.players.length,room.opts.mode)};
+      const p={id:conn.peer,name:uniqueName(cleanName(d.name)||'Jogador'),uid:typeof d.uid==='string'?d.uid.slice(0,128):'',username:typeof d.username==='string'?d.username.slice(0,18).toLowerCase():'',photo:typeof d.photo==='string'?d.photo.slice(0,350000):'',gender:GENDER_EMOJI[d.gender]?d.gender:'',frame:safeFrameClass(d.frame),nameEffect:safeNameEffect(d.nameEffect),showcase:Array.isArray(d.showcase)?d.showcase.filter(id=>ACHIEVEMENTS.some(a=>a.id===id)).slice(0,3):[],hand:[],bot:false,wins:0,called:false,team:teamForIndex(room.players.length,room.opts.mode)};
       room.players.push(p);conns[conn.peer]=conn;
       broadcast();
     }else if(d.t==='act'){
-      if(!byId(conn.peer))return;
+      if(spectators[conn.peer]===conn||conns[conn.peer]!==conn||!byId(conn.peer))return refuse(conn,'Espectadores não podem jogar, usar CHROMA! ou denunciar.');
       const err=doAct(conn.peer,d.a||{});
       if(err){try{conn.send({t:'err',msg:err});}catch(_){}}else broadcast();
     }else if(d.t==='leave'){
-      if(byId(conn.peer)){removePlayer(conn.peer);broadcast();}
+      if(spectators[conn.peer]===conn){delete spectators[conn.peer];conn.close();return;}
+      if(conns[conn.peer]===conn&&byId(conn.peer)){removePlayer(conn.peer);broadcast();}
     }else if(d.t==='ping'){
       try{conn.send({t:'pong',ts:d.ts});}catch(_){}
     }else if(d.t==='pong'){
       pingRecordHost(conn.peer,Date.now()-d.ts);
     }
   });
-  conn.on('close',()=>{delete hostRtts[conn.peer];if(room&&byId(conn.peer)&&conns[conn.peer]===conn){removePlayer(conn.peer);broadcast();}});
+  conn.on('close',()=>{delete hostRtts[conn.peer];if(spectators[conn.peer]===conn){delete spectators[conn.peer];return;}if(room&&byId(conn.peer)&&conns[conn.peer]===conn){removePlayer(conn.peer);broadcast();}});
   conn.on('error',e=>console.warn('conn:',e));
 }
 function refuse(conn,msg){
@@ -1733,7 +1994,7 @@ function uniqueName(base){
   return n;
 }
 
-function joinRoom(code,name,profile){
+function joinRoom(code,name,profile,watching=false){
   isHost=false;joined=false;busy('Entrando na sala…');
   const fail=msg=>{clearTimeout(giveUp);teardown(msg);};
   const giveUp=setTimeout(()=>{if(!joined)fail('Não deu para conectar. Confira o código e a internet (algumas redes bloqueiam conexão direta).');},15000);
@@ -1746,9 +2007,9 @@ function joinRoom(code,name,profile){
   });
   pr.on('open',id=>{
     myId=id;
-    const conn=pr.connect(APP+code,{reliable:true});
+    const conn=pr.connect(APP+code,{reliable:true,metadata:{role:watching?'spectator':'player'}});
     hostConn=conn;
-    conn.on('open',()=>conn.send({t:'join',name,photo:profile.photo,gender:profile.gender,frame:profile.frame,nameEffect:profile.nameEffect,showcase:profile.showcase||[]}));
+    conn.on('open',()=>conn.send(watching?{t:'watch'}:{t:'join',name,uid:window.firebaseCurrentUserUid||'',username:localStorage.getItem('chroma-username')||'',photo:profile.photo,gender:profile.gender,frame:profile.frame,nameEffect:profile.nameEffect,showcase:profile.showcase||[]}));
     conn.on('data',d=>{
       if(!d)return;
       if(d.t==='state'){if(!joined){joined=true;clearTimeout(giveUp);busy(null);}render(d.s);}
@@ -1764,6 +2025,7 @@ function joinRoom(code,name,profile){
 }
 
 function send(a){
+  if(view?.spectator)return warn('Espectadores só podem assistir.');
   const action=Object.assign({},a,{_id:(myId||'local')+'-'+(++clientActionSeq)});
   if(isHost){const err=doAct('host',action);if(err){cancelFly();warn(err);}else broadcast();}
   else if(hostConn&&hostConn.open)hostConn.send({t:'act',a:action});
@@ -1772,15 +2034,16 @@ function teardown(msg,ms){
   clearTimeout(botTimer);clearInterval(clockTimer);clockTimer=null;killFly();dealing.clear();document.querySelectorAll('.flying').forEach(e=>e.remove());
   const p=peer;peer=null;hostConn=null;room=null;view=null;isHost=false;joined=false;
   for(const k in conns)delete conns[k];
+  for(const k in spectators)delete spectators[k];
   try{if(p)p.destroy();}catch(_){}
-  lastTop=null;prevIds=new Set();wasMyTurn=false;
+  lastTop=null;prevIds=new Set();wasMyTurn=false;lastCelebratedRound=null;$('#victoryConfetti').replaceChildren();
   pingMs=null;pingUpdatedAt=0;hostRtts={};updatePingUI();
   busy(null);show('home');
   if(msg)toast(msg,ms||3500);
 }
 function leave(){
   if(isHost){
-    for(const k in conns){try{conns[k].send({t:'closed'});}catch(_){}}
+    for(const c of [...Object.values(conns),...Object.values(spectators)]){try{c.send({t:'closed'});}catch(e){console.warn('[CHROMA] aviso de encerramento',e);}}
     setTimeout(()=>teardown(),200);
   }else{
     try{hostConn.send({t:'leave'});}catch(_){}
@@ -1802,6 +2065,7 @@ const SVG={
   confuse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 0 7 2.5 7 6s-2.8 5.5-6 5.5-4.8-1.6-4.8-3.7 1.8-3.3 3.8-3.3 3 1.1 3 2.6-1.1 2.2-2.2 2.2"/><circle cx="12" cy="20" r="1.4" fill="currentColor" stroke="none"/></svg>'
 };
 function sym(c,small){
+  if(c.v==='shield'||c.v==='mirror')return '<i data-lucide="'+(c.v==='shield'?'shield':'flip-horizontal')+'" aria-hidden="true"></i>';
   if(c.v==='skip')return SVG.skip;
   if(c.v==='skip2')return small?'2×':SVG.skip;
   if(c.v==='rev')return SVG.rev;
@@ -1859,7 +2123,7 @@ function cardEl(c,extra){
 }
 const AV=['#e63946','#f5b301','#25b05a','#2c7be5','#9b5de5','#f15bb5','#00a6a6','#ff7b00'];
 const ORD={r:0,y:1,g:2,b:3,w:4};
-  const VORD=['0','1','2','3','4','5','6','7','8','9','skip','skip2','rev','+2','+4','+6','+10','+99','wild','swap','eye','blackhole','confuse'];
+  const VORD=['0','1','2','3','4','5','6','7','8','9','skip','skip2','rev','shield','+2','+4','+6','+10','+99','wild','mirror','swap','eye','blackhole','confuse'];
 const GENDER_EMOJI={female:'',male:'',nonbinary:'',other:''};
 
 function genderEmoji(g){return GENDER_EMOJI[g]||'';}
@@ -1895,7 +2159,7 @@ function show(id){
   if(id!=='game'){$('#endOv').classList.remove('on');$('#colorOv').classList.remove('on');}
 }
 function render(v){
-  const prev=view;if(prev&&prev.phase==='playing'&&v.phase==='playing'&&prev.top&&v.top&&prev.top.id!==v.top.id&&prev.turn===v.me){try{const n=Number(localStorage.getItem('chroma-cards-played')||0)+1;localStorage.setItem('chroma-cards-played',String(n));}catch(e){}}view=v;
+  const prev=view;if(!v.opts.tutorial&&!v.spectator&&prev&&prev.phase==='playing'&&v.phase==='playing'&&prev.top&&v.top&&prev.top.id!==v.top.id&&prev.turn===v.me){try{const n=Number(localStorage.getItem('chroma-cards-played')||0)+1;localStorage.setItem('chroma-cards-played',String(n));}catch(e){}}view=v;
   if(v.phase==='lobby'){show('lobby');renderLobby(v,prev);}
   else{show('game');renderGame(v,prev);}
 }
@@ -1904,8 +2168,8 @@ function renderLobby(v,prev){
   document.body.classList.remove('chaos-bg','super-chaos-bg');
   killFly();dealing.clear();lastTop=null;prevIds=new Set();
   if(prev&&prev.phase==='lobby'&&v.players.length>prev.players.length)sfx.join();
-  $('#lobCode').textContent=v.code;
-  $('#lobCount').textContent=v.players.length+' de '+v.opts.maxPlayers+' jogadores';
+  $('#lobCode').textContent=String(v.code||'').trim()||'-----';
+  $('#lobCount').textContent=v.players.length+' de '+v.opts.maxPlayers+' jogadores'+(v.spectator?' · assistindo':'');
   $('#lobPlayers').innerHTML=v.players.map((p,i)=>
     '<li><span class="av" style="background:'+AV[i%AV.length]+'">'+esc(p.name.charAt(0).toUpperCase())+'</span>'+
     '<span class="pn">'+esc(p.name)+(p.id===v.me?' (você)':'')+(p.id==='host'?' ':'')+(p.bot?' ':'')+'</span>'+
@@ -1914,7 +2178,7 @@ function renderLobby(v,prev){
   const st=$('#optStack');st.checked=!!v.opts.stack;st.disabled=!isHost;
   const ef=$('#optEffects');ef.checked=!!v.opts.effects;ef.disabled=!isHost;
   const dc=$('#optDump');dc.checked=!!v.opts.dumpColor;dc.disabled=!isHost;
-  const rk=$('#optRanked');if(rk){rk.checked=!!v.opts.ranked;rk.disabled=!isHost;}
+  const rk=$('#optRanked');if(rk){rk.checked=!!v.opts.ranked&&!UNRANKED_MODES.includes(v.opts.mode);rk.disabled=!isHost||UNRANKED_MODES.includes(v.opts.mode);rk.closest('label').title=UNRANKED_MODES.includes(v.opts.mode)?'Este modo não vale pontos ranqueados':'';}
   document.querySelectorAll('input[name=mode]').forEach(r=>{r.checked=r.value===(v.opts.mode||'classic');});
   $('#modeWrap').classList.toggle('locked',!isHost);
   updateModeLockUI();
@@ -1922,7 +2186,7 @@ function renderLobby(v,prev){
   $('#turnTime').value=v.opts.turnSeconds||TURN_SECONDS;$('#turnTime').disabled=!isHost;
   $('#maxPlayers').value=v.opts.maxPlayers||4;$('#maxPlayers').disabled=!isHost;
   $('#hostBtns').style.display=isHost?'flex':'none';
-  $('#waitHost').style.display=isHost?'none':'block';
+  $('#waitHost').style.display=isHost?'none':'block';$('#waitHost').textContent=v.spectator?'Você está assistindo à sala. Aguarde o início.':'Aguardando o host começar…';
   const teamCfg=teamConfig(v.opts.mode);
   $('#maxPlayers').value=teamCfg?teamCfg.players:(v.opts.maxPlayers||4);
   $('#maxPlayers').disabled=!isHost||!!teamCfg;
@@ -1934,6 +2198,9 @@ function renderGame(v,prev){
   awardMatchXP(v,prev);
   if(v.phase==='ended'&&prev&&prev.phase==='playing')settleRankedView(v);
   const playing=v.phase==='playing';
+  $('#game').classList.toggle('spectating',!!v.spectator);
+  const guide=$('#tutorialGuide'),skip=$('#btnTutorialSkip');guide.hidden=!v.opts.tutorial;skip.hidden=!v.opts.tutorial;
+  if(v.opts.tutorial){const step=TUTORIAL_STEPS[v.tutorial.step];guide.textContent='Passo '+(v.tutorial.step+1)+' de '+TUTORIAL_STEPS.length+' · '+(v.tutorial.feedback||step.text);}
   document.body.classList.toggle('chaos-bg',v.opts.mode==='caos');
   document.body.classList.toggle('super-chaos-bg',v.opts.mode==='supercaos');
   syncMusic(v.opts.mode,playing);
@@ -1946,16 +2213,30 @@ function renderGame(v,prev){
   const chatFor=pid=>{const m=(v.chat||[]).filter(x=>x.pid===pid).pop();
     if(!m||Date.now()-m.at>=CHAT_BUBBLE_MS)return '';
     scheduleChatExpiry(m.at);
-    return '<span class="chat-bubble">'+esc(m.text)+'</span>';};
+    const emote=QUICK_EMOTES[QUICK_MESSAGES.indexOf(m.text)];
+    return '<span class="chat-bubble">'+esc(m.text)+'</span>'+(emote?'<span class="chat-emote" aria-label="Reação: '+esc(m.text)+'">'+emote+'</span>':'');};
   const mt=$('#modeTag');const mn=(MODES[v.opts.mode]||'')+(v.opts.ranked?' · Ranqueado':'');
   mt.textContent=mn;mt.classList.toggle('on',v.opts.mode&&v.opts.mode!=='classic');
   $('#dirInd').textContent=v.dir===1?'↻':'↺';
   $('#stackInd').textContent=v.pending>0?'+'+v.pending:'';
+  const ms=$('#modeStatus'),notice=$('#modeNotice');
+  ms.hidden=!playing||!UNRANKED_MODES.includes(v.opts.mode);
+  if(v.opts.mode==='maldita'&&v.cursedColor){
+    const left=MALDITA_TURNOS-(v.turnCount%MALDITA_TURNOS);
+    ms.innerHTML='<i data-lucide="skull" aria-hidden="true"></i> Cor Maldita: <b>'+CNAME[v.cursedColor]+'</b> · troca em '+left+' turno'+(left===1?'':'s');
+    ms.style.setProperty('--mode-color','var(--'+v.cursedColor+')');
+  }else if(v.opts.mode==='eventos'){
+    const left=Math.max(0,v.nextEventAt-v.turnCount);
+    ms.innerHTML='<i data-lucide="dices" aria-hidden="true"></i> Próximo evento '+(left?'em '+left+' turno'+(left===1?'':'s'):'no próximo turno livre')+(v.lastEvent?' · último: '+esc(RANDOM_EVENTS.find(e=>e.id===v.lastEvent)?.name||''):'');
+    ms.style.setProperty('--mode-color','var(--y)');
+  }
+  notice.hidden=!playing||!v.modeNotice||v.modeNotice.epoch!==v.turnEpoch;
+  notice.textContent=notice.hidden?'':v.modeNotice.text;
 
-  const mi=v.players.findIndex(p=>p.id===v.me),order=[];
+  const mi=Math.max(0,v.players.findIndex(p=>p.id===v.me)),order=[];
   for(let k=0;k<v.players.length;k++)order.push(v.players[(mi+k)%v.players.length]);
   const cardHtml=p=>
-    '<div class="opp'+(p.id===v.me?' me':'')+' team-'+(['a','b','c'][p.team]||'a')+''+(playing&&p.id===v.turn?' turn':'')+(p.count===1?' chroma':'')+'" data-pid="'+esc(p.id)+'"><div class="player-line">'+avatarMarkup(p)+'<div class="nm '+safeNameEffect(p.nameEffect)+'">'+esc(p.name)+(p.bot?' ':'')+'</div>'+(genderEmoji(p.gender)?'<span class="gender">'+genderEmoji(p.gender)+'</span>':'')+(isTeamMode(v.opts.mode)?'<span class="team-badge team-'+(['a','b','c'][p.team]||'a')+'">'+teamLabel(p.team)+'</span>':'')+'</div>'+achievementInsignias(p)+chatFor(p.id)+
+    '<div class="opp'+(p.id===v.me?' me':'')+' team-'+(['a','b','c'][p.team]||'a')+''+(playing&&p.id===v.turn?' turn':'')+(p.count===1?' chroma':'')+'" data-pid="'+esc(p.id)+'"><div class="player-line">'+avatarMarkup(p)+'<div class="nm '+safeNameEffect(p.nameEffect)+'">'+esc(p.name)+(p.bot?' ':'')+'</div>'+(genderEmoji(p.gender)?'<span class="gender">'+genderEmoji(p.gender)+'</span>':'')+(isTeamMode(v.opts.mode)?'<span class="team-badge team-'+(['a','b','c'][p.team]||'a')+'">'+teamLabel(p.team)+'</span>':'')+'</div>'+achievementInsignias(p)+(p.shield?'<span class="shield-badge" title="Escudo ativo" aria-label="Escudo ativo"><i data-lucide="shield"></i> Escudo</span>':'')+chatFor(p.id)+
     '<div class="cnt'+(p.count===1?' one':'')+'">'+p.count+'</div>'+
     '<div class="w">'+(p.id===v.me?'<b class="me-tag">VOCÊ</b> ':'')+(p.wins?' '+p.wins:'')+'</div></div>';
   /* setas entre os jogadores mostram o sentido da partida; a que liga quem joga agora ao próximo fica dourada */
@@ -1995,26 +2276,30 @@ function renderGame(v,prev){
   $('#drawCount').textContent=v.drawLeft;
 
   const hidId=fly&&fly.own?fly.id:null;
-  const hand=v.hand.slice().sort((a,b)=>ORD[a.c]-ORD[b.c]||VORD.indexOf(a.v)-VORD.indexOf(b.v));
+  const hand=(v.spectator?[]:v.hand).slice().sort((a,b)=>ORD[a.c]-ORD[b.c]||VORD.indexOf(a.v)-VORD.indexOf(b.v));
   const hEl=$('#hand');hEl.innerHTML='';
   const fresh=[];
   hand.forEach(c=>{
     if(c.id===hidId)return;
     const el=cardEl(c,'own-card');
     if(myTurn)el.classList.add(v.legal.includes(c.id)?'legal':'dim');
+    if(v.opts.mode==='maldita'&&c.c===v.cursedColor)el.classList.add('cursed-card');
+    if(v.opts.tutorial&&c.id==='tutorial-'+v.tutorial.step+'-alvo')el.classList.add('tutorial-focus');
     if(dealing.has(c.id))el.style.visibility='hidden';
     hEl.appendChild(el);
     if(!prevIds.has(c.id))fresh.push({el,card:c});
   });
   prevIds=new Set(v.hand.map(c=>c.id));
   if(!RM&&fresh.length)dealFromPile(fresh);
+  refreshIcons(); // Cartas e distintivos novos são inseridos dinamicamente.
   sfxDiff(prev,v,d0);
 
   const ban=$('#banner');let t;
   if(!playing)t='Fim da rodada';
+  else if(v.opts.tutorial)t='Sua vez · siga o passo do tutorial';
   else if(myTurn){
     if(v.drawnId)t='Jogue a carta comprada ou passe';
-    else if(v.pending>0)t='Compre '+v.pending+(v.legal.length?' ou devolva +2/+4':'');
+    else if(v.pending>0)t='Compre '+v.pending+(v.legal.length?' ou devolva +N / Espelho':'');
     else t='Sua vez!';
   }else{const tp=v.players.find(p=>p.id===v.turn);t='Vez de '+(tp?tp.name:'…');}
   ban.textContent=t;ban.classList.toggle('me',myTurn);
@@ -2035,11 +2320,12 @@ function renderGame(v,prev){
   $('#btnAllyView').textContent=ally?' Ver cartas de '+ally.name:' Ver aliado';
   const urgent=playing&&v.vulnerable===v.me;
   $('#btnChroma').classList.toggle('on',playing&&(urgent||mine<=2));
+  $('#btnChroma').classList.toggle('tutorial-focus',!!v.opts.tutorial&&v.tutorial.step===6&&!v.tutorial.called);
   $('#btnChroma').classList.toggle('urgent',urgent);
   $('#btnCatch').classList.toggle('on',playing&&!!v.vulnerable&&v.vulnerable!==v.me);
   $('#btnPass').classList.toggle('on',myTurn&&!!v.drawnId);
   $('#drawpile').classList.toggle('pulse',myTurn&&!v.drawnId&&(v.legal.length===0||v.pending>0));
-  $('#quickChatBtn').style.display=playing?'block':'none';
+  $('#quickChatBtn').style.display=playing&&!v.spectator?'block':'none';
   if(!playing)$('#quickChatMenu').classList.remove('on');
 
   if(myTurn&&!wasMyTurn&&navigator.vibrate)navigator.vibrate(60);
@@ -2056,18 +2342,32 @@ function renderGame(v,prev){
     $('#endScore').innerHTML=ordered.map((p,i)=>'<li class="'+(w&&p.id===w.id?'win':'')+'"><span>'+(tour?((i+1)+'º '):'')+esc(p.name)+(p.id===v.me?' (você)':'')+'</span><b>'+(tour?(v.tournament.scores[p.id]||0)+' pts':p.wins+(p.wins===1?' vitória':' vitórias'))+'</b></li>').join('');
     $('#tourneyMeta').textContent=tour?(finished?'Resultado final · '+v.tournament.round+' partidas':'Pontuação acumulada · partida '+v.tournament.round+' de '+v.tournament.maxRounds):(v.opts.training?'Partida local · sem código de sala e sem pontos ranqueados':'');
     const endStats=myRankStats(),endRank=rankedTier(endStats.points||0),endXp=v.opts.training?'Treinamento concluído':'Progressão atualizada';
-    $('#endDetails').innerHTML='<div><b>'+endXp+'</b><small>XP e conquistas processados nesta partida</small></div><div><b>'+esc(endRank.name)+' '+esc(endRank.level||'')+'</b><small>'+(v.opts.ranked?(endStats.points||0)+' pontos ranqueados':'Modo não ranqueado')+'</small></div>';
+    const allStats=Object.values(v.roundStats?.players||{});
+    const mineStats=v.spectator?{
+      played:allStats.reduce((n,s)=>n+s.played,0),drawn:allStats.reduce((n,s)=>n+s.drawn,0),
+      chroma:allStats.reduce((n,s)=>n+s.chroma,0),bestSpecial:Math.max(0,...allStats.map(s=>s.bestSpecial))
+    }:(v.roundStats?.players?.[v.me]||{played:0,drawn:0,chroma:0,bestSpecial:0});
+    const statsLine=[['Duração',formatTime(v.roundStats?.durationMs||0)],['Cartas jogadas',mineStats.played],['Cartas compradas',mineStats.drawn],['Vezes que usou CHROMA!',mineStats.chroma],['Maior sequência de especiais',mineStats.bestSpecial]];
+    $('#endDetails').innerHTML='<div class="match-winner"><b>Vencedor: '+esc(v.winnerTeam!=null?teamLabel(v.winnerTeam):(w?.name||'Rodada encerrada'))+'</b><small>'+(v.spectator?'Resumo da mesa':'Resumo da rodada · seus números')+'</small></div>'+statsLine.map(([label,value])=>'<div><b>'+esc(value)+'</b><small>'+esc(label)+'</small></div>').join('')+'<div><b>'+endXp+'</b><small>'+(v.spectator?'Sem recompensas para espectadores':'XP e conquistas processados nesta partida')+'</small></div><div><b>'+esc(endRank.name)+' '+esc(endRank.level||'')+'</b><small>'+(v.opts.ranked&&!v.spectator?(endStats.points||0)+' pontos ranqueados':'Modo não ranqueado')+'</small></div>';
     $('#podium').style.display='none';
     $('#btnNext').style.display=isHost&&!v.opts.training&&((isTeamMode(v.opts.mode)&&v.players.length===teamConfig(v.opts.mode).players)||(!isTeamMode(v.opts.mode)&&v.players.length>=2))&&(!tour||!finished)?'':'none';
     $('#btnReplay').style.display=isHost&&!tour?'':'none';
     $('#btnTourAgain').style.display=tour&&finished&&isHost?'':'none';
     $('#btnTourRank').style.display=tour&&finished?'':'none';
     $('#btnBackLobby').style.display=isHost?'':'none';
-    $('#endWait').style.display=isHost?'none':'block';
+    $('#endWait').style.display=isHost?'none':'block';$('#endWait').textContent=v.spectator?'Você está assistindo à partida.':'Aguardando o host…';
+    if(v.spectator){['btnNext','btnReplay','btnTourAgain','btnTourRank','btnBackLobby'].forEach(id=>$('#'+id).style.display='none');}
     if(tour&&finished){$('#endScore').style.display='none';$('#podium').style.display='grid';$('#podium').innerHTML=ordered.slice(0,3).map((p,i)=>'<div class="podium-card '+(i===0?'first':'')+'"><div class="medal">'+['','',''][i]+'</div><b>'+esc(p.name)+'</b><small>'+(v.tournament.scores[p.id]||0)+' pontos</small></div>').join('');}
     else $('#endScore').style.display='flex';
     ov.classList.add('on');
-  }else ov.classList.remove('on');
+    // Um único efeito por rodada; animações são removidas ao sair ou mudar de qualidade.
+    ov.classList.toggle('end-loss',!me&&!v.spectator);
+    if(lastCelebratedRound!==v.roundId){
+      lastCelebratedRound=v.roundId;$('#victoryConfetti').replaceChildren();
+      if(me&&!RM)for(let i=0;i<28;i++){const part=document.createElement('i');part.style.setProperty('--x',(Math.random()*100)+'%');part.style.setProperty('--delay',(Math.random()*.8)+'s');part.style.setProperty('--speed',(2+Math.random()*1.5)+'s');part.style.setProperty('--hue',String([28,48,167,204,275][i%5]));$('#victoryConfetti').appendChild(part);}
+    }
+    if(RM)$('#victoryConfetti').replaceChildren();
+  }else{ov.classList.remove('on','end-loss');$('#victoryConfetti').replaceChildren();}
 }
 
 function pickColor(cb){colorCb=cb;$('#colorOv').classList.add('on');}
@@ -2196,9 +2496,12 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#inCode').addEventListener('input',e=>{
     e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5);
   });
-  const syncTrainingModeUI=()=>{const mode=$('#trainingMode').value,cfg=teamConfig(mode),bots=$('#trainingBots');if(!bots)return;const required=cfg?cfg.players-1:null;[...bots.options].forEach(o=>{o.disabled=!!required&&Number(o.value)!==required;});if(required)bots.value=String(required);else if(Number(bots.value)>8||Number(bots.value)<1)bots.value='2';};
+  const syncTrainingModeUI=()=>{const mode=$('#trainingMode').value,cfg=teamConfig(mode),bots=$('#trainingBots');if(!bots)return;const required=cfg?cfg.players-1:null,limit=UNRANKED_MODES.includes(mode)?3:8;[...bots.options].forEach(o=>{o.disabled=required!=null?Number(o.value)!==required:Number(o.value)>limit;});if(required)bots.value=String(required);else if(Number(bots.value)>limit||Number(bots.value)<1)bots.value='2';};
   $('#trainingMode').onchange=syncTrainingModeUI;
   $('#optTraining').onchange=e=>{$('#trainingControls').hidden=!e.target.checked;$('#btnCreate').hidden=e.target.checked;if(e.target.checked)syncTrainingModeUI();};
+  $('#btnTutorial').onclick=startTutorial;
+  $('#btnTutorialSkip').onclick=()=>{if(room?.opts?.tutorial)teardown('Tutorial pulado.');};
+  $('#btnTutorialDone').onclick=()=>$('#tutorialDoneOv').classList.remove('on');
   $('#btnTraining').onclick=()=>{const n=cleanName($('#inName').value);if(!n){toast('Digite seu nome em Editar perfil');openProfileEdit(true);return;}startTraining(n,profileData(),$('#trainingBots').value,$('#trainingDifficulty').value,$('#trainingMode').value);};
   $('#btnCreate').onclick=()=>{
     const n=cleanName($('#inName').value);
@@ -2206,13 +2509,15 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
     if(typeof Peer==='undefined'){toast('Não consegui carregar a biblioteca de conexão. Verifique a internet.');return;}
     saveName(n);createRoom(n,profileData());
   };
-  $('#btnJoin').onclick=()=>{
+  const joinFromModal=watching=>{
     const n=cleanName($('#inName').value),code=$('#inCode').value.trim().toUpperCase();
     if(!n){toast('Digite seu nome em Editar perfil');openProfileEdit(true);return;}
     if(code.length!==5){toast('O código tem 5 letras/números');$('#inCode').focus();return;}
     if(typeof Peer==='undefined'){toast('Não consegui carregar a biblioteca de conexão. Verifique a internet.');return;}
-    saveName(n);joinRoom(code,n,profileData());
+    saveName(n);joinRoom(code,n,profileData(),watching);
   };
+  $('#btnJoin').onclick=()=>joinFromModal(false);
+  $('#btnWatch').onclick=()=>joinFromModal(true);
   $('#inCode').addEventListener('keydown',e=>{if(e.key==='Enter')$('#btnJoin').click();});
   $('#inName').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 
@@ -2234,18 +2539,19 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#optStack').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.stack=e.target.checked;broadcast();}};
   $('#optEffects').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.effects=e.target.checked;broadcast();}};
   $('#optDump').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.dumpColor=e.target.checked;broadcast();}};
-  $('#optRanked').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.ranked=e.target.checked;broadcast();}};
+  $('#optRanked').onchange=e=>{if(isHost&&room&&room.phase==='lobby'){room.opts.ranked=e.target.checked&&!UNRANKED_MODES.includes(room.opts.mode);broadcast();}};
   const updateRoomLimits=()=>{
     if(!isHost||!room||room.phase!=='lobby')return;
     const cfg=teamConfig(room.opts.mode);
     if(cfg&&room.players.length!==cfg.players){toast('Para iniciar '+MODES[room.opts.mode]+', é necessário ter exatamente '+cfg.players+' jogadores');return;}
     const limits=clampRoomOptions($('#matchTime').value,cfg?cfg.players:$('#maxPlayers').value,$('#turnTime').value);
     limits.maxPlayers=Math.max(limits.maxPlayers,room.players.length);
+    if(UNRANKED_MODES.includes(room.opts.mode))limits.maxPlayers=Math.min(4,limits.maxPlayers);
     room.opts.minutes=limits.minutes;room.opts.maxPlayers=Math.min(MAX_PLAYERS,limits.maxPlayers);room.opts.turnSeconds=limits.turnSeconds;broadcast();
   };
   $('#matchTime').onchange=updateRoomLimits;$('#maxPlayers').onchange=updateRoomLimits;$('#turnTime').onchange=updateRoomLimits;
   $('#modeWrap').addEventListener('change',e=>{
-    if(e.target.name==='mode'&&isHost&&room&&room.phase==='lobby'){if(isModeLocked(e.target.value)){toast('Este modo será desbloqueado somente no nível 5');updateModeLockUI();return;}const cfg=teamConfig(e.target.value);if(cfg&&room.players.length>cfg.players){toast('Este modo exige no máximo '+cfg.players+' jogadores');return;}room.opts.mode=e.target.value;room.opts.maxPlayers=cfg?cfg.players:Math.max(4,room.opts.maxPlayers||4);room.players.forEach((p,i)=>p.team=teamForIndex(i,room.opts.mode));broadcast();}
+    if(e.target.name==='mode'&&isHost&&room&&room.phase==='lobby'){if(isModeLocked(e.target.value)){toast('Este modo será desbloqueado somente no nível 5');updateModeLockUI();return;}const cfg=teamConfig(e.target.value);if(cfg&&room.players.length>cfg.players){toast('Este modo exige no máximo '+cfg.players+' jogadores');return;}if(UNRANKED_MODES.includes(e.target.value)&&room.players.length>4){toast('Este modo aceita até 4 jogadores');return;}room.opts.mode=e.target.value;if(UNRANKED_MODES.includes(e.target.value))room.opts.ranked=false;room.opts.maxPlayers=cfg?cfg.players:UNRANKED_MODES.includes(e.target.value)?4:Math.max(4,room.opts.maxPlayers||4);room.players.forEach((p,i)=>p.team=teamForIndex(i,room.opts.mode));broadcast();}
   });
   $('#btnBot').onclick=()=>{
     if(!isHost||!room||!room.opts.training){toast('Bots só estão disponíveis no Modo Treinamento');return;}
@@ -2276,7 +2582,7 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#btnBackLobby').onclick=()=>{if(isHost&&room){room.phase='lobby';broadcast();}};
 
 
-  if(window.lucide)lucide.createIcons();
+  refreshIcons();
   initPreferences();
   pingTimer=setInterval(sendPings,3000);
   setInterval(()=>{if(view&&view.phase==='playing'){
@@ -2288,14 +2594,14 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
       if(urgent&&turnWarningKey!==key){turnWarningKey=key;sfx.turnWarning();if(navigator.vibrate)navigator.vibrate([90,70,90]);}
     }
   }},100);
-  const openProfileEdit=(focusName)=>{renderProfile();$('#profileEditModal').classList.add('on');if(window.lucide)lucide.createIcons();if(focusName)setTimeout(()=>$('#inName').focus(),50);};
+  const openProfileEdit=(focusName)=>{renderProfile();$('#profileEditModal').classList.add('on');refreshIcons();if(focusName)setTimeout(()=>$('#inName').focus(),50);};
   $('#inName').addEventListener('change',()=>{const n=cleanName($('#inName').value);$('#inName').value=n;saveName(n);renderProfile();});
   $('#settingsBack').onclick=()=>show('home');
   $('#profileBack').onclick=()=>show('home');
   $('#profileEditClose').onclick=()=>$('#profileEditModal').classList.remove('on');
   $('#profileEditDone').onclick=()=>$('#profileEditModal').classList.remove('on');
   $('#profileEditModal').addEventListener('click',e=>{if(e.target.id==='profileEditModal')e.target.classList.remove('on');});
-  $('#btnOpenPlay').onclick=()=>{$('#playModal').classList.add('on');if(window.lucide)lucide.createIcons();};
+  $('#btnOpenPlay').onclick=()=>{$('#playModal').classList.add('on');refreshIcons();};
   $('#playModalClose').onclick=()=>$('#playModal').classList.remove('on');
   $('#playModal').addEventListener('click',e=>{if(e.target.id==='playModal')e.target.classList.remove('on');});
   $('#homeShop').onclick=()=>{setShopView('shop');renderShop();show('shop');};
@@ -2372,7 +2678,7 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
     if(view.turn!==view.me){warn('Ainda não é a sua vez');return;}
     if(!view.legal.includes(id)){
       el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');
-      warn(view.drawnId?'Só dá para jogar a carta que você comprou':view.pending>0?'Compre as cartas ou devolva um +2/+4':c.v==='+4'?'Coringa +4 só sem carta da cor atual':'Essa carta não combina');
+      warn(view.drawnId?'Só dá para jogar a carta que você comprou':view.pending>0?'Compre as cartas ou devolva um +N / Espelho':c.v==='+4'?'Coringa +4 só sem carta da cor atual':'Essa carta não combina');
       return;
     }
     const from=rectOf(el);
@@ -2394,13 +2700,13 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#btnChroma').onclick=()=>send({type:'chroma'});
   $('#btnCatch').onclick=()=>send({type:'catch'});
   $('#btnPass').onclick=()=>send({type:'pass'});
-  $('#quickChatMenu').innerHTML=QUICK_MESSAGES.map((m,i)=>'<button type="button" data-quick-chat="'+i+'">'+esc(m)+'</button>').join('');
+  $('#quickChatMenu').innerHTML=QUICK_MESSAGES.map((m,i)=>'<button type="button" data-quick-chat="'+i+'"><span aria-hidden="true">'+QUICK_EMOTES[i]+'</span> '+esc(m)+'</button>').join('');
   $('#quickChatBtn').onclick=()=>{if(view&&view.phase==='playing')$('#quickChatMenu').classList.toggle('on');};
   $('#quickChatMenu').addEventListener('click',e=>{
     const b=e.target.closest('[data-quick-chat]');if(!b||!view||view.phase!=='playing')return;
     if(Date.now()<quickChatCooldownUntil){$('#quickChatMenu').classList.remove('on');return;}
     const message=QUICK_MESSAGES[Number(b.dataset.quickChat)];
-    if(message){send({type:'chat',message});quickChatCooldownUntil=Date.now()+1500;}
+    if(message){send({type:'chat',message,emote:QUICK_EMOTES[Number(b.dataset.quickChat)]});quickChatCooldownUntil=Date.now()+1500;}
     $('#quickChatMenu').classList.remove('on');
   });
   $('#colorOv').addEventListener('click',e=>{
@@ -2454,7 +2760,7 @@ function adminLockAll(){
   const clickId=id=>{const el=document.getElementById(id);if(el)el.click();};
   const isTyping=t=>!!t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
   const isVisible=el=>!!el&&el.offsetParent!==null;
-  const playing=()=>!!view&&view.phase==='playing'&&isOn('#game');
+  const playing=()=>!!view&&view.phase==='playing'&&!view.spectator&&isOn('#game');
   const menuOpen=()=>isOn('#matchMenuDropdown');
   const setShortcuts=on=>$('#shortcutsOv').classList.toggle('on',on);
 
@@ -2553,7 +2859,109 @@ function adminLockAll(){
   $('#menuOptShortcuts').onclick=()=>{$('#matchMenuDropdown').classList.remove('on');$('#btnMatchMenu').setAttribute('aria-expanded','false');setShortcuts(true);};
   $('#shortcutsClose').onclick=()=>setShortcuts(false);
   $('#shortcutsOv').addEventListener('click',e=>{if(e.target.id==='shortcutsOv')setShortcuts(false);});
-  if(window.lucide)lucide.createIcons();
+  refreshIcons();
+})();
+</script>
+<script>
+/* Instalação PWA e atualizações: sem recarga automática nem interrupção de partidas. */
+(function initPwa(){
+  const button=document.getElementById('installGame');
+  const status=document.getElementById('installStatus');
+  const notice=document.getElementById('updateNotice');
+  const updateButton=document.getElementById('updateGame');
+  let promptEvent=null,installedByEvent=false,updateRequested=false,registration=null;
+  const displayMode=window.matchMedia?.('(display-mode: standalone)');
+  const isInstalled=()=>installedByEvent||!!displayMode?.matches||navigator.standalone===true;
+  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  const isBusyPlaying=()=>!!document.querySelector('#game.screen.on, #lobby.screen.on, #busy.on');
+  const iosHelp='Toque em Compartilhar e depois em Adicionar à Tela de Início.';
+  const browserHelp='Se o navegador permitir, abra o menu e escolha Instalar aplicativo ou Adicionar à tela inicial.';
+
+  function updateInstallUI(){
+    if(isInstalled()){
+      button.textContent='Jogo já instalado';button.disabled=true;
+      status.textContent='Abra o CHROMA pelo ícone na tela inicial.';
+    }else{
+      button.disabled=false;
+      button.textContent=promptEvent?'Instalar': 'Como instalar';
+      status.textContent=promptEvent?'Pronto para instalar neste aparelho.':
+        isIOS?'No Safari, use Compartilhar para adicionar à Tela de Início.':
+        'Se não aparecer a instalação automática, veja o menu do navegador.';
+    }
+  }
+  updateInstallUI();
+
+  // O Chrome/Edge entrega um evento que pode ser usado apenas uma vez.
+  window.addEventListener('beforeinstallprompt',event=>{
+    event.preventDefault();promptEvent=event;updateInstallUI();
+  });
+  window.addEventListener('appinstalled',()=>{
+    installedByEvent=true;promptEvent=null;updateInstallUI();toast('CHROMA instalado!');
+  });
+  if(displayMode?.addEventListener)displayMode.addEventListener('change',updateInstallUI);
+  else if(displayMode?.addListener)displayMode.addListener(updateInstallUI);
+
+  button.addEventListener('click',async()=>{
+    if(isInstalled())return;
+    if(promptEvent){
+      const event=promptEvent;promptEvent=null;
+      try{
+        await event.prompt();
+        const result=await event.userChoice;
+        updateInstallUI();
+        if(result?.outcome==='dismissed')status.textContent='Instalação cancelada. Você pode tentar pelo menu do navegador.';
+      }catch(error){
+        console.warn('[CHROMA PWA] Não foi possível mostrar a instalação:',error);
+        updateInstallUI();status.textContent=browserHelp;toast(browserHelp,6500);
+      }
+      return;
+    }
+    const message=isIOS?iosHelp:browserHelp;
+    status.textContent=message;toast(message,6500);
+  });
+
+  // O evento offline é só um aviso: falhas reais também são tratadas pelo jogo/rede.
+  window.addEventListener('offline',()=>toast('Sem internet: o menu e o Treinamento/Tutorial funcionam; contas e partidas online precisam de conexão.',6000));
+
+  updateButton.addEventListener('click',()=>{
+    if(isBusyPlaying()){
+      toast('Saia da sala ou termine a partida antes de atualizar.',4500);return;
+    }
+    updateRequested=true;updateButton.disabled=true;
+    const waiting=registration?.waiting;
+    if(!waiting){location.reload();return;} // Recarga apenas após o clique da pessoa.
+    try{waiting.postMessage({type:'SKIP_WAITING'});}
+    catch(error){
+      console.warn('[CHROMA PWA] Não foi possível ativar a nova versão:',error);
+      updateRequested=false;updateButton.disabled=false;
+      toast('Não foi possível atualizar agora. Tente novamente.',4500);
+    }
+  });
+
+  // file:// e HTTP comum não podem registrar Service Worker.
+  const secure=location.protocol==='https:'||
+    (location.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(location.hostname));
+  if(!secure||!('serviceWorker' in navigator))return;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(!updateRequested)return; // Primeiro registro ou outra aba: nunca recarregar sozinho.
+    updateRequested=false;updateButton.disabled=false;
+    if(isBusyPlaying())toast('Versão pronta. Saia da partida e toque em Atualizar.',4500);
+    else location.reload();
+  });
+  const showWaiting=()=>{
+    if(registration?.waiting&&navigator.serviceWorker.controller)notice.hidden=false;
+  };
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>{
+      registration=reg;showWaiting();
+      reg.addEventListener('updatefound',()=>{
+        const worker=reg.installing;
+        if(worker)worker.addEventListener('statechange',()=>{
+          if(worker.state==='installed')showWaiting();
+        });
+      });
+    }).catch(error=>console.warn('[CHROMA PWA] Registro do Service Worker falhou:',error));
+  });
 })();
 </script>
 <script type="module" src="firebase-auth.js" onerror="window.chromaCloudLoadFailed=true"></script>

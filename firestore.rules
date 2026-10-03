@@ -3,13 +3,34 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    // O Passe já é salvo em missions.__battlePass; "friends" é só mais um contador.
+    // Perfis anteriores podem ter missions == null ou não ter o Passe ainda.
+    function validFriendMissions() {
+      let missions = request.resource.data.get('missions', null);
+      return missions == null || (missions is map && (!('__battlePass' in missions) || (
+        missions.__battlePass is map
+        && missions.__battlePass.daily is map && missions.__battlePass.weekly is map
+        && missions.__battlePass.daily.progress is map && missions.__battlePass.weekly.progress is map
+        && missions.__battlePass.daily.progress.size() <= 12
+        && missions.__battlePass.weekly.progress.size() <= 12
+        && missions.__battlePass.daily.progress.get('friends', 0) is int
+        && missions.__battlePass.daily.progress.get('friends', 0) >= 0
+        && missions.__battlePass.daily.progress.get('friends', 0) <= 1000
+        && missions.__battlePass.weekly.progress.get('friends', 0) is int
+        && missions.__battlePass.weekly.progress.get('friends', 0) >= 0
+        && missions.__battlePass.weekly.progress.get('friends', 0) <= 1000
+        && missions.__battlePass.daily.claimed is list && missions.__battlePass.daily.claimed.size() <= 12
+        && missions.__battlePass.weekly.claimed is list && missions.__battlePass.weekly.claimed.size() <= 12
+      )));
+    }
     function validAccount() {
       return request.resource.data.uid == request.auth.uid
         && request.resource.data.coins is int && request.resource.data.coins >= 0
         && request.resource.data.xp is int && request.resource.data.xp >= 0
         && request.resource.data.level is int && request.resource.data.level >= 1
         && request.resource.data.rank is string && request.resource.data.username is string
-        && request.resource.data.username.size() <= 18 && !('role' in request.resource.data);
+        && request.resource.data.username.size() <= 18 && !('role' in request.resource.data)
+        && validFriendMissions();
     }
     match /users/{userId} {
       allow read: if owner(userId);
