@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Primeiro a cópia local; o CDN da MESMA versão só entra se ela faltar. -->
 <script src="lucide.min.js"></script>
+<script src="10-notificacoes-push.js"></script>
 <script>window.lucide||document.write('<script src="https://cdn.jsdelivr.net/npm/lucide@1.48.0/dist/umd/lucide.min.js"><\/script>')</script>
 <link rel="stylesheet" href="style.css">
 <script>
@@ -75,33 +76,40 @@
 </script>
 </head>
 <body>
-<div class="coin-hud" id="coinHud"><span class="coin-ico"><i data-lucide="coins"></i></span><span id="coinAmt">0</span></div>
+<div class="coin-hud" id="coinHud" aria-label="Saldo de moedas"><span class="coin-ico"><img src="MOEDA-E-RECOMPENSAS.png" alt=""></span><span class="coin-copy"><b id="coinAmt">0</b><small>MOEDAS</small></span></div>
 
 <!-- ===== INÍCIO ===== -->
 <div id="home" class="screen on">
-  <h1 class="logo" id="logo"><img src="CHROMA-LOGO.png" alt="CHROMA"></h1>
-  <p class="tag">Cartas, cores e caos com os amigos</p>
-  <button class="home-profile-card" id="homeProfileCard" type="button" aria-label="Abrir perfil">
-    <span class="home-profile-avatar-wrap frame-wrap" id="homeProfileFrame"><span class="profile-photo" id="homeProfilePhoto">?</span></span>
-    <span class="home-profile-main"><span class="home-profile-name" id="homeProfileName">Jogador</span><span class="home-level-row"><span id="homeProfileLevel">Nível 1</span><span class="home-level-label">NÍVEL ATUAL</span></span><span class="home-level-track"><i id="homeProfileLevelFill"></i></span></span>
-    <i class="home-profile-arrow" data-lucide="chevron-right"></i>
-  </button>
-  <div class="home-actions">
-    <button class="btn primary home-play-btn" id="btnOpenPlay" type="button"><i data-lucide="play"></i> Jogar</button>
-    <div class="home-shortcuts" aria-label="Atalhos principais">
-      <button class="home-shortcut" id="homeShop" type="button"><i data-lucide="shopping-cart"></i><span>Loja</span></button>
-      <button class="home-shortcut" id="homeSettings" type="button"><i data-lucide="settings"></i><span>Configurações</span></button>
-      <button class="home-shortcut" id="homeSocial" type="button"><i data-lucide="users"></i><span>Social</span></button>
-      <button class="home-shortcut" id="homeRewards" type="button"><i data-lucide="coins"></i><span>Recompensas</span></button>
-      <button class="home-shortcut battle-pass-shortcut" id="homeBattlePass" type="button"><i data-lucide="swords"></i><span>Passe de Batalha</span></button>
-      <button class="home-shortcut" id="homeMail" type="button"><i data-lucide="mail"></i><span>Correio</span></button>
-      <button class="home-shortcut" id="homeAchievements" type="button"><i data-lucide="medal"></i><span>Conquistas</span></button>
-      <button class="home-shortcut" id="homeRanking" type="button"><i data-lucide="trophy"></i><span>Ranqueado</span></button>
-      <button class="home-shortcut" id="homeEvents" type="button"><i data-lucide="calendar-days"></i><span>Eventos</span></button>
+  <div class="home-topbar">
+    <button class="home-profile-card" id="homeProfileCard" type="button" aria-label="Abrir perfil">
+      <span class="home-profile-avatar-wrap frame-wrap" id="homeProfileFrame"><span class="profile-photo" id="homeProfilePhoto">?</span></span>
+      <span class="home-profile-main"><span class="home-profile-name" id="homeProfileName">Jogador</span><span class="home-level-row"><span id="homeProfileLevel">Nível 1</span><span class="home-level-label">NÍVEL ATUAL</span></span><span class="home-level-track"><i id="homeProfileLevelFill"></i></span></span>
+      <i class="home-profile-arrow" data-lucide="chevron-right"></i>
+    </button>
+    <div class="home-resource-placeholder" aria-label="Recursos disponíveis">
+      <span class="home-resource-chip"><b>XP</b><small>PROGRESSO</small></span>
+      <span class="home-resource-chip home-resource-future"><b>—</b><small>ENERGIA</small></span>
     </div>
   </div>
-  <details class="rules">
-    <summary>Como jogar</summary>
+
+  <div class="home-main-layout">
+
+    <section class="home-center" aria-label="Centro do CHROMA">
+      <div class="home-season-card" id="homeSeasonCard" role="button" tabindex="0" aria-label="Abrir Passe de Batalha">
+        <div class="home-season-heading"><span><small>TEMPORADA ATUAL</small><b>Era Dourada</b></span><strong id="homeSeasonTimer">ATIVO</strong></div>
+        <div class="home-season-progress"><i id="homeSeasonFill"></i></div>
+        <div class="home-season-meta"><span id="homeSeasonProgressText">Passe de Batalha · nível 1</span><span>Temporada 1</span></div>
+      </div>
+      <div class="home-empty-stage" aria-label="Área reservada para futura ilustração"><span class="home-stage-kicker">CHROMA</span><h1 class="logo" id="logo"><img src="CHROMA-LOGO.png" alt="CHROMA"></h1><p class="tag">Cartas, cores e caos com os amigos</p><span class="home-stage-placeholder">Área central reservada para uma futura arte</span></div>
+      <div class="home-stage-title"><b>Prepare sua próxima partida</b><small>Entre em uma sala, treine contra bots ou desafie seus amigos.</small></div>
+    </section>
+
+  </div>
+
+  <div class="home-bottom-actions">
+    <button class="btn primary home-play-btn" id="btnOpenPlay" type="button"><i data-lucide="play"></i><span>Jogar</span><small>INICIAR PARTIDA</small></button>
+  </div>
+  <details class="rules"><summary>Como jogar</summary>
     <p><b>Objetivo:</b> ser o primeiro a ficar sem cartas.</p>
     <p><b>Tempo de turno:</b> cada jogador tem o tempo definido pelo host (6 segundos por padrão) para jogar. Se o tempo acabar, recebe uma carta de penalidade e a vez passa automaticamente.</p>
     <p>Jogue uma carta da <b>mesma cor</b> ou do <b>mesmo número/símbolo</b> da carta do topo. Sem carta boa? Compre uma; se ela servir, pode jogar na hora.</p>
@@ -118,9 +126,13 @@
     <button class="btn good" id="btnTutorial" type="button">Fazer tutorial rápido</button>
   </details>
 </div>
-
-
-
+<nav id="mainDock" class="dock on" aria-label="Navegação principal">
+  <button class="dock-btn" id="dockShop" data-cat="shop" type="button"><img class="dock-img" src="LOJA.png" alt=""><span>Loja</span></button>
+  <button class="dock-btn" id="dockFriends" data-cat="friends" type="button"><span class="dock-ico dock-ico-wrap"><img class="dock-img" src="SOCIAL.png" alt=""><i class="dock-badge" id="mailBadge"></i></span><span>Social</span></button>
+  <button class="dock-btn active" id="dockHome" data-cat="home" type="button"><img class="dock-img" src="PASSE-DE-BATALHA.png" alt=""><span>Jogar</span></button>
+  <button class="dock-btn" id="dockProgress" data-cat="progress" type="button"><span class="dock-ico dock-ico-wrap"><img class="dock-img" src="MOEDA-E-RECOMPENSAS.png" alt=""><i class="dock-badge" id="progressBadge"></i></span><span>Progresso</span></button>
+  <button class="dock-btn" id="dockSettings" data-cat="settings" type="button"><img class="dock-img" src="CONFIGURACOES.png" alt=""><span>Ajustes</span></button>
+</nav>
 <!-- ===== RANQUEADO ===== -->
 <div id="ranking" class="screen">
   <div class="rank-top"><button class="btn ghost" id="btnRankBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="trophy"></i> RANQUEADO</h1><span></span></div>
@@ -357,21 +369,65 @@
 </div>
 
 <div id="shop" class="screen">
-  <div class="rank-top"><button class="btn ghost" id="shopBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="shopping-cart"></i> LOJA</h1><span></span></div>
-  <div class="rank-panel">
-    <div class="shop-head"><p>Use moedas apenas em itens cosméticos e baús.</p><span class="shop-coins"> <b id="shopCoins">0</b></span></div>
-    <div class="shop-view-tabs" role="tablist" aria-label="Seção da loja">
-      <button class="active" data-shop-view="shop" type="button" role="tab" aria-selected="true">LOJA</button>
-      <button data-shop-view="inventory" type="button" role="tab" aria-selected="false">INVENTÁRIO</button>
-    </div>
-    <div class="shop-tabs" id="shopFilters"><button class="active" data-shop-filter="all">Tudo</button><button data-shop-filter="profile">Perfil</button><button data-shop-filter="name-effect">Nomes</button><button data-shop-filter="cards">Cartas</button><button data-shop-filter="chests">Baús</button></div>
-    <div class="shop-grid" id="shopGrid"></div><div class="shop-note">Cosméticos de carta só alteram cartas compradas na loja e não mudam as cartas comuns do baralho.</div>
-    <section class="shop-inventory-view" id="shopInventoryView" hidden aria-label="Meu inventário">
-      <div class="inventory-head"><div><small>ITENS RECEBIDOS</small><h2>Minha coleção</h2></div><span id="shopInventoryCount">0 itens</span></div>
-      <div class="inventory-section"><h3><i data-lucide="sparkles"></i> Cosméticos</h3><div class="inventory-grid" id="shopInventoryCosmetics"></div></div>
-      <div class="inventory-section"><h3><i data-lucide="flask-conical"></i> Consumíveis</h3><div class="inventory-grid" id="shopInventoryConsumables"></div></div>
+  <main class="shop-page">
+    <header class="shop-header">
+      <div class="shop-header-left">
+        <button id="shopBack" class="shop-back" type="button" aria-label="Voltar ao menu"><i data-lucide="arrow-left"></i><span>Menu</span></button>
+      </div>
+      <div class="shop-title"><small>CHROMA</small><h1>LOJA</h1></div>
+      <div class="shop-wallet" aria-label="Saldo de moedas">
+        <div class="shop-wallet-icon"><i data-lucide="coins"></i></div>
+        <div class="shop-wallet-data"><strong id="shopCoins">0</strong><span>MOEDAS</span></div>
+      </div>
+    </header>
+
+    <section class="shop-carousel" aria-label="Ofertas e novidades da loja">
+      <div class="shop-carousel-track">
+        <article class="shop-slide shop-slide-collection">
+          <img src="CONQUISTA-COSMETICOS.png" alt="Cosméticos do CHROMA">
+          <div class="shop-slide-content"><small>CATÁLOGO CHROMA</small><h2>Personalize<br>seu estilo.</h2><p>Molduras, cartas e efeitos para deixar seu perfil único.</p></div>
+        </article>
+        <article class="shop-slide shop-slide-ultra">
+          <img src="FRAME-MITICO-OUROBOROS.png" alt="Destaque de raridade ULTRA">
+          <div class="shop-slide-content"><small>RARIDADE ULTRA</small><h2>O impossível<br>chegou.</h2><p>Itens prismáticos de edição especial para quem quer se destacar.</p></div>
+        </article>
+        <article class="shop-slide shop-slide-chests">
+          <img src="BAU-REAL.png" alt="Baú real de recompensas">
+          <div class="shop-slide-content"><small>EDIÇÃO ESPECIAL</small><h2>Abra seu<br>próximo destaque.</h2><p>Descubra cosméticos e recompensas em baús selecionados.</p></div>
+        </article>
+      </div>
+      <div class="shop-carousel-dots" aria-hidden="true"><span></span><span></span><span></span></div>
     </section>
-  </div>
+
+    <div class="shop-navigation">
+      <div class="shop-view-tabs" role="tablist" aria-label="Área da loja">
+        <button class="active" data-shop-view="shop" type="button" role="tab" aria-selected="true"><i data-lucide="store"></i> Loja</button>
+        <button data-shop-view="inventory" type="button" role="tab" aria-selected="false"><i data-lucide="backpack"></i> Meu inventário</button>
+      </div>
+    </div>
+
+    <nav class="shop-filters" id="shopFilters" aria-label="Categorias da loja">
+      <button class="shop-filter active" data-shop-filter="all" type="button">Tudo</button>
+      <button class="shop-filter" data-shop-filter="profile" type="button">Molduras</button>
+      <button class="shop-filter" data-shop-filter="profile-theme" type="button">Banners</button>
+      <button class="shop-filter" data-shop-filter="name-effect" type="button">Nomes</button>
+      <button class="shop-filter" data-shop-filter="cards" type="button">Cartas</button>
+      <button class="shop-filter" data-shop-filter="chests" type="button">Baús</button>
+    </nav>
+
+    <section class="shop-catalog" aria-labelledby="shopProductsTitle">
+      <div class="shop-section-heading"><div><small>CATÁLOGO</small><h2 id="shopProductsTitle">Itens disponíveis</h2></div><span>Cosméticos</span></div>
+      <div class="shop-grid" id="shopGrid"></div>
+    </section>
+
+    <section class="shop-inventory-view" id="shopInventoryView" hidden aria-label="Meu inventário">
+      <div class="inventory-head"><div><small>COLEÇÃO</small><h2>Minha coleção</h2></div><span id="shopInventoryCount">0 itens</span></div>
+      <section class="inventory-section"><h3><i data-lucide="sparkles"></i> Cosméticos</h3><div class="inventory-grid" id="shopInventoryCosmetics"></div></section>
+      <section class="inventory-section"><h3><i data-lucide="flask-conical"></i> Consumíveis</h3><div class="inventory-grid" id="shopInventoryConsumables"></div></section>
+    </section>
+
+    <p class="shop-note">Cosméticos alteram apenas a aparência dos itens. Eles não oferecem vantagem competitiva durante as partidas.</p>
+  </main>
 </div>
 <div id="rewards" class="screen">
   <div class="rank-top"><button class="btn ghost" id="rewardsBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="coins"></i> RECOMPENSAS</h1><span></span></div>
@@ -419,6 +475,7 @@
       <div class="settings-row"><span><b>Tema</b><small>Escolha a aparência do jogo</small><div class="theme-choice"><button id="themeLight">Modo Claro</button><button id="themeDark">Modo Escuro (Padrão)</button><button id="themeOLED">Modo OLED</button></div></span></div>
       <div class="settings-row device-row"><span><b>Modo de tela</b><small>Ajusta o tamanho das cartas e a organização dos botões para o seu aparelho.</small><div class="device-choice" role="group" aria-label="Modo de tela"><button type="button" id="deviceMobile" data-device-mode="mobile" aria-pressed="false"><i data-lucide="smartphone"></i><span>Celular</span></button><button type="button" id="deviceTablet" data-device-mode="tablet" aria-pressed="false"><i data-lucide="tablet"></i><span>Tablet</span></button><button type="button" id="deviceDesktop" data-device-mode="desktop" aria-pressed="false"><i data-lucide="computer"></i><span>Computador</span></button></div></span></div>
       <div class="settings-row install-settings-row"><span><b>Instalar o jogo</b><small>Instale para abrir o CHROMA direto da tela inicial, em tela cheia, e carregar mais rápido.</small><small id="installStatus" role="status" aria-live="polite"></small></span><button class="btn ghost" id="installGame" type="button">Como instalar</button></div>
+      <div class="settings-row push-settings-row"><span><b>Notificações PUSH</b><small id="pushStatus" role="status" aria-live="polite">Receba avisos importantes quando estiver fora do jogo.</small></span><button class="btn ghost" id="pushEnable" type="button">Ativar notificações</button></div>
       <div class="settings-row audio-settings"><span><b>Volume</b><small>Ajuste separadamente a música e os efeitos sonoros</small></span><div class="volume-controls"><label for="musicVolume">Música <output id="musicVolumeValue">35%</output></label><input id="musicVolume" type="range" min="0" max="100" value="35"><label for="sfxVolume">Efeitos <output id="sfxVolumeValue">90%</output></label><input id="sfxVolume" type="range" min="0" max="100" value="90"></div></div>
       <div class="settings-row"><span><b>Resgatar Códigos</b><small>Use um código promocional para receber moedas ou XP.</small></span></div>
       <div class="redeem-row"><input id="redeemCode" class="txt" maxlength="16" placeholder="Digite o código" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn primary" id="btnRedeem" type="button">Resgatar</button></div>
@@ -438,7 +495,7 @@
 </div>
 <div id="friends" class="screen social-screen">
   <div class="rank-top"><button class="btn ghost" id="friendsBack"><i data-lucide="arrow-left"></i> Menu</button><h1><i data-lucide="users"></i> SOCIAL</h1><span></span></div>
-  <div class="social-tabs" role="tablist"><button class="active" id="socialTabFriends" type="button"><i data-lucide="users"></i> Amigos</button><button id="socialTabClan" type="button"><i data-lucide="shield"></i> Clã</button></div>
+  <div class="social-tabs" role="tablist"><button class="active" id="socialTabFriends" type="button"><i data-lucide="users"></i> Amigos</button><button id="socialTabClan" type="button"><i data-lucide="shield"></i> Clã</button><button id="socialTabMail" type="button"><i data-lucide="mail"></i> Correio<i class="dock-badge" id="tabMailBadge"></i></button></div>
   <div id="socialFriendsView" class="social-view">
     <div class="rank-panel friends-panel">
       <div class="social-heading"><div><small>CONEXÕES CHROMA</small><h2>Amigos</h2><p>Encontre jogadores pelo nome público. Seus dados privados nunca são exibidos.</p></div><button class="btn ghost" id="socialMyProfile" type="button"><i data-lucide="user-round"></i> Meu perfil</button></div>
@@ -1036,7 +1093,19 @@ function writeCoins(n){if(!window.chromaCloud?.canWrite())return false;try{local
 function readStreak(){try{return JSON.parse(localStorage.getItem('chroma-daily-streak')||'{"day":0,"lastClaim":null}');}catch(e){return {day:0,lastClaim:null};}}
 function writeStreak(s){if(!window.chromaCloud?.canWrite())return false;try{localStorage.setItem('chroma-daily-streak',JSON.stringify(s));}catch(e){return false;}window.dispatchEvent(new Event('chroma-state-changed'));return true;}
 function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
-function updateCoinHud(bump){const el=$('#coinAmt');if(el)el.textContent=readCoins();if(bump){const hud=$('#coinHud');if(hud){hud.classList.remove('bump');void hud.offsetWidth;hud.classList.add('bump');}}}
+function updateCoinHud(bump){const el=$('#coinAmt');if(el)el.textContent=readCoins().toLocaleString('pt-BR');if(bump){const hud=$('#coinHud');if(hud){hud.classList.remove('bump');void hud.offsetWidth;hud.classList.add('bump');}}}
+function setDockBadge(id,count){const b=document.getElementById(id);if(!b)return;const n=Math.max(0,Number(count)||0);b.textContent=n>9?'9+':(n||'');b.classList.toggle('show',n>0);}
+function setHomeShortcutBadge(id,count){const badge=document.querySelector('#'+id+' .home-shortcut-badge, #'+id+' .home-side-badge');if(!badge)return;const n=Math.max(0,Number(count)||0);badge.textContent=n>9?'9+':(n||'');badge.classList.toggle('show',n>0);}
+function updateHomeShortcutBadges(){
+  let rewards=canClaimDaily()?1:0;
+  try{const st=readMissions();rewards+=DAILY_MISSIONS.filter(m=>!st.claimed.includes(m.id)&&Number(st.progress[m.stat]||0)>=m.goal).length;}catch(_){ }
+  let passReady=0;
+  try{const st=readBattlePass(),level=battlePassLevel(st.xp),seasonFill=document.querySelector('#homeSeasonFill'),seasonText=document.querySelector('#homeSeasonProgressText');if(seasonFill)seasonFill.style.width=Math.min(100,Math.max(8,(Number(st.xp)||0)%100))+'%';if(seasonText)seasonText.textContent='Passe de Batalha · nível '+level;let levels=BATTLE_PASS_REWARDS.filter(r=>r.level<=level&&!st.claimed.includes(r.level)).length;let missionReady=0;[...BATTLE_PASS_DAILY,...BATTLE_PASS_WEEKLY].forEach(m=>{const bucket=BATTLE_PASS_DAILY.includes(m)?st.daily:st.weekly;if(!bucket.claimed.includes(m.id)&&Number(bucket.progress[m.stat]||0)>=m.goal)missionReady++;});passReady=levels+missionReady;}catch(_){passReady=0;}
+  setDockBadge('progressBadge',rewards+passReady);
+  updateMailBadge();
+  updateEventsBadge();
+}
+async function updateEventsBadge(){if(!document.querySelector('#homeEvents .home-shortcut-badge'))return;if(!window.chromaCloud?.isAuthenticated?.()){setHomeShortcutBadge('homeEvents',0);return;}try{const events=await window.chromaCloud.listActiveEvents();setHomeShortcutBadge('homeEvents',events.length);}catch(_){setHomeShortcutBadge('homeEvents',0);}}
 
 
 // ---- loja: cosméticos locais e baús de roleta ----
@@ -1054,6 +1123,9 @@ const SHOP_ITEMS=[
  {id:'frame-mitico',rarity:'Mítico',type:'profile',name:'Moldura Presa Ígnea',desc:'Um anel de garras flamejantes com um rastro de luz que percorre a moldura.',image:'FRAME-MITICO-GARRAS.png',price:340,css:'profile-frame-mitico'},
  {id:'frame-mitico-ouroboros',rarity:'Mítico',type:'profile',name:'Moldura Ouroboros Flamejante',desc:'Um dragão ancestral devora a própria cauda em um anel de lava, com um rastro de luz percorrendo o metal.',image:'FRAME-MITICO-OUROBOROS.png',price:340,css:'profile-frame-mitico-ouroboros'},
  {id:'frame-mitico-chamas',rarity:'Mítico',type:'profile',name:'Moldura Círculo de Chamas',desc:'Um anel de fogo vivo envolve seu avatar, com o mesmo rastro de luz da Presa Ígnea percorrendo as chamas.',image:'FRAME-MITICO-CHAMAS.png',price:340,css:'profile-frame-mitico-chamas'},
+ {id:'frame-ultra-prisma',rarity:'ULTRA',type:'profile',name:'Moldura Prisma Absoluto',desc:'Um halo prismático de edição ultra que pulsa em todas as cores do CHROMA.',image:'Link da imagem aqui',price:620,css:'profile-frame-ultra-prisma'},
+ {id:'card-ultra-singularidade',rarity:'ULTRA',type:'cards',name:'Cartas Singularidade',desc:'Uma skin ultra com brilho profundo e reflexos de matéria cósmica.',image:'Link da imagem aqui',price:680,css:'card-skin-ultra-singularidade'},
+ {id:'name-ultra-aurora',rarity:'ULTRA',type:'name-effect',name:'Nome Aurora Prime',desc:'Efeito ultra iridescente para transformar seu nome em um ponto de luz.',image:'Link da imagem aqui',price:590,css:'name-effect-ultra-aurora'},
  {id:'theme-aurora',rarity:'Raro',type:'profile-theme',name:'Banner Aurora',desc:'Um banner colorido com brilho de aurora para o seu perfil.',image:'Link da imagem aqui',price:220,css:'profile-theme-aurora'},
  {id:'theme-nebula',rarity:'Épico',type:'profile-theme',name:'Banner Nebulosa',desc:'Um céu profundo com estrelas e energia cósmica.',image:'Link da imagem aqui',price:260,css:'profile-theme-nebula'},
  {id:'theme-flame',rarity:'Mítico',type:'profile-theme',name:'Banner Ígneo',desc:'Fogo suave e luminoso inspirado na Presa Ígnea.',image:'Link da imagem aqui',price:320,css:'profile-theme-flame'},
@@ -1108,7 +1180,7 @@ function shopPreviewMarkup(x){
   }
   return '<span class="preview-fallback">'+esc(x.name)+'</span>';
 }
- function renderShop(filter='all'){const grid=$('#shopGrid');if(!grid)return;const st=readShop(),level=levelFromXP(readXP());$('#shopCoins').textContent=readCoins();const items=SHOP_ITEMS.filter(x=>x.type!=='profile-badge'&&(filter==='all'||(filter==='profile'?['profile','profile-theme'].includes(x.type):x.type===filter)));grid.innerHTML=items.map(x=>{const own=st.owned.includes(x.id),locked=x.levelOnly&&level<x.levelOnly&&!own;const rarSlug=x.rarity?x.rarity.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace('é','e'):'';const glowCls=['mitico','lendario','epico'].includes(rarSlug)?' rc-'+rarSlug:'';return '<article class="shop-item '+(own?'owned ':'')+(locked?'item-locked':'')+glowCls+'"><div class="item-art '+(x.css||'')+'">'+shopPreviewMarkup(x)+'</div>'+(own?'<span class="item-owned">DESBLOQUEADO</span>':'')+(x.rarity?'<span class="rarity-tag rarity-'+rarSlug+'">'+x.rarity+'</span>':'')+'<b>'+x.name+'</b><small>'+x.desc+'</small><span class="item-price">'+(locked?'Nível '+x.levelOnly:own?'':x.price)+'</span>'+(own?'<span class="shop-inventory-hint">Equipe pelo Inventário</span>':'<button data-shop-buy="'+x.id+'" '+(locked?'disabled':'')+'>'+(locked?'Bloqueado':'Comprar')+'</button>')+'</article>';}).join('');}
+ function renderShop(filter='all'){const grid=$('#shopGrid');if(!grid)return;const st=readShop(),level=levelFromXP(readXP());$('#shopCoins').textContent=readCoins();const items=SHOP_ITEMS.filter(x=>x.type!=='profile-badge'&&(filter==='all'||(filter==='profile'?['profile','profile-theme'].includes(x.type):x.type===filter)));grid.innerHTML=items.map(x=>{const own=st.owned.includes(x.id),locked=x.levelOnly&&level<x.levelOnly&&!own;const rarSlug=x.rarity?x.rarity.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace('é','e'):'';const glowCls=['ultra','mitico','lendario','epico'].includes(rarSlug)?' rc-'+rarSlug:'';return '<article class="shop-item '+(own?'owned ':'')+(locked?'item-locked':'')+glowCls+'"><div class="item-art '+(x.css||'')+'">'+shopPreviewMarkup(x)+'</div>'+(own?'<span class="item-owned">DESBLOQUEADO</span>':'')+(x.rarity?'<span class="rarity-tag rarity-'+rarSlug+'">'+x.rarity+'</span>':'')+'<b>'+x.name+'</b><small>'+x.desc+'</small><span class="item-price">'+(locked?'Nível '+x.levelOnly:own?'':x.price)+'</span>'+(own?'<span class="shop-inventory-hint">Equipe pelo Inventário</span>':'<button data-shop-buy="'+x.id+'" '+(locked?'disabled':'')+'>'+(locked?'Bloqueado':'Comprar')+'</button>')+'</article>';}).join('');}
 function openRoulette(item){const ov=$('#rouletteOv'),track=$('#rouletteTrack'),result=$('#rouletteResult');const prizes=CHEST_PRIZES[item.chest];const weighted=[];prizes.forEach(x=>{for(let i=0;i<x.weight;i++)weighted.push(x)});const win=weighted[Math.floor(Math.random()*weighted.length)];const sequence=[];for(let i=0;i<26;i++)sequence.push(prizes[Math.floor(Math.random()*prizes.length)]);sequence[21]=win;track.innerHTML=sequence.map(x=>'<div class="roulette-prize"><strong><img src="'+x.image+'" alt="Imagem da recompensa" onerror="this.remove()"></strong><span>'+x.name+'</span></div>').join('');track.style.transition='none';track.style.transform='translateX(0)';result.textContent='';ov.classList.add('on');void track.offsetWidth;const target=-(21*91-((ov.querySelector('.roulette-window').clientWidth/2)-41));track.style.transition='transform 3.3s cubic-bezier(.08,.72,.14,1)';track.style.transform='translateX('+target+'px)';setTimeout(()=>{const msg=grantPrize(win);result.textContent='Você ganhou: '+msg;renderShop();},3500);}
 function applyCosmetics(){const st=readShop(),frame=findShopItem(st.equipped.profile),photo=$('#profilePreview'),wrap=$('#profilePreviewWrap');const wrapCls=frame&&IMAGE_FRAME_WRAPS[frame.css];if(photo)photo.className='profile-photo '+(wrapCls?'':(frame?frame.css:''));if(wrap)wrap.className='frame-wrap'+(wrapCls?' '+wrapCls:'');}
 // molduras baseadas em imagem (não CSS puro) precisam do <span class="frame-wrap"> extra ao redor do
@@ -1379,7 +1451,7 @@ function flyCoins(fromEl,toEl){
 }
 /* ===== REGRAS, REDE P2P E BOTS — motor de jogadas (doAct), PeerJS (criar/entrar/enviar sala), bots, ping, torneio/times ===== */
 function hasUnreadMail(){const read=readMailIds();return MAIL_MESSAGES.some(m=>!read.includes(m.id));}
-async function updateMailBadge(){const badge=$('#mailBadge');if(!badge)return;let unread=hasUnreadMail();if(window.chromaSocial?.isReady()){try{const gifts=await window.chromaSocial.gifts();unread=unread||gifts.some(g=>g.status==='pending');}catch(_){}}badge.classList.toggle('show',unread);}
+async function updateMailBadge(){const badges=[document.querySelector('#mailBadge'),document.querySelector('#tabMailBadge')].filter(Boolean);if(!badges.length)return;let count=MAIL_MESSAGES.filter(m=>!readMailIds().includes(m.id)).length;if(window.chromaSocial?.isReady()){try{const gifts=await window.chromaSocial.gifts();count+=gifts.filter(g=>g.status==='pending').length;}catch(_){}}badges.forEach(b=>{b.textContent=count>9?'9+':(count||'');b.classList.toggle('show',count>0);});}
 async function renderMail(){
   const read=readMailIds(); let gifts=[];
   if(window.chromaSocial?.isReady()){try{gifts=await window.chromaSocial.gifts();}catch(e){console.warn('[CHROMA] presentes no correio',e);}}
@@ -2150,6 +2222,29 @@ function avatarMarkup(p,cls='avatar'){
 function safeFrameClass(frame){return SHOP_ITEMS.some(x=>x.type==='profile'&&x.css===frame)?frame:'';}
 function safeNameEffect(effect){return SHOP_ITEMS.some(x=>x.type==='name-effect'&&x.css===effect)?effect:'';}
 
+// Cada tela pertence a um botão do dock (agrupa categorias para a interface ficar enxuta).
+const DOCK_CAT={shop:'shop',inventory:'shop',friends:'friends',mail:'friends',home:'home',profile:'home',rewards:'progress',battlePass:'progress',achievements:'progress',events:'progress',ranking:'progress',settings:'settings'};
+const SCREEN_OPEN={
+  home:()=>show('home'),
+  shop:()=>{setShopView('shop');renderShop();show('shop');},
+  friends:()=>{show('friends');$('#socialTabFriends').click();},
+  clan:()=>{show('friends');$('#socialTabClan').click();},
+  mail:()=>{renderMail();show('mail');},
+  settings:()=>show('settings'),
+  rewards:()=>{renderRewards();show('rewards');},
+  battlePass:()=>{renderBattlePass();show('battlePass');},
+  achievements:()=>{renderAchievements();show('achievements');},
+  events:()=>{show('events');renderEvents();},
+  ranking:()=>openRanking()
+};
+window.chromaOpenScreen=id=>(SCREEN_OPEN[id]||(()=>show(id)))();
+function buildScreenTabs(){
+  const mk=(items,active)=>{const nav=document.createElement('nav');nav.className='screen-tabs';nav.innerHTML=items.map(([k,l])=>'<button type="button" data-open="'+k+'"'+(k===active?' class="active"':'')+'>'+l+'</button>').join('');nav.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)window.chromaOpenScreen(b.dataset.open);});return nav;};
+  const progress=[['rewards','Recompensas'],['battlePass','Passe'],['achievements','Conquistas'],['events','Eventos'],['ranking','Ranking']];
+  progress.forEach(([id])=>{const top=document.querySelector('#'+id+'>.rank-top');if(top)top.after(mk(progress,id));});
+  const mailTop=document.querySelector('#mail>.rank-top');
+  if(mailTop)mailTop.after(mk([['friends','Amigos'],['clan','Clã'],['mail','Correio']],'mail'));
+}
 function show(id){
   const playModal=$('#playModal');if(playModal)playModal.classList.remove('on');
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
@@ -2157,6 +2252,9 @@ function show(id){
   if(id!=='game'){stopMusic();document.body.classList.remove('chaos-bg','super-chaos-bg');}
   if(id!=='game'){$('#eyeTargetOv').classList.remove('on');$('#eyeViewOv').classList.remove('on');}
   if(id!=='game'){$('#endOv').classList.remove('on');$('#colorOv').classList.remove('on');}
+  const dockScreens=Object.keys(DOCK_CAT);
+  const mainDock=$('#mainDock');if(mainDock)mainDock.classList.toggle('on',dockScreens.includes(id));
+  document.querySelectorAll('.dock-btn[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===DOCK_CAT[id]));
 }
 function render(v){
   const prev=view;if(!v.opts.tutorial&&!v.spectator&&prev&&prev.phase==='playing'&&v.phase==='playing'&&prev.top&&v.top&&prev.top.id!==v.top.id&&prev.turn===v.me){try{const n=Number(localStorage.getItem('chroma-cards-played')||0)+1;localStorage.setItem('chroma-cards-played',String(n));}catch(e){}}view=v;
@@ -2452,8 +2550,8 @@ function renderInventoryInto(cos,cons,countEl){
 function renderInventory(){renderInventoryInto($('#inventoryCosmetics'),$('#inventoryConsumables'),$('#inventoryCount'));}
 function renderShopInventory(){renderInventoryInto($('#shopInventoryCosmetics'),$('#shopInventoryConsumables'),$('#shopInventoryCount'));}
 function setShopView(view){
-  const shop=view!=='inventory',grid=$('#shopGrid'),filters=$('#shopFilters'),note=$('.shop-note'),inv=$('#shopInventoryView');
-  if(grid)grid.hidden=!shop;if(filters)filters.hidden=!shop;if(note)note.hidden=!shop;if(inv)inv.hidden=shop;
+  const shop=view!=='inventory',grid=$('#shopGrid'),filters=$('#shopFilters'),note=$('.shop-note'),inv=$('#shopInventoryView'),catalog=$('.shop-catalog');
+  if(grid)grid.hidden=!shop;if(filters)filters.hidden=!shop;if(note)note.hidden=!shop;if(catalog)catalog.hidden=!shop;if(inv)inv.hidden=shop;
   document.querySelectorAll('[data-shop-view]').forEach(b=>{const active=b.dataset.shopView===view;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false');});
   if(!shop)renderShopInventory();
 }
@@ -2604,21 +2702,23 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#btnOpenPlay').onclick=()=>{$('#playModal').classList.add('on');refreshIcons();};
   $('#playModalClose').onclick=()=>$('#playModal').classList.remove('on');
   $('#playModal').addEventListener('click',e=>{if(e.target.id==='playModal')e.target.classList.remove('on');});
-  $('#homeShop').onclick=()=>{setShopView('shop');renderShop();show('shop');};
-  $('#homeSettings').onclick=()=>show('settings');
-  $('#homeSocial').onclick=()=>{show('friends');renderSocial();};
-  $('#homeRewards').onclick=()=>{renderRewards();show('rewards');};
-  $('#homeBattlePass').onclick=()=>{renderBattlePass();show('battlePass');};
-  $('#homeMail').onclick=()=>{renderMail();show('mail');};
+  // ---- dock inferior (5 botões) e abas dos grupos ----
+  $('#dockShop').onclick=()=>window.chromaOpenScreen('shop');
+  $('#dockFriends').onclick=()=>window.chromaOpenScreen('friends');
+  $('#dockHome').onclick=()=>window.chromaOpenScreen('home');
+  $('#dockProgress').onclick=()=>window.chromaOpenScreen('rewards');
+  $('#dockSettings').onclick=()=>window.chromaOpenScreen('settings');
+  const openSeason=()=>window.chromaOpenScreen('battlePass');
+  $('#homeSeasonCard').onclick=openSeason;
+  $('#homeSeasonCard').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSeason();}});
+  $('#socialTabMail').onclick=()=>window.chromaOpenScreen('mail');
+  buildScreenTabs();
   $('#mailList').addEventListener('click',async e=>{const b=e.target.closest('[data-redeem-gift]');if(!b)return;b.disabled=true;try{const r=await window.chromaSocial.redeemGift(b.dataset.redeemGift);toast('Item resgatado: '+(findShopItem(r.itemId)?.name||'presente'));await renderMail();renderInventory();renderShopInventory();}catch(err){toast(cloudErr(err,'resgatar o presente'));b.disabled=false;}});
-  $('#homeAchievements').onclick=()=>{renderAchievements();show('achievements');};
-  $('#homeRanking').onclick=()=>openRanking();
-  $('#homeEvents').onclick=()=>{show('events');renderEvents();};
   $('#btnEventsBack').onclick=()=>show('home');
   $('#btnEventsRefresh').onclick=()=>renderEvents();
   $('#eventsList').addEventListener('click',async e=>{const b=e.target.closest('[data-event-action]');if(!b)return;if(!window.chromaCloud?.isAuthenticated?.()){toast('Entre na conta para participar.');return;}const id=b.dataset.eventAction;try{if(b.textContent.includes('Participando'))await window.chromaCloud.leaveEvent(id);else await window.chromaCloud.joinEvent(id);await renderEvents();}catch(err){toast(window.chromaCloud.describeError(err,'alterar sua participação'));}});
   $('#homeProfileCard').onclick=()=>openProfileEdit(false);
-  window.addEventListener('chroma-state-changed',()=>{renderHomeProfileCard();if(!$('#shopInventoryView')?.hidden)renderShopInventory();if($('#battlePass')?.classList.contains('on'))renderBattlePass();});
+  window.addEventListener('chroma-state-changed',()=>{renderHomeProfileCard();updateHomeShortcutBadges();if(!$('#shopInventoryView')?.hidden)renderShopInventory();if($('#battlePass')?.classList.contains('on'))renderBattlePass();});
   $('#saveUsername').onclick=saveUsername;
   $('#btnRedeem').onclick=redeemCode;
   $('#redeemCode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16);});
@@ -2663,6 +2763,7 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   ensureLevelRewards();
   updateModeLockUI();
   updateMailBadge();
+  updateHomeShortcutBadges();
   updateCoinHud(false);
   renderProfileXP();
   renderHomeProfileCard();

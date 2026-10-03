@@ -230,7 +230,14 @@ async function equipShopItem(itemId,type,equipped){assertWritable();const s=snap
 async function debitCoins(amount){assertWritable();const s=snapshot();const ref=doc(db,'users',s.uid);let next;await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(!snap.exists())throw new ChromaError('Perfil não encontrado.');const d=snap.data(),coins=Number(d.coins||0);if(coins<amount)throw new ChromaError('Moedas insuficientes.');next={...d,coins:coins-amount,updatedAt:serverTimestamp()};tx.set(ref,next,{merge:true});});return applyWritten(next,s);}
 
 const hasIdentity=()=>!!currentUser&&[STATE.PROFILE_LOADING,STATE.READY,STATE.PROFILE_ERROR].includes(authState);
-window.chromaCloud={canWrite,isReady:canWrite,persistState,syncToCloud,restoreFromServer,retryProfileLoad,purchaseShopItem,equipShopItem,debitCoins,readRankedBoard,listActiveEvents,eventParticipation,eventParticipantCount,joinEvent,leaveEvent,getUser:()=>currentUser,getAuthState:()=>authState,getWriteMessage:authUnavailableMessage,isAuthenticated:hasIdentity,describeError,classifyError,subscribe,STATES:STATE};
+async function registerPushSubscription(subscription){
+  const s=ensureSocial();
+  const raw=subscription?.toJSON?subscription.toJSON():subscription;
+  if(!raw?.endpoint)throw new ChromaError('Assinatura PUSH inválida.');
+  await setDoc(doc(db,'pushSubscriptions',s.uid),{uid:s.uid,endpoint:String(raw.endpoint),keys:raw.keys||{},updatedAt:serverTimestamp(),userAgent:String(navigator.userAgent||'').slice(0,240)},{merge:true});
+  return true;
+}
+window.chromaCloud={canWrite,isReady:canWrite,persistState,syncToCloud,restoreFromServer,retryProfileLoad,purchaseShopItem,equipShopItem,debitCoins,registerPushSubscription,readRankedBoard,listActiveEvents,eventParticipation,eventParticipantCount,joinEvent,leaveEvent,getUser:()=>currentUser,getAuthState:()=>authState,getWriteMessage:authUnavailableMessage,isAuthenticated:hasIdentity,describeError,classifyError,subscribe,STATES:STATE};
 window.chromaAuth={getState:()=>authState,getUser:()=>currentUser,getError:()=>sessionError,isLoading:()=>authState===STATE.LOADING||authState===STATE.PROFILE_LOADING,isAuthenticated:hasIdentity,isReady:canWrite,subscribe};
 
 /* ===== LOGIN: Google e e-mail/senha terminam no MESMO onAuthStateChanged -> mesma sessão -> mesmo users/{uid} ===== */

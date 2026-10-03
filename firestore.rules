@@ -127,6 +127,15 @@ service cloud.firestore {
       allow read: if signedIn() && request.auth.uid in resource.data.recipients;
       allow write: if false;
     }
+    match /pushSubscriptions/{userId} {
+      allow read: if owner(userId);
+      allow create, update: if owner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.endpoint is string
+        && request.resource.data.endpoint.size() <= 2048
+        && request.resource.data.keys is map;
+      allow delete: if owner(userId);
+    }
     match /gifts/{giftId} {
       allow read: if signedIn() && (request.auth.uid == resource.data.senderUid || request.auth.uid == resource.data.recipientUid);
       allow create: if signedIn()

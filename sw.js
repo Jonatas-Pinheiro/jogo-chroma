@@ -1,12 +1,12 @@
 /* Aumente apenas este número ao publicar uma nova versão para renovar os caches. */
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 4;
 const PREFIX = 'chroma-v';
 const CORE_CACHE = `${PREFIX}${CACHE_VERSION}-essential`;
 const DYNAMIC_CACHE = `${PREFIX}${CACHE_VERSION}-dynamic`;
 const INDEX_URL = new URL('./index.html', self.registration.scope).href;
 const ESSENTIAL = [
   './index.html', './style.css', './manifest.webmanifest', './lucide.min.js',
-  './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'
+  './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png', './MOEDA-E-RECOMPENSAS.png', './RANQUEADO-OU-PLACAR.png', './PASSE-DE-BATALHA.png', './SOCIAL.png'
 ];
 const ESSENTIAL_URLS = new Set(ESSENTIAL.map(path => new URL(path, self.registration.scope).href));
 
@@ -26,6 +26,45 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+function notificationPayload(data) {
+  const d = data && typeof data === 'object' ? data : {};
+  const type = String(d.type || 'general');
+  const defaults = {
+    reward: { title: 'CHROMA · Recompensa disponível', body: 'Você tem uma recompensa pronta para coletar.', route: 'rewards', icon: './MOEDA-E-RECOMPENSAS.png' },
+    ranking: { title: 'CHROMA · Você foi ultrapassado', body: 'Confira sua nova posição no ranking.', route: 'ranking', icon: './RANQUEADO-OU-PLACAR.png' },
+    season: { title: 'CHROMA · Nova temporada', body: 'Uma nova temporada está disponível.', route: 'battlePass', icon: './PASSE-DE-BATALHA.png' },
+    gift: { title: 'CHROMA · Presente recebido', body: 'Você recebeu um presente de um amigo.', route: 'mail', icon: './SOCIAL.png' },
+    general: { title: 'CHROMA', body: 'Você tem uma novidade no jogo.', route: 'home', icon: './icon-192.png' }
+  };
+  const base = defaults[type] || defaults.general;
+  return { title: String(d.title || base.title), body: String(d.body || base.body), route: String(d.route || base.route), tag: String(d.tag || `chroma-${type}`), icon: String(d.icon || base.icon || './icon-192.png'), type };
+}
+self.addEventListener('push', event => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (_) { data = { body: event.data?.text?.() || '' }; }
+  const n = notificationPayload(data);
+  event.waitUntil((async () => {
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const inUse = clients.some(client => client.visibilityState === 'visible' && client.focused);
+    if (inUse) return; // O CHROMA está aberto e em uso: nenhum PUSH.
+    return self.registration.showNotification(n.title, {
+      body: n.body, icon: n.icon, badge: './icon-192.png', tag: n.tag, renotify: false,
+      data: { route: n.route, type: n.type }
+    });
+  })());
+});
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const route = event.notification.data?.route || 'home';
+  event.waitUntil((async () => {
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clients) {
+      if ('focus' in client) { await client.focus(); client.postMessage({ type: 'CHROMA_NOTIFICATION_CLICK', route }); return; }
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(`./?notification=${encodeURIComponent(route)}`);
+  })());
 });
 
 // Autenticação, banco de dados e sinalização P2P SEMPRE passam direto à rede.

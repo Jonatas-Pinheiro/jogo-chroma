@@ -98,7 +98,7 @@ function show(id){
   if(id!=='game'){$('#eyeTargetOv').classList.remove('on');$('#eyeViewOv').classList.remove('on');}
   if(id!=='game'){$('#endOv').classList.remove('on');$('#colorOv').classList.remove('on');}
   const dockScreens=['home','profile','achievements','mail','settings','rewards','shop','inventory','friends'];
-  $('#mainDock').classList.toggle('on',dockScreens.includes(id));
+  const mainDock=$('#mainDock');if(mainDock)mainDock.classList.toggle('on',dockScreens.includes(id));
   document.querySelectorAll('.dock-btn[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===id));
 }
 function render(v){
@@ -450,7 +450,7 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
     }
   }},100);
   $('#btnSettings').onclick=()=>show('settings');
-  $('#dockProfile').onclick=()=>{renderProfile();show('profile');};
+  if($('#dockProfile'))$('#dockProfile').onclick=()=>{renderProfile();show('profile');};
   $('#settingsBack').onclick=()=>show('home');
   $('#profileBack').onclick=()=>show('home');
   $('#saveUsername').onclick=saveUsername;
@@ -459,13 +459,13 @@ function initPreferences(){applyPreferences();syncAudioVolumes();$('#graphicsQua
   $('#redeemCode').addEventListener('keydown',e=>{if(e.key==='Enter')redeemCode();});
 
   // ---- dock inferior (categorias) ----
-  $('#dockAchievements').onclick=()=>{renderAchievements();show('achievements');};
-  $('#dockMail').onclick=()=>{renderMail();show('mail');};
-  $('#dockHome').onclick=()=>show('home');
-  $('#dockRewards').onclick=()=>{renderRewards();show('rewards');};
-  $('#dockShop').onclick=()=>{renderShop();show('shop');};
-  $('#dockInventory').onclick=()=>{renderInventory();show('inventory');};
-  $('#dockFriends').onclick=()=>{renderFriends();show('friends');};
+  if($('#dockAchievements'))$('#dockAchievements').onclick=()=>{renderAchievements();show('achievements');};
+  if($('#dockMail'))$('#dockMail').onclick=()=>{renderMail();show('mail');};
+  if($('#dockHome'))$('#dockHome').onclick=()=>show('home');
+  if($('#dockRewards'))$('#dockRewards').onclick=()=>{renderRewards();show('rewards');};
+  if($('#dockShop'))$('#dockShop').onclick=()=>{renderShop();show('shop');};
+  if($('#dockInventory'))$('#dockInventory').onclick=()=>{renderInventory();show('inventory');};
+  if($('#dockFriends'))$('#dockFriends').onclick=()=>{renderFriends();show('friends');};
   document.querySelectorAll('[data-shop-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-shop-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderShop(b.dataset.shopTab);});
   $('#shopGrid').addEventListener('click',e=>{const b=e.target.closest('[data-shop-buy]');if(b)buyShop(b.dataset.shopBuy);});
   $('#inventory').addEventListener('click',e=>{const use=e.target.closest('[data-use-potion]');if(use)usePotion(Number(use.dataset.usePotion));const equip=e.target.closest('[data-inv-equip]');if(equip){equipShop(equip.dataset.invEquip);renderInventory();}});
