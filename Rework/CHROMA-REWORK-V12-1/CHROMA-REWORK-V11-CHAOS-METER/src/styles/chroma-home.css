@@ -1,0 +1,213 @@
+/* CHROMA · Home refinada (V11).
+   Escopo: #home, #hdHome e o fundo .home-grid. Carregada por último para refinar, sem reformular, o que já existe.
+   Só usa tokens (--ac, --acd, --sg, --sf, --sf2, --ln, --tx, --mu…): funciona nas duas temporadas e nos dois temas.
+   Hierarquia: 1 JOGAR · 2 arte da temporada · 3 nível + XP · 4 missões e evento · 5 moedas · 6 secundário.
+   Cuidados: nenhum ::before/::after de .cd; sem movimento de layout; animações só com prefers-reduced-motion: no-preference. */
+
+#home {
+  --home-accent-text: var(--sg);
+  --home-gap: color-mix(in srgb, var(--sf2), #000 18%);
+}
+/* Tema claro: o dourado/rosa da marca não alcança 4,5:1 sobre fundo claro; escurecido só para TEXTO pequeno. */
+html[data-theme="light"] #home { --home-accent-text: color-mix(in srgb, var(--acd), #000 30%); --home-gap: var(--sf2); }
+
+/* ─── 5 · Cabeçalho: jogador à esquerda, moedas e ajustes à direita ─────────────────────────── */
+#hdHome { align-items: center; padding-bottom: 6px; }
+#hdHome .me { min-width: 0; }
+#hdHome .me > div { min-width: 0; }
+#hdHome .me b {
+  max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 18px; line-height: 1.1;
+}
+/* 4 · Nível do jogador: mesma linguagem do XP abaixo (dourado), mais legível. */
+#hdHome .me small {
+  display: block; margin-top: 2px;
+  color: var(--home-accent-text); font: 800 13px/1.1 var(--fm); letter-spacing: .01em;
+}
+/* 5 · Moedas: leitura de recurso (ícone + número + legenda), sem superfície nem sombra de botão.
+   CONTRATO de .bal (três scripts escrevem nele): o ÚLTIMO filho é o número; o PRIMEIRO <span> é o número; não há texto solto.
+   Por isso a legenda <small> vem antes no DOM e o grid a posiciona abaixo do número. */
+#hdHome .wallet {
+  display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; align-items: center;
+  column-gap: 8px; row-gap: 3px; padding: 0 2px; background: none; border-radius: 0; box-shadow: none;
+}
+#hdHome .wallet svg.i { grid-row: 1 / 3; grid-column: 1; width: 24px; height: 24px; }
+#hdHome .wallet #systemHomeCoins {
+  grid-row: 1; grid-column: 2; font: 400 19px/1 var(--fd); color: var(--tx); font-variant-numeric: tabular-nums;
+}
+#hdHome .wallet small {
+  grid-row: 2; grid-column: 2; color: var(--mu); font: 800 10px/1 var(--fm); letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* ─── 2 · Arte da temporada: palco com luz da própria temporada ─────────────────────────────── */
+#home .art {
+  border-radius: 26px 26px 0 0;
+  background:
+    radial-gradient(ellipse 64% 52% at 50% 72%, color-mix(in srgb, var(--ac) 24%, transparent) 0%, transparent 72%),
+    linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--sf) 55%, transparent) 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 93%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 93%, transparent 100%);
+}
+@keyframes homeTwinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+/* Tema claro: o palco é escuro por natureza (mina); sem esmaecer, para não virar borrão cinza sobre o fundo claro. */
+html[data-theme="light"] #home .art { border-radius: 26px; -webkit-mask-image: none; mask-image: none; }
+#home .art .twinkle { opacity: .6; }
+@media (prefers-reduced-motion: no-preference) {
+  #home .art .twinkle { animation: homeTwinkle 3.4s ease-in-out infinite; }
+}
+
+/* ─── 7 · Título domina; a frase de contexto é curta e discreta ─────────────────────────────── */
+#home .ttl { padding: 12px 0 0; }
+#home .ttl small {
+  color: var(--home-accent-text); font: 800 13px/1 var(--fm); letter-spacing: .16em; text-transform: uppercase;
+}
+#home .ttl h1 {
+  margin-top: 4px; letter-spacing: .005em;
+  text-shadow: 0 4px 0 #0007, 0 10px 26px color-mix(in srgb, var(--ac) 22%, transparent);
+}
+#home .season-story { max-width: 44ch; margin-top: 6px; font: 700 13px/1.35 var(--fm); color: var(--mu); }
+
+/* ─── 3 · Nível + XP: faixa mais legível e com área de toque adequada ───────────────────────── */
+#home .prog { margin: 4px 0 12px; }
+#home .pbtn { min-height: 44px; gap: 10px; font-size: 13px; }
+#home #homePassLevel { color: var(--tx); font: 400 17px/1 var(--fd); white-space: nowrap; }
+#home #homePassXp { color: var(--tx); font-weight: 800; white-space: nowrap; }
+#home .prog i {
+  height: 12px; border-radius: 7px;
+  background: color-mix(in srgb, var(--sf) 85%, #000); box-shadow: inset 0 2px 3px #0008;
+}
+#home .prog b { border-radius: 7px; box-shadow: inset 0 2px 0 #fff5; }
+#home .pbtn .i { opacity: .75; }
+#home .pbtn:hover .i { opacity: 1; }
+
+/* ─── 1 · JOGAR: o maior e mais profundo elemento da Home ───────────────────────────────────── */
+#home .btn-play {
+  position: relative;               /* o halo é ::before com z-index:-1, atrás do próprio botão */
+  min-height: 70px; margin-bottom: 22px; border-radius: 20px;
+  font: 400 clamp(28px, 7.6vw, 34px)/1 var(--fd); letter-spacing: .1em; color: #1a120c;
+  text-shadow: 0 2px 0 #fff7;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--ac), #fff 50%) 0%,
+    color-mix(in srgb, var(--ac), #fff 14%) 46%,
+    var(--ac) 52%,
+    color-mix(in srgb, var(--ac), #000 16%) 100%);
+  box-shadow:
+    inset 0 3px 0 #fffa,
+    inset 0 -5px 0 color-mix(in srgb, var(--acd), transparent 65%),
+    0 7px 0 var(--acd),
+    0 18px 26px #000a;
+}
+#home .btn-play::before {
+  content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: 24px;
+  background: var(--ac); filter: blur(20px); opacity: .32; pointer-events: none;
+}
+#home .btn-play:not(:disabled):hover { filter: brightness(1.06); transform: translateY(-1px); }
+#home .btn-play:not(:disabled):active {
+  transform: translateY(6px);
+  box-shadow: inset 0 3px 0 #fff8, inset 0 -3px 0 color-mix(in srgb, var(--acd), transparent 65%), 0 1px 0 var(--acd), 0 6px 12px #000a;
+}
+@keyframes homePlayGlow { 0%, 100% { opacity: .26; } 50% { opacity: .5; } }
+@media (prefers-reduced-motion: no-preference) {
+  #home .btn-play::before { animation: homePlayGlow 2.8s ease-in-out infinite; }
+}
+
+/* ─── 4 · Missões e Evento: dois mini-cards, claramente abaixo do JOGAR ─────────────────────── */
+#home .quick-links {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 10px; margin: 0 0 12px;
+}
+#home .quick-card {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 68px; padding: 10px 12px;
+  text-align: left; font: 800 13px/1.15 var(--fm); letter-spacing: 0; color: var(--tx);
+  border: 1px solid var(--ln); border-radius: 16px;
+  background: linear-gradient(180deg, var(--sf2), var(--sf));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--sf), #000 28%), inset 0 1px 0 #fff1;
+}
+#home .quick-card:not(:disabled):hover { filter: brightness(1.07); }
+#home .quick-card:active { transform: translateY(2px); box-shadow: 0 1px 0 color-mix(in srgb, var(--sf), #000 28%), inset 0 1px 0 #fff1; }
+#home .quick-links b { margin: 0; }
+#home .qc-body { display: grid; gap: 4px; min-width: 0; flex: 1; }
+#home .qc-kicker { color: var(--mu); font: 800 10.5px/1.15 var(--fm); letter-spacing: .06em; text-transform: uppercase; }
+#home .qc-ico {
+  flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px;
+  background: color-mix(in srgb, var(--sf) 70%, #000); box-shadow: inset 0 2px 3px #0008;
+}
+#home .qc-ico svg.i { width: 22px; height: 22px; }
+
+/* Missões: 2/5 em destaque + barra segmentada (um segmento por missão). --p e --n vêm de renderMissions(). */
+#home .mission-card { --p: 0%; --n: 5; }
+#home .mission-card #missionShortcut { color: var(--home-accent-text); font: 400 23px/1 var(--fd); font-variant-numeric: tabular-nums; }
+#home .qc-track {
+  position: relative; display: block; height: 8px; border-radius: 5px; overflow: hidden;
+  background: color-mix(in srgb, var(--sf) 70%, #000); box-shadow: inset 0 1px 2px #0009;
+}
+#home .qc-track u {
+  display: block; width: var(--p); height: 100%; text-decoration: none; border-radius: 5px;
+  background: linear-gradient(90deg, #ffd36b 0%, var(--sg) 100%); box-shadow: inset 0 2px 0 #fff5;
+}
+#home .qc-track::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(90deg,
+    transparent 0, transparent calc(100% / var(--n) - 2px),
+    var(--home-gap) calc(100% / var(--n) - 2px), var(--home-gap) calc(100% / var(--n)));
+}
+
+/* Evento da semana: conteúdo vivo, com acento da temporada e leque de cartas que respira. */
+#home .event-card {
+  border-color: color-mix(in srgb, var(--ac) 46%, var(--ln));
+  background:
+    radial-gradient(130% 150% at 100% 0%, color-mix(in srgb, var(--ac) 22%, transparent) 0%, transparent 62%),
+    linear-gradient(180deg, var(--sf2), var(--sf));
+}
+#home .event-card .qc-kicker { color: var(--home-accent-text); white-space: nowrap; letter-spacing: .04em; }
+#home .event-card .qc-title { font: 400 18px/1.1 var(--fd); color: var(--tx); text-wrap: balance; overflow-wrap: anywhere; }
+#home .event-card > svg.i { flex: none; width: 16px; height: 16px; opacity: .8; transform: rotate(180deg); }
+#home .qc-cards { position: relative; width: 34px; background: none; box-shadow: none; }
+#home .qc-cards i {
+  position: absolute; left: 50%; top: 50%; width: 17px; height: 24px; margin: -12px 0 0 -8.5px;
+  border: 2px solid var(--tx); border-radius: 4px; transform-origin: 50% 90%;
+}
+#home .qc-cards i:nth-child(1) { background: var(--r); transform: translateX(-9px) rotate(-18deg); }
+#home .qc-cards i:nth-child(2) { background: var(--b); transform: translateY(-2px); z-index: 1; }
+#home .qc-cards i:nth-child(3) { background: var(--y); transform: translateX(9px) rotate(18deg); }
+@keyframes homeCardsFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -2px; } }
+@media (prefers-reduced-motion: no-preference) {
+  #home .qc-cards i:nth-child(1) { animation: homeCardsFloat 3.2s ease-in-out infinite; }
+  #home .qc-cards i:nth-child(2) { animation: homeCardsFloat 3.2s ease-in-out -1.1s infinite; }
+  #home .qc-cards i:nth-child(3) { animation: homeCardsFloat 3.2s ease-in-out -2.2s infinite; }
+}
+
+/* ─── 8 · Fundo de símbolos: textura, não protagonista ──────────────────────────────────────── */
+#home.on ~ .home-grid { opacity: .5; }
+html[data-theme="light"] #home.on ~ .home-grid { opacity: .8; }
+
+/* ─── Responsivo ────────────────────────────────────────────────────────────────────────────── */
+/* A arte usa preserveAspectRatio="slice" (preenche o palco). Para nunca cortar as cartas, a caixa fica entre 56% e 100% da
+   largura do hero: mais baixa que isso cortaria o topo (cartas); mais alta cortaria as laterais da Singularidade.
+   Largura do hero via container query (cqw). Sobra de altura em telas muito altas vira respiro acima da arte. */
+@media (max-width: 899.98px) {
+  #home .hero { container-type: inline-size; justify-content: flex-end; }
+  #home .art { min-height: 56cqw; max-height: 100cqw; }
+}
+/* Telas baixas: compacta o que está abaixo da arte para ela manter o mínimo e o JOGAR continuar visível sem rolar. */
+@media (max-height: 700px) {
+  #home .ttl { padding-top: 6px; }
+  #home .prog { margin: 0 0 6px; }
+  #home .pbtn { min-height: 40px; }
+  #home .btn-play { min-height: 62px; margin-bottom: 14px; }
+  #home .quick-links { margin-bottom: 8px; }
+  #home .quick-card { min-height: 60px; padding-block: 8px; }
+}
+
+@media (max-width: 360px) {
+  #home .quick-card { padding: 9px 10px; gap: 8px; }
+  #home .qc-ico { width: 34px; height: 34px; }
+}
+@media (min-width: 900px) {
+  /* Desktop: coluna de texto à esquerda, arte à direita (estrutura já existente). Os cards ficam compactos. */
+  #home .art { border-radius: 30px; }
+  /* Em linha, a altura da caixa vem do hero (≈ 100dvh − 368px: cabeçalho, dock, nível/XP, JOGAR e cards). Limito a largura
+     para a proporção nunca ficar mais achatada que ~0,58 (abaixo disso o topo da arte, com as cartas, seria cortado). */
+  #home .art { margin-inline: auto; max-width: calc((100vh - 368px) / .58); max-width: calc((100dvh - 368px) / .58); }
+  #home .quick-links { max-width: 440px; }
+  #home .btn-play { min-width: 340px; }
+}

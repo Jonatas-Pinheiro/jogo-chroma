@@ -1,0 +1,235 @@
+/* ==========================================================
+   CHROMA · visual das cartas
+   Este arquivo vem DEPOIS do <style> do index.html, então as
+   regras daqui sobrescrevem as antigas (.cd, .bk, .c-w ...).
+   ========================================================== */
+
+/* ---------- Frente da carta ---------- */
+
+.cd {
+  isolation: isolate; /* mantém brilho e marca d'água "presos" dentro da carta */
+  background:
+    linear-gradient(135deg, #ffffff3d 0 34%, #0000 34%),                    /* brilho diagonal */
+    radial-gradient(circle at 50% 120%, #00000038 0 45%, #0000 70%),        /* sombra no pé da carta */
+    var(--c);
+  box-shadow: 0 3px 0 #0007;
+}
+
+/* Moldura fina por dentro da borda creme */
+.cd::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--cw) * .035);
+  border: 1.5px solid #ffffff59;
+  border-radius: calc(var(--cw) * .11);
+  pointer-events: none;
+}
+
+/* Marca d'água: o formato da cor, grande, atrás do valor */
+.cd::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 66%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: #fff;
+  opacity: .17;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask: var(--shape) center / contain no-repeat;
+  mask: var(--shape) center / contain no-repeat;
+}
+.c-r { --shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 22 12 12 22 2 12z'/%3E%3C/svg%3E"); }
+.c-b { --shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/svg%3E"); }
+.c-g { --shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 22 21H2z'/%3E%3C/svg%3E"); }
+.c-y { --shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3.5' y='3.5' width='17' height='17' rx='2'/%3E%3C/svg%3E"); }
+.c-y::before { background: #1a120c; opacity: .12; }
+
+/* Valor (número/símbolo) com relevo e acima da marca d'água */
+.cd .v { position: relative; z-index: 1; }
+.cd:not(.bk):not(.c-w) .v { text-shadow: 0 .05em 0 #0006, 0 0 .03em #0005; }
+.c-y .v { text-shadow: 0 .04em 0 #ffffff66; }
+
+/* Cantinhos com o formato da cor */
+.cd .k { z-index: 1; filter: drop-shadow(0 1px 0 #0004); }
+
+/* ---------- Carta coringa ---------- */
+
+.c-w {
+  background:
+    linear-gradient(135deg, #ffffff3d 0 34%, #0000 34%),
+    conic-gradient(var(--r) 0 25%, var(--b) 0 50%, var(--g) 0 75%, var(--y) 0);
+}
+.c-w::before { display: none; }
+.c-w .v {
+  box-shadow: 0 0 0 calc(var(--cw) * .035) var(--ac), 0 2px 0 calc(var(--cw) * .035) #0006;
+  color: var(--ac);
+}
+
+/* Brilho que passa pela carta coringa (só na mesa e na mão, para economizar processamento) */
+#hand .c-w,
+#disc .c-w {
+  background:
+    linear-gradient(115deg, #0000 38%, #ffffff77 50%, #0000 62%) 150% 0 / 260% 100% no-repeat,
+    linear-gradient(135deg, #ffffff3d 0 34%, #0000 34%),
+    conic-gradient(var(--r) 0 25%, var(--b) 0 50%, var(--g) 0 75%, var(--y) 0);
+  animation: cardShine 3.6s linear infinite;
+}
+@keyframes cardShine {
+  0%   { background-position: 150% 0, 0 0, 0 0; }
+  55%, 100% { background-position: -60% 0, 0 0, 0 0; }
+}
+/* O disco já tem a animação "land": junta as duas */
+#disc .c-w { animation: land .24s ease-out, cardShine 3.6s linear infinite; }
+
+/* ---------- Verso da carta e monte de compra ---------- */
+
+.bk {
+  background:
+    radial-gradient(circle at 50% 50%, #e9a82526 0 30%, #0000 31%),
+    repeating-linear-gradient(45deg, #ffffff10 0 5px, #0000 5px 10px),
+    linear-gradient(135deg, var(--sf2), var(--d));
+  color: var(--sg);
+  text-shadow: none;
+}
+.bk::before { display: none; }
+.bk::after { border-color: #e9a82566; }
+.bk .v {
+  display: grid;
+  place-items: center;
+  width: 58%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: calc(var(--cw) * .03) solid var(--sg);
+  background: var(--d);
+  font-size: .4em;
+  box-shadow: inset 0 0 0 2px #0006;
+}
+
+/* Monte parece uma pilha de cartas */
+.draw-pile {
+  box-shadow:
+    0 3px 0 #0007,
+    0 6px 0 -1px var(--ln),
+    0 9px 0 -2px var(--sf2),
+    0 12px 0 -3px #0007;
+  margin-bottom: 12px;
+}
+.draw-pile:disabled { box-shadow: 0 3px 0 #0007, 0 6px 0 -1px var(--ln); }
+
+/* ---------- Mão do jogador ---------- */
+
+.hand .cd { box-shadow: 0 4px 0 #0008; }
+/* Na mão, a carta é um <button>; neutralize o visual nativo e reaplique a face da mesa. */
+#hand.hand .cd.c-w {
+  -webkit-appearance: none;
+  appearance: none;
+  background:
+    linear-gradient(115deg, #0000 38%, #ffffff77 50%, #0000 62%) 150% 0 / 260% 100% no-repeat,
+    linear-gradient(135deg, #ffffff3d 0 34%, #0000 34%),
+    conic-gradient(var(--r) 0 25%, var(--b) 0 50%, var(--g) 0 75%, var(--y) 0);
+}
+.hand .off { filter: brightness(.62) saturate(.55); }
+.hand .off.c-w { filter: none; }
+.hand .off::before { opacity: .08; }
+
+.hand .sel {
+  outline: 0;
+  box-shadow: 0 6px 0 #0008, 0 0 0 3px var(--ac), 0 0 20px 3px #ffb81c99;
+}
+#game .hand .cd[aria-pressed="true"] { outline: 0; }
+
+#game .hand .cd[aria-disabled="true"] { cursor: not-allowed; }
+
+/* Carta que não pode ser jogada: chacoalha e pisca em vermelho */
+.hand .cd.nope { animation: cardNope .34s ease-in-out; }
+@keyframes cardNope {
+  0%, 100% { translate: 0 0; }
+  20%      { translate: -6px 0; box-shadow: 0 4px 0 #0008, 0 0 0 3px var(--er); }
+  40%      { translate: 6px 0;  box-shadow: 0 4px 0 #0008, 0 0 0 3px var(--er); }
+  60%      { translate: -4px 0; box-shadow: 0 4px 0 #0008, 0 0 0 3px var(--er); }
+  80%      { translate: 3px 0; }
+}
+
+/* ---------- Mesa ---------- */
+
+#disc { position: relative; }
+#disc .cd { box-shadow: 0 6px 0 #0008; }
+
+/* Aviso rápido que aparece em cima da carta especial */
+.fx-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  z-index: 3;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: #17110de6;
+  border: 2px solid var(--ac);
+  color: var(--ac);
+  font: 400 clamp(15px, 4.4vw, 22px) / 1 var(--fd);
+  letter-spacing: .03em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Carta "fantasma" que voa pela tela (criada pelo chroma-card-fx.js) */
+.fx-ghost {
+  position: fixed;
+  z-index: 60;
+  margin: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ---------- Movimento reduzido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  #hand .c-w, #disc .c-w, .hand .cd.nope { animation: none !important; }
+}
+.calm #hand .c-w, .calm #disc .c-w, .calm .hand .cd.nope { animation: none !important; }
+
+/* ---------- Mão horizontal rolável + ícones Kenney ---------- */
+#hand.hand {
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: visible;
+  min-width: 0;
+  padding: 34px 12px 16px;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sg) var(--sf);
+}
+#hand.hand::-webkit-scrollbar { height: 8px; }
+#hand.hand::-webkit-scrollbar-track { background: var(--sf); border-radius: 8px; }
+#hand.hand::-webkit-scrollbar-thumb { background: var(--sg); border-radius: 8px; }
+#hand.hand .cd {
+  flex: 0 0 var(--cw);
+  margin-left: 0;
+  transform: translateY(var(--y-offset)) rotate(0deg);
+}
+#hand.hand .cd:first-child { margin-left: 0; }
+#hand.hand .cd.sel,
+#hand.hand .cd[aria-pressed="true"] {
+  transform: translateY(-12px) rotate(0deg);
+}
+.kenney-card-icon {
+  position: relative;
+  z-index: 1;
+  width: 48%;
+  height: 48%;
+  object-fit: contain;
+  image-rendering: auto;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 0 #0007);
+  pointer-events: none;
+}
+.c-y .kenney-card-icon { filter: brightness(0) drop-shadow(0 1px 0 #ffffff66); }
+.sr-only-value { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+@media (hover: hover) {
+  #hand.hand .cd:not(.off):not(.sel):hover { transform: translateY(-8px) rotate(0deg); }
+}

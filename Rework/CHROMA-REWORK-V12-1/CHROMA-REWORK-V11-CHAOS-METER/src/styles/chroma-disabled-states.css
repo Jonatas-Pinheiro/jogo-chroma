@@ -1,0 +1,53 @@
+/* Estado indisponível padronizado conforme CHROMA-UI-KIT: fundo surface-2,
+   texto muted, sem filtro ou deslocamento de interação.
+   As dimensões e o tamanho/peso próprios de cada componente permanecem intactos.
+   Não usar pointer-events:none nem remover outline: foco e teclado são preservados. */
+:where(
+  button:disabled:not(.cd):not(.draw-pile),
+  button[aria-disabled="true"]:not(.cd):not(.draw-pile),
+  input[type="button"]:disabled,
+  input[type="button"][aria-disabled="true"],
+  input[type="submit"]:disabled,
+  input[type="submit"][aria-disabled="true"],
+  input[type="reset"]:disabled,
+  input[type="reset"][aria-disabled="true"],
+  input[type="image"]:disabled,
+  input[type="image"][aria-disabled="true"],
+  [role="button"][disabled]:not(.cd):not(.draw-pile),
+  [role="button"][aria-disabled="true"]:not(.cd):not(.draw-pile)
+) {
+  cursor: default !important;
+  filter: none !important;
+  transform: none !important;
+  background: var(--sf2) !important;
+  color: var(--mu) !important;
+  box-shadow: 0 4px 0 var(--sf) !important;
+  border-color: transparent !important;
+  opacity: 1 !important;
+  font-family: var(--fd) !important;
+  transition: none !important;
+}
+
+/* Cartas .cd e o monte .draw-pile não recebem a superfície cinza do UI Kit.
+   A face, a cor e o contraste são mantidos; apenas reduza a luminosidade a 68%.
+   Isso substitui filtros antigos que escureciam/dessaturavam a mão ou apagavam coringas. */
+:where(
+  button.cd:disabled,
+  button.cd[aria-disabled="true"],
+  button.cd.off,
+  button.draw-pile:disabled,
+  button.draw-pile[aria-disabled="true"]
+) {
+  filter: brightness(.68) !important;
+  opacity: 1 !important;
+}
+
+/* A marca d'água conserva a opacidade da face normal mesmo em uma carta .off. */
+.hand .cd.off::before { opacity: .17 !important; }
+.hand .cd.c-y.off::before { opacity: .12 !important; }
+
+/* O monte mantém as quatro camadas de profundidade também quando indisponível. */
+.draw-pile:disabled,
+.draw-pile[aria-disabled="true"] {
+  box-shadow: 0 3px 0 #0007, 0 6px 0 -1px var(--ln), 0 9px 0 -2px var(--sf2), 0 12px 0 -3px #0007 !important;
+}

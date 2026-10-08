@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CHROMA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap">
+<link rel="stylesheet" href="src/styles/chroma-toast.css">
+<link rel="stylesheet" href="src/styles/chroma-home-grid.css">
+<link rel="stylesheet" href="src/styles/chroma-systems.css">
+<link rel="stylesheet" href="src/styles/chroma-shop.css">
+<style>
+:root{--bg:#17110d;--sf:#2c2119;--sf2:#3d2d21;--ln:#4a382a;--tx:#fff3dc;--mu:#b09b84;--ac:#ffb81c;--acd:#a86a06;--ss:#c8452c;--sg:#e9a825;--d:#1a120c;--er:#ff5a4d;--r:#e8384f;--b:#2f6fed;--g:#1fa86a;--y:#f4e04d;--ov:#0a0603b8;--mm:#ffe3c9;--rl:#e9a825;--fd:'Lilita One','Arial Rounded MT Bold',system-ui,sans-serif;--fm:'Nunito',system-ui,sans-serif;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit;margin:0}
+body{height:100%;background:var(--bg);color:var(--tx);font:600 15px/1.35 var(--fm);display:flex;justify-content:center;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.app{width:100%;max-width:560px;height:100%;display:flex;flex-direction:column;background:var(--bg)}
+.scr{display:none;flex:1;min-height:0;flex-direction:column;padding:12px 20px 0;overflow-y:auto;animation:in .22s ease-out}
+.scr.on{display:flex}
+.col{width:100%;max-width:540px;align-self:center}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+svg.i{width:24px;height:24px;fill:currentColor;flex:none}
+:focus-visible{outline:3px solid var(--tx);outline-offset:3px}
+.cut{--k:12px;clip-path:polygon(var(--k) 0,100% 0,100% calc(100% - var(--k)),calc(100% - var(--k)) 100%,0 100%,0 var(--k))}
+/* botões */
+.btn{font:400 22px var(--fd);letter-spacing:.02em;border:0;border-radius:14px;padding:16px 24px;min-height:52px;cursor:pointer;color:inherit;background:none;transition:transform .08s,box-shadow .08s}
+.pri{background:var(--ac);color:var(--d);box-shadow:0 5px 0 var(--acd)}
+.pri:not(:disabled):hover{filter:brightness(1.07)}
+.pri:not(:disabled):active{transform:translateY(4px);box-shadow:0 1px 0 var(--acd)}
+.pri:disabled{background:var(--sf2);color:var(--mu);box-shadow:0 5px 0 var(--sf);cursor:default}
+.sec{background:var(--sf2);box-shadow:0 4px 0 var(--sf);font-size:17px;padding:12px 18px}
+.sec:active{transform:translateY(3px);box-shadow:0 1px 0 var(--sf)}
+.sq{width:46px;height:46px;min-height:0;padding:0;display:grid;place-items:center}
+/* header e avatar */
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px}
+.hd h2,.sub h2{font:400 26px var(--fd)}
+.me{display:flex;align-items:center;gap:10px}
+.me b{display:block;font:400 17px var(--fd)}.me small{color:var(--mu);font-size:12px}
+.pill{display:flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;background:var(--sf);border-radius:12px;font:400 17px var(--fd)}
+.pill svg{fill:var(--sg)}
+.av{display:block;flex:none;width:var(--s,40px);aspect-ratio:1;border-radius:50%;overflow:hidden;border:3px solid var(--sf2);background:var(--sf2)}
+.av svg{width:100%;height:100%;display:block}
+.av.emp{background:none;border:2px dashed var(--mu);display:grid;place-items:center;color:var(--mu);font:400 26px var(--fd)}
+.tag{background:var(--ss);padding:5px 16px;font-weight:800;font-size:13px;--k:8px}
+/* home */
+.hero{flex:1;min-height:240px;display:flex;flex-direction:column}
+.art{flex:1;min-height:0;width:100%}
+.ttl{padding:6px 0 4px}
+.ttl small{display:block;color:var(--sg);font-weight:800;font-size:14px}
+.ttl h1{font:400 clamp(42px,13vw,64px)/.95 var(--fd);text-shadow:0 4px 0 #0007}
+.prog{display:flex;align-items:center;gap:10px;color:var(--mu);font-size:12px;font-weight:800;margin:10px 0 18px}
+.prog i{flex:1;height:8px;background:var(--sf);border-radius:4px;overflow:hidden}.prog b{display:block;height:100%;background:var(--sg)}
+#home>.btn{margin-bottom:18px}
+/* dock */
+.dock{display:flex;align-items:stretch;justify-content:center;background:var(--sf);border-top:3px solid var(--ln);padding:8px 8px 6px}
+.dock[hidden]{display:none}
+.dock button{flex:1 1 0;min-width:0;min-height:52px;max-width:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 1px;background:none;border:0;color:var(--mu);font:800 clamp(9px,2.35vw,12px)/1.05 var(--fm);text-align:center;cursor:pointer;position:relative}
+.dock svg{width:24px;height:24px;flex:none;fill:currentColor}
+.dock .dock-label{display:block;max-width:100%;overflow-wrap:anywhere;text-align:center}
+.dock [aria-current]{color:var(--tx)}
+.dock [aria-current]::before{content:"";position:absolute;top:-11px;width:38px;height:5px;background:var(--ac);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.dock button:disabled{opacity:.4;cursor:default}
+/* lobby */
+.sub{display:flex;align-items:center;gap:12px;padding-bottom:14px}
+.sub small{display:block;color:var(--mu);font-size:12px}
+.mode{background:var(--ss);border-left:8px solid var(--sg);padding:20px 20px 22px;--k:20px}
+.mode h3{font:400 40px/1 var(--fd);margin:0 0 6px;text-shadow:0 3px 0 #0005}
+.mode p{max-width:30ch}
+.meta{margin-top:12px;display:flex;gap:18px;font-size:13px;font-weight:800;color:var(--mm)}
+.tabs{display:flex;gap:6px;margin:10px 0 24px}
+.tabs button{flex:1;padding:10px 4px;border:0;border-bottom:3px solid var(--ln);background:none;color:var(--mu);font:800 14px var(--fm);cursor:pointer}
+.tabs [aria-selected=true]{color:var(--tx);border-color:var(--sg)}
+.lb{color:var(--mu);font-weight:800;font-size:13px;margin-bottom:10px}
+.pl{display:flex;gap:12px;margin-bottom:24px}
+.pl>div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:800}
+.cfg{margin-bottom:20px}
+.cfg div{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-top:2px solid var(--ln)}
+.cfg b{font:400 18px var(--fd)}
+#lobby>.btn{margin:auto 0 20px}
+/* cartas */
+.cd{flex:none;width:var(--cw);aspect-ratio:5/7;position:relative;display:grid;place-items:center;padding:0;font:400 calc(var(--cw)*.5)/1 var(--fd);color:var(--tx);text-shadow:0 .06em 0 #0004;border:calc(var(--cw)*.06) solid var(--tx);border-radius:calc(var(--cw)*.15);box-shadow:0 3px 0 #0006;background:linear-gradient(135deg,#ffffff2e 0 36%,#0000 0),var(--c)}
+.c-r{--c:var(--r)}.c-b{--c:var(--b)}.c-g{--c:var(--g)}
+.c-y{--c:var(--y);color:var(--d);text-shadow:none}
+.c-w{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--g) 0 75%,var(--y) 0)}
+.c-w .v{background:var(--d);border-radius:50%;width:64%;aspect-ratio:1;display:grid;place-items:center;font-size:.42em}
+.bk{background:linear-gradient(135deg,var(--sf2) 0 50%,var(--d) 0);color:var(--sg)}
+.v svg{width:.85em;height:.85em;fill:currentColor;display:block}
+.k{position:absolute;top:calc(var(--cw)*.05);left:calc(var(--cw)*.05);width:calc(var(--cw)*.19);height:calc(var(--cw)*.19)}
+.k.e{top:auto;left:auto;bottom:calc(var(--cw)*.05);right:calc(var(--cw)*.05);transform:rotate(180deg)}
+.k svg{width:100%;height:100%;fill:currentColor;display:block}
+/* partida */
+#game{padding:8px 12px 12px;overflow:hidden}
+.gt{display:flex;align-items:flex-start;gap:8px}
+.opps{flex:1;display:flex;justify-content:space-around}
+.op{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--mu)}
+.op .n{display:flex;align-items:center;gap:4px;background:var(--sf);padding:2px 9px;border-radius:8px;color:var(--tx);font:400 15px var(--fd)}
+.op .n svg{width:11px;height:11px;fill:var(--mu)}
+.op .n.low{box-shadow:0 0 0 2px var(--er)}
+.table{--cw:clamp(64px,19vw,100px);flex:1;min-height:0;margin:10px 0;display:flex;align-items:center;justify-content:center;gap:clamp(18px,6vw,56px);background:var(--sf);position:relative;--k:30px}
+#disc .cd{animation:land .24s ease-out;box-shadow:0 6px 0 #0007}
+@keyframes land{from{transform:translateY(40px) scale(1.12);opacity:.4}}
+.cur{position:absolute;bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+#game .cur{position:static;align-self:center;justify-content:center;margin:0 0 8px}
+.cur svg{width:18px;height:18px;fill:currentColor;display:block}
+.act{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.act .btn{font-size:18px;padding:10px 16px;min-height:48px}
+.turn{margin-right:auto;background:var(--sf2);padding:9px 18px;font:400 16px var(--fd);--k:10px}
+.hand{--cw:clamp(54px,15.5vw,82px);display:flex;justify-content:center;align-items:flex-end;min-height:calc(var(--cw)*1.4 + 40px);padding-top:34px}
+.hand .cd{margin-left:calc(var(--cw)*-.34);transform:translateY(var(--y-offset)) rotate(var(--rt));transition:transform .18s cubic-bezier(.2,.8,.3,1);cursor:pointer}
+.hand .cd:first-child{margin-left:0}
+.hand .off{filter:brightness(.6) saturate(.6)}
+.hand .sel{transform:translateY(calc(var(--cw)*-.42)) rotate(0);z-index:2;outline:3px solid var(--ac);outline-offset:2px}
+.nope{animation:nope .25s}
+@keyframes nope{25%{translate:-5px}75%{translate:5px}}
+@media(hover:hover){.hand .cd:not(.off):not(.sel):hover{transform:translateY(calc(var(--cw)*-.14 + var(--y-offset))) rotate(var(--rt))}}
+/* ranking */
+.pos{display:flex;align-items:center;gap:14px;margin:4px 0 8px}
+.big{font:400 72px/.9 var(--fd);color:var(--sg);text-shadow:0 4px 0 #0007}.big i{font-size:.5em;font-style:normal;margin-right:2px}
+.pos b{display:block;font:400 20px var(--fd)}.pos small{color:var(--mu);font-size:13px}
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:14px 0 18px}
+.pd{flex:1;max-width:130px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;font-weight:800}
+.pd small{color:var(--mu);font-size:12px}
+.pd .blk{width:100%;display:grid;place-items:center;background:var(--sf2);font:400 30px var(--fd);margin-top:4px;--k:12px}
+.pd.f .blk{background:var(--sg);color:var(--d);font-size:40px}
+.rows{list-style:none;padding:0 0 16px}
+.rows li{display:flex;align-items:center;gap:12px;padding:9px 6px;border-top:2px solid var(--ln);font-weight:800}
+.rows .rk{width:28px;font:400 19px var(--fd);color:var(--mu)}
+.rows .pt{margin-left:auto;font:400 17px var(--fd)}
+.rows .you{background:var(--sf2);box-shadow:inset 6px 0 var(--sg);border:0;margin-top:8px;padding:10px 12px;--k:10px}
+.rows .you .rk{color:var(--sg)}
+@media(min-width:900px){
+.app{max-width:1000px;border-inline:2px solid var(--ln)}
+.scr{padding-inline:40px}
+.hero{flex-direction:row;align-items:center;gap:32px}
+.ttl{order:-1;flex:0 0 42%}.art{height:100%}
+.prog{max-width:42%}#home>.btn{align-self:flex-start;min-width:320px}
+.table{--cw:112px}.hand{--cw:92px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* loja e perfil */
+:root{--rr:#58c4dd;--re:#a56bff}
+.stage{position:relative;height:208px;display:grid;place-items:center;background:var(--sf);--k:26px;margin-bottom:14px}
+.rar{position:absolute;top:14px;left:18px;display:flex;align-items:center;gap:6px;font:400 15px var(--fd)}
+.rar svg{width:14px;height:14px;fill:currentColor}
+.fi{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.fi h3{font:400 32px/1 var(--fd);margin-bottom:4px}
+.fi p{color:var(--mu);font-size:14px;max-width:26ch}
+.pr{display:flex;align-items:center;gap:6px;font:400 24px var(--fd);color:var(--sg)}
+.pr svg{width:22px;height:22px;fill:currentColor}
+#feat .btn{width:100%}
+.shelf{display:flex;gap:8px;margin-top:22px}
+.it{flex:1;min-height:122px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;padding:10px 4px 8px;background:none;border:0;border-bottom:3px solid var(--ln);color:var(--tx);font:400 15px var(--fd);cursor:pointer}
+.it span{color:var(--mu);font:800 13px var(--fm)}
+.it[aria-pressed=true]{border-color:var(--sg)}
+@media(hover:hover){.it:hover{border-color:var(--mu)}}
+#cats{margin:auto 0 12px;padding-top:20px}
+.skin{background:linear-gradient(135deg,var(--k1) 0 50%,var(--d) 0);color:var(--k2)}
+.leg{box-shadow:0 0 0 3px var(--d),0 0 0 6px var(--rl),0 4px 0 6px #0006}
+.tbl{position:relative;background:var(--k1);box-shadow:inset 0 0 0 4px var(--k2)}
+.tbl::after{content:"";position:absolute;inset:30% 41%;background:var(--k2);border-radius:3px;opacity:.85}
+.ov{position:fixed;inset:0;z-index:9;display:grid;place-items:center;padding:20px;background:var(--ov)}
+.ov[hidden]{display:none}
+.mdl{width:100%;max-width:340px;background:var(--sf);border:3px solid var(--ln);border-radius:22px;padding:24px 22px 20px;text-align:center;box-shadow:0 8px 0 #0008;animation:pop .2s ease-out}
+@keyframes pop{from{transform:scale(.92) translateY(10px);opacity:0}}
+.mdl h3{font:400 26px var(--fd);margin-bottom:14px}
+#mp{display:grid;place-items:center;margin-bottom:14px}
+.mdl p{color:var(--mu);margin-bottom:18px}
+.mdl .row{display:flex;gap:10px}.mdl .row .btn{flex:1}
+.who{display:flex;align-items:center;gap:18px;margin:6px 0 16px}
+.who .av{border:4px solid var(--sg)}
+.who h2{font:400 38px/1 var(--fd);margin-bottom:8px}
+.plate{display:inline-flex;align-items:center;gap:6px;background:var(--sg);color:var(--d);padding:6px 16px 6px 10px;font:400 17px var(--fd);--k:9px}
+.plate svg{width:18px;height:18px;fill:currentColor}
+.stats{display:flex;border-block:2px solid var(--ln);margin:6px 0 22px}
+.stats div{flex:1;padding:14px 0 12px;text-align:center}
+.stats div+div{border-left:2px solid var(--ln)}
+.stats b{display:block;font:400 38px/1 var(--fd)}
+.stats span{color:var(--mu);font-size:12px;font-weight:800}
+.ach{display:flex;gap:10px;margin-bottom:24px}
+.ach div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:12px;font-weight:800}
+.hx{width:56px;height:62px;display:grid;place-items:center;background:var(--sg);color:var(--d);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.hx svg{width:26px;height:26px;fill:currentColor}
+.ach .lk .hx{background:var(--sf2);color:var(--mu)}
+.ach small{color:var(--mu);font-weight:800}
+.own{--cw:54px;display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.own .more{font:400 20px var(--fd);color:var(--mu);margin-left:6px}
+@media(min-width:900px){
+#shop.col{max-width:900px}
+#shop.on{display:grid;grid-template-columns:1.1fr 1fr;grid-template-rows:auto 1fr auto;grid-template-areas:"h h" "f s" "c c";column-gap:48px}
+#shop .hd{grid-area:h}#feat{grid-area:f}
+#shelf{grid-area:s;flex-direction:column;align-self:start;margin:0}
+.it{flex-direction:row;justify-content:flex-start;min-height:0;gap:16px;padding:12px 6px}
+.it span{margin-left:auto}
+#cats{grid-area:c}
+}
+
+/* configurações */
+:root{--ok:#3ecf7a}
+.hr{display:flex;align-items:center;gap:8px}
+.sm{width:40px;height:40px}
+.gh{font:400 20px var(--fd);color:var(--sg);margin:26px 0 6px}
+.gh:first-child{margin-top:6px}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:62px;padding:10px 0;border-top:2px solid var(--ln)}
+.sr b{display:block;font:400 18px var(--fd)}
+.sr small{color:var(--mu);font-size:13px}
+.acc{justify-content:flex-start;gap:14px}
+.sw{position:relative;flex:none;width:68px;height:36px;border:0;border-radius:18px;background:var(--sf2);color:var(--mu);display:flex;align-items:center;padding:0 10px 0 36px;font:800 12px var(--fm);cursor:pointer;transition:background .15s}
+.sw i{position:absolute;left:4px;top:4px;width:28px;height:28px;border-radius:50%;background:var(--tx);box-shadow:0 2px 0 #0006;transition:transform .15s}
+.sw[aria-checked=true]{background:var(--ok);color:var(--d);padding:0 36px 0 12px}
+.sw[aria-checked=true] i{transform:translateX(32px)}
+.dng{width:100%;margin:22px 0 28px;background:none;color:var(--er);box-shadow:inset 0 0 0 3px var(--er);font-size:18px}
+.dng:active{background:var(--er);color:var(--d)}
+@media(hover:hover){.dng:hover{background:var(--er);color:var(--d)}}
+.sol{background:var(--er);color:var(--d);box-shadow:0 5px 0 #8a2018}
+.sol:active{transform:translateY(4px);box-shadow:0 1px 0 #8a2018}
+.bigc .hand{--cw:clamp(62px,18vw,96px)}
+.calm *{animation:none!important;transition:none!important}
+@media(min-width:900px){.bigc .hand{--cw:108px}}
+
+/* passe */
+#pass{overflow:hidden;padding-bottom:0}
+.pbtn{width:100%;padding:0;background:none;border:0;color:inherit;font:800 12px var(--fm);cursor:pointer;text-align:left}
+.pbtn .i{width:16px;height:16px;transform:rotate(180deg)}
+.ph{display:flex;align-items:center;gap:18px;margin-bottom:12px}
+.lv{display:flex;flex-direction:column;align-items:center;min-width:84px}
+.lv small{color:var(--mu);font-weight:800;font-size:13px}
+.lv b{font:400 88px/.9 var(--fd);color:var(--sg);text-shadow:0 4px 0 #0007}
+.px{flex:1;display:flex;flex-direction:column;gap:8px;font-weight:800}
+.px span:last-child{color:var(--mu);font-size:13px}
+.bar{display:block;height:14px;background:var(--sf);border-radius:7px;overflow:hidden}
+.bar b{display:block;height:100%;background:var(--sg)}
+.pb{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-block:2px solid var(--ln)}
+.pb b{display:block;font:400 17px var(--fd)}
+.pb small{color:var(--mu);font-size:12px}
+.spc{flex:none;background:var(--sg);color:var(--d);padding:10px 18px;font-size:17px;min-height:44px;box-shadow:none;--k:10px}
+.spc:disabled{background:var(--sf2);color:var(--mu);cursor:default}
+.spc:not(:disabled):active{filter:brightness(.88)}
+.trk{flex:1;min-height:0;overflow-y:auto;margin:0 -20px;padding:0 20px 8px}
+.lvl{display:grid;grid-template-columns:1fr 56px 1fr;gap:10px;align-items:center;position:relative;padding:5px 0}
+.lvl::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:var(--ln)}
+.lvl.rch::before{background:var(--sg)}
+.lvl.th{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 0 6px;font:400 15px var(--fd);color:var(--mu)}
+.lvl.th::before{display:none}
+.th span{display:flex;align-items:center;justify-content:center;gap:5px}
+.th svg{width:14px;height:14px;fill:currentColor}
+.nd{position:relative;z-index:1;justify-self:center;width:46px;height:46px;display:grid;place-items:center;font:400 19px var(--fd);background:var(--sf2);color:var(--mu);clip-path:polygon(11px 0,calc(100% - 11px) 0,100% 11px,100% calc(100% - 11px),calc(100% - 11px) 100%,11px 100%,0 calc(100% - 11px),0 11px)}
+.nd.rch{background:var(--sg);color:var(--d)}
+.nd.cur{background:var(--ac);color:var(--d);width:56px;height:56px;font-size:24px}
+.rc{position:relative;height:94px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px;background:var(--sf);border-radius:12px;font-size:12px;font-weight:800;text-align:center;line-height:1.15}
+.rc>*{position:relative}
+.rc .st{position:absolute;top:5px;right:5px;width:16px;height:16px}
+.rc .st svg{width:100%;height:100%;fill:currentColor;display:block}
+.rc.p{background:var(--sg);border-radius:0;--k:12px}
+.rc.p::before{content:"";position:absolute;inset:3px;background:var(--sf);clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+.rc.done{opacity:.5}
+.rc.lk{opacity:.6}
+.rc.rdy{outline:3px solid var(--ac)}
+.rc.p.rdy{background:var(--ac);outline:0}
+.cn svg{width:34px;height:34px;fill:var(--sg);display:block}
+.pbar{padding:12px 0 18px}
+.pbar .btn{width:100%}
+
+/* temporada 2: Singularidade (muda só a pele; a anatomia é a mesma) */
+:root[data-season="2"]{--bg:#0f0b1f;--sf:#1d1736;--sf2:#2b2350;--ln:#3a3068;--tx:#f1ecff;--mu:#9d94c4;--ac:#ff5fb8;--acd:#a3236f;--ss:#5b34c9;--sg:#53e3f0;--d:#0b0818;--ov:#05030fb8;--mm:#e0d4ff}
+:root:not([data-season="2"]) .art.s2,:root[data-season="2"] .art.s1{display:none}
+:root[data-season="2"] .ttl h1{font-size:clamp(34px,10.8vw,56px)}
+.seg{display:flex;gap:4px;padding:4px;background:var(--sf);border-radius:12px;margin:2px 0 8px}
+.seg button{flex:1;min-height:44px;border:0;border-radius:9px;background:none;color:var(--mu);font:400 16px var(--fd);cursor:pointer}
+.seg [aria-pressed=true]{background:var(--tx);color:var(--d)}
+
+/* Ajustes solicitados: profundidade cromática sutil */
+.btn.pri{background:linear-gradient(135deg,#ffd35c 0%,var(--ac) 58%,#df970e 100%)}
+.sec,.pill{background:linear-gradient(135deg,var(--sf2) 0%,var(--sf) 100%)}
+.mode{background:linear-gradient(135deg,#d95438 0%,var(--ss) 100%)}
+.dock{background:linear-gradient(180deg,var(--sf2) 0%,var(--sf) 100%)}
+.stage{background:linear-gradient(135deg,var(--sf2) 0%,var(--sf) 100%)}
+.prog i,.bar{background:linear-gradient(180deg,var(--sf2) 0%,var(--sf) 100%)}
+.prog b,.bar b{background:linear-gradient(90deg,#ffd36b 0%,var(--sg) 100%)}
+.sw[aria-checked=true]{background:linear-gradient(135deg,#6be68f 0%,var(--ok) 100%)}
+.version{display:block;margin:0 0 28px;color:var(--mu);font-size:12px;font-weight:800;text-align:center;letter-spacing:.04em}
+
+/* modos e social */
+#tabs{min-height:42px;position:relative;z-index:1;overflow-x:auto;scrollbar-width:none}#tabs::-webkit-scrollbar{display:none}
+#tabs button{min-height:38px;display:inline-flex;align-items:center;flex:none;padding:10px 14px;white-space:nowrap}
+.meta{flex-wrap:wrap;gap:4px 18px}
+.rows b{display:block;font:400 17px var(--fd)}
+.rows small{display:block;color:var(--mu);font-size:12px;font-weight:800}
+.rows li>div{min-width:0}.rows li>small,.rows li>.btn{margin-left:auto;flex:none}
+.rows .btn{min-height:40px;padding:8px 14px;font-size:15px}
+.acts{margin-left:auto;display:flex;gap:6px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--mu)}.dot.on{background:var(--ok)}.dot.pl{background:var(--ac)}
+.fld{width:100%;padding:13px 14px;margin-bottom:18px;border:3px solid var(--ln);border-radius:12px;background:var(--sf);color:var(--tx);font:800 16px var(--fm);-webkit-appearance:none;appearance:none}
+.mdl .fld{margin-bottom:16px;text-align:center}
+.nt{color:var(--mu);font-weight:800;padding:6px 0 18px}
+/* expansão de categorias: mesma anatomia, efeitos apenas com função */
+.quick-links{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 12px}.quick-links .btn.sec{min-height:46px;padding:10px 12px;font-size:14px}.quick-links .btn.sec:hover{filter:brightness(1.06)}.quick-links b{margin-left:5px;color:var(--sg)}.settings-tutorial{width:100%;min-height:46px;padding:10px 12px;margin:0 0 16px;font-size:14px}
+.lobby-watch{width:100%;margin:-6px 0 20px;font-size:15px}.pass-missions{margin-left:auto;padding:10px 12px;font-size:13px;min-height:40px}
+.tutorial-progress{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--mu);font-size:13px;font-weight:800}.tutorial-progress i,.mission-track{display:block;flex:1;height:8px;background:var(--sf);overflow:hidden}.tutorial-progress i b,.mission-track i{display:block;height:100%;background:var(--sg);transition:width .18s ease}
+.tutorial-card{min-height:270px;padding:24px 20px;margin:8px 0 16px;background:var(--sf);border-left:6px solid var(--sg);--k:14px}.tutorial-kicker{display:block;color:var(--sg);font-size:11px;font-weight:800;letter-spacing:.12em}.tutorial-card h3,.daily-reward h3{margin:16px 0 10px;font:400 32px/1.05 var(--fd)}.tutorial-card p,.daily-reward p{max-width:54ch;color:var(--mu);line-height:1.55}.tutorial-example{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;color:var(--mm);font-weight:800}.tutorial-example .cd{--cw:54px}.tutorial-actions{display:flex;gap:8px;align-items:center}.tutorial-actions .btn{font-size:14px;padding:10px 12px;min-height:46px}.prototype-note{margin:16px 0 24px;color:var(--mu);font-size:12px;line-height:1.5}
+.mission-season{display:flex;flex-direction:column;gap:5px;padding:14px 16px;margin:4px 0 20px;background:var(--sf);border-left:5px solid var(--sg)}.mission-season b{font:400 18px var(--fd)}.mission-season span{color:var(--mu);font-size:13px}.mission-heading{margin-top:22px}.mission-item{display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:2px solid var(--ln)}.mission-symbol{flex:none;width:38px;height:38px;display:grid;place-items:center;background:var(--sf2);color:var(--sg);font:400 20px var(--fd)}.mission-copy{flex:1;min-width:0}.mission-copy b{display:block;font:400 17px var(--fd)}.mission-copy small{display:block;color:var(--mu);font-size:12px;margin:2px 0 7px}.mission-copy .mission-track{height:6px}.mission-meta{display:flex;justify-content:space-between;color:var(--mu);font-size:11px;margin-top:5px}.mission-meta strong{color:var(--sg)}.mission-item .btn{min-width:94px;min-height:40px;padding:8px 10px;font-size:13px}.mission-item .btn:disabled{opacity:.55}
+.inventory-summary{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:2px solid var(--ln);font-size:13px}.inventory-summary span{color:var(--mu)}.inventory-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;margin-top:10px}.inventory-item{display:grid;grid-template-columns:58px 1fr;gap:10px 12px;align-items:center;padding:14px 0;border-bottom:2px solid var(--ln)}.inventory-item>div:nth-child(2){min-width:0}.inventory-item>div:nth-child(2) b,.inventory-item>div:nth-child(2) small{display:block}.inventory-item>div:nth-child(2) b{font:400 17px var(--fd)}.inventory-item>div:nth-child(2) small{color:var(--mu);font-size:11px}.inventory-art{width:54px;height:70px;display:grid;place-items:center;border:3px solid var(--tx);color:var(--tx);font:400 30px var(--fd);border-radius:9px;background:#292019}.back-gold{background:linear-gradient(135deg,#785018,#ffd36b 52%,#3d2d21)}.back-ember{background:linear-gradient(135deg,#7a1f14,#ff9a5c 52%,#2c2119)}.avatar-art{width:58px;height:58px;border-radius:50%;background:var(--blue);border-width:4px}.table-art{width:58px;height:48px;clip-path:polygon(12% 0,100% 0,88% 100%,0 100%);background:var(--sg);color:var(--d)}.inventory-item button{grid-column:2;justify-self:start;min-height:36px;padding:6px 10px;background:var(--sf2);border:0;color:var(--tx);font:800 11px var(--fm);cursor:pointer}.inventory-item.selected button{color:var(--sg)}
+.achievement-feature{display:flex;align-items:center;gap:14px;padding:18px 0;margin:4px 0 18px;border-block:2px solid var(--ln)}.achievement-feature>div{flex:1}.achievement-feature>div>*{display:block}.achievement-feature small{color:var(--sg);font-size:10px;font-weight:800;letter-spacing:.1em}.achievement-feature b{font:400 21px var(--fd);margin:4px 0}.achievement-feature span{color:var(--mu);font-size:12px}.achievement-feature>strong{font:400 17px var(--fd);white-space:nowrap}.achievement-mark{width:48px;height:52px;display:grid;place-items:center;flex:none;background:var(--sg);color:var(--d);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);font:400 19px var(--fd)}.achievement-list{list-style:none;padding:0}.achievement-list li{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:2px solid var(--ln)}.achievement-list li>div{flex:1;min-width:0}.achievement-list li>div>b,.achievement-list li>div>small{display:block}.achievement-list li>div>b{font:400 17px var(--fd)}.achievement-list li>div>small,.achievement-list li>span:last-child{color:var(--mu);font-size:12px}.achievement-list li>div>i{display:block;height:6px;margin-top:7px;background:var(--sf)}.achievement-list li>div>i b{display:block;height:100%;background:var(--sg)}
+.daily-reward{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:20px 0;border-block:2px solid var(--ln)}.daily-reward strong{color:var(--sg);font:400 25px var(--fd);white-space:nowrap}.daily-reward strong small{font-size:13px}.daily-reward .btn{grid-column:1/-1;width:100%}.reward-mail li{padding-block:14px}.reward-mail .btn{min-height:38px;font-size:12px;padding:8px}
+.event-feature{padding:22px 20px;margin-top:10px;background:var(--sf);border-left:7px solid var(--ss);--k:16px}.event-index{color:var(--sg);font-size:11px;font-weight:800;letter-spacing:.12em}.event-feature h3{font:400 40px/1 var(--fd);margin:18px 0 10px}.event-feature p{color:var(--mu);max-width:52ch;line-height:1.5}.event-rule{display:flex;flex-direction:column;gap:6px;margin:20px 0;padding:12px 0;border-block:2px solid var(--ln)}.event-rule b{color:var(--sg);font-size:11px;letter-spacing:.1em}.event-rule span{line-height:1.5}
+.quick-open{font-size:13px!important;padding:9px 10px!important;min-height:44px!important}.quick-menu{padding:12px;margin:0 0 10px;background:var(--sf);border-top:2px solid var(--sg)}.quick-menu[hidden],.spectator-banner[hidden],.spectator-log[hidden],.emote-feedback[hidden]{display:none}.quick-menu-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.quick-menu-title b{font:400 17px var(--fd)}.quick-menu-title small{color:var(--mu);font-size:11px}.reaction-list{display:flex;gap:6px;flex-wrap:wrap}.reaction-list button{min-height:38px;padding:7px 10px;background:var(--sf2);border:1px solid var(--ln);color:var(--tx);font:800 12px var(--fm);cursor:pointer}.reaction-list button:active{transform:translateY(1px)}.finish-preview{margin-top:12px;padding:8px 0;border:0;border-bottom:1px solid var(--ln);background:transparent;color:var(--mu);font:800 12px var(--fm);cursor:pointer}.spectator-banner{display:flex;flex-direction:column;gap:3px;padding:9px 12px;margin-top:8px;background:var(--sf2);border-left:4px solid var(--sg);font-size:12px}.spectator-banner span{color:var(--mu)}.spectator-log{padding:12px;margin:12px 0;background:var(--sf);font-size:12px}.spectator-log p{color:var(--mu);margin:5px 0}.spectator-log ol{padding-left:18px;color:var(--mm);line-height:1.7}.emote-feedback{align-self:flex-end;max-width:80%;padding:8px 12px;margin:8px 0 0;background:var(--sf2);border:1px solid var(--ln);color:var(--tx);font:400 16px var(--fd);--k:9px;animation:emoteIn .18s ease-out}@keyframes emoteIn{from{opacity:0;transform:translateY(5px)}}#game.spectator #act,#game.spectator #hand{display:none}#game.spectator .table{margin-top:14px}
+@media(max-width:520px){.tutorial-actions{flex-wrap:wrap}.tutorial-actions .btn{flex:1}.tutorial-actions #tutorialSkip{order:3;flex-basis:100%}.inventory-grid{grid-template-columns:1fr}.sub .pass-missions{font-size:11px;padding:8px}.quick-open{flex:1}.act{gap:6px}.act .btn{font-size:15px;padding:8px 10px}}
+@media(prefers-reduced-motion:reduce){.tutorial-progress i b,.mission-track i,.emote-feedback{animation:none!important;transition:none!important}}
+.profile-links{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:18px 0 28px;border-block:2px solid var(--ln)}.profile-links button{min-height:68px;padding:12px 10px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;border:0;border-right:1px solid var(--ln);background:none;color:var(--tx);text-align:left;cursor:pointer}.profile-links button:last-child{border:0}.profile-links span{font:400 16px var(--fd)}.profile-links b{color:var(--mu);font-size:11px}
+.end-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:0 16px;margin:12px 0 20px;text-align:left}.end-stats div{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--ln)}.end-stats small{color:var(--mu);font-size:11px}.end-stats b{font:400 15px var(--fd);text-align:right}.color-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.color-choices button{min-height:44px;border:2px solid var(--ln);font:400 16px var(--fd);cursor:pointer}.color-choices [data-color="r"]{background:var(--r);color:var(--tx)}.color-choices [data-color="b"]{background:var(--b);color:var(--tx)}.color-choices [data-color="g"]{background:var(--g);color:var(--tx)}.color-choices [data-color="y"]{background:var(--y);color:var(--d)}.special-card{width:54px;height:64px;display:grid;place-items:center;border:3px solid var(--tx);background:var(--b);color:var(--tx);border-radius:8px}.special-card svg{width:30px;height:30px;fill:currentColor}.mirror-card{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--g) 0 75%,var(--y) 0);color:var(--d)}.tutorial-chip{padding:7px 10px;background:var(--sf2);color:var(--sg);font-size:11px;font-weight:800;letter-spacing:.05em}
+/* Variantes do UI Kit aplicadas apenas aos botões de ação principal/secundária. */
+.btn.btn-primary{background:linear-gradient(135deg,#ffd86a 0%,var(--ac) 58%,#d9910b 100%);color:#1a120c;box-shadow:0 5px 0 var(--acd)}
+.btn.btn-primary:not(:disabled):hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn.btn-primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--acd)}
+.btn.btn-primary:disabled{background:var(--sf2);color:var(--mu);box-shadow:0 4px 0 var(--sf);cursor:default}
+.btn.btn-secondary{background:linear-gradient(135deg,var(--sf2) 0%,var(--sf) 100%);color:var(--tx);box-shadow:0 4px 0 var(--sf)}
+.btn.btn-secondary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--sf)}
+.btn.btn-special{background:var(--ss);color:var(--tx);box-shadow:0 4px 0 #762717}
+.btn.btn-special:active{transform:translateY(3px);box-shadow:0 1px 0 #762717}
+.btn.btn-square{width:46px;height:46px;min-height:46px;padding:0;display:inline-grid;place-items:center;font-family:var(--fm);font-size:22px}
+/* Estados e controles da mesa: preservam cartões, tokens e composição existentes. */
+#game .opps{display:grid;grid-template-columns:repeat(auto-fit,minmax(42px,1fr));align-items:start;gap:4px;min-width:0;overflow:visible}
+#game .op{min-width:0;font-size:10px}
+#game .op .av{--s:34px!important}
+#game .op>span:nth-child(2){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-statusbar{display:flex;align-items:center;gap:8px;min-height:42px}
+.game-statusbar .turn{margin:0;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.turn-timer,.stack-indicator{padding:7px 10px;border-radius:9px;background:var(--sf);color:var(--mu);font:400 15px var(--fd);white-space:nowrap}
+.turn-timer{margin-left:auto}
+.turn-timer.warn{color:var(--er);box-shadow:0 0 0 1px var(--er)}
+.stack-indicator{background:var(--ss);color:var(--tx)}
+.draw-pile{cursor:pointer;transition:transform .14s,filter .14s}
+.draw-pile:not(:disabled):hover{transform:translateY(-3px);filter:brightness(1.08)}
+.draw-pile:disabled{cursor:default;opacity:.5;filter:saturate(.6)}
+.draw-pile small{position:absolute;right:5px;bottom:4px;padding:1px 4px;border-radius:5px;background:#17110dcc;color:var(--tx);font:800 10px var(--fm)}
+/* Feedback visual da vez local (classes aplicadas por chroma-game.js: .is-my-turn e .draw-hint).
+   Só cor, elemento decorativo absoluto, transform e opacity: não altera tamanho nem fluxo do layout.
+   NÃO usa ::before/::after de .cd (chroma-cards.css os usa para a moldura e a marca d'água das cartas).
+   O estado estático já destaca por si; o movimento só entra sem prefers-reduced-motion. */
+#turnLabel{position:relative;transition:background-color .18s,color .18s}
+#turnLabel.is-my-turn{background:var(--ac);color:var(--d)}
+#turnLabel.is-my-turn::after{content:"";position:absolute;inset:0;z-index:-1;background:#fff;opacity:0;pointer-events:none}
+.draw-ring{display:none;position:absolute;inset:calc(var(--cw)*-.16) calc(var(--cw)*-.16) calc(var(--cw)*-.16 - 12px);border:3px solid var(--ac);border-radius:calc(var(--cw)*.25);box-shadow:0 0 12px #ffb81c66;pointer-events:none}
+.draw-pile.draw-hint:not(:disabled) .draw-ring{display:block}
+@keyframes turn-glow{0%,100%{opacity:0}50%{opacity:.3}}
+@keyframes draw-pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.05);opacity:1}}
+@media(prefers-reduced-motion:no-preference){
+#turnLabel.is-my-turn::after{animation:turn-glow 1.6s ease-in-out 3}
+.draw-pile.draw-hint:not(:disabled) .draw-ring{animation:draw-pulse 1.1s ease-in-out infinite}
+}
+@media(prefers-reduced-motion:reduce){#turnLabel.is-my-turn::after,.draw-ring{animation:none}}
+.game-message{min-height:18px;margin:0 2px 4px;color:var(--mu);font-size:12px;text-align:center}
+.match-log{min-height:26px;max-height:42px;overflow:hidden;color:var(--mu);font-size:10px;line-height:1.3}
+.match-log span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#game .act{flex-wrap:wrap;justify-content:center;gap:7px}
+#game .act .btn{min-height:42px;padding:9px 11px;font-size:14px}
+#game .hand .cd[disabled]{cursor:default}
+#game .hand .cd[aria-pressed="true"]{outline:3px solid var(--ac);outline-offset:2px}
+.cfg .sw{margin-left:12px}
+.tourney-meta{padding:9px 11px;margin:10px 0 4px;background:var(--sf);border-left:4px solid var(--ac);color:var(--mm);font:800 11px var(--fm);letter-spacing:.04em}
+.tourney-standings{padding-left:28px;margin:6px 0 12px;color:var(--tx);font:400 13px var(--fd)}
+.tourney-standings li{padding:3px 0}
+.button-row{flex-wrap:wrap}
+.room-tools{padding:18px;margin:12px 0 18px;border:1px solid var(--ln);background:linear-gradient(135deg,var(--sf2),var(--sf));--k:14px}.room-actions,.room-join-row,.lobby-player-head{display:flex;align-items:center;gap:8px}.room-actions{margin:10px 0 14px}.room-code{padding:10px 14px;border-radius:10px;background:var(--sf);color:var(--sg);font:400 22px var(--fd);letter-spacing:.16em}.room-join label{display:block;margin-bottom:7px}.room-join-row .text-input{flex:1;min-width:0;margin:0;text-transform:uppercase}.room-join-row .btn{min-height:48px;padding:10px 16px;font-size:16px}.room-tools>small{display:block;margin-top:10px;color:var(--mu);font-size:11px;line-height:1.45}.lobby-player-head{justify-content:space-between;gap:12px}.lobby-player-head .lb{margin:0}.add-bot{min-height:40px;padding:8px 12px;font-size:13px}.pl .empty-slot{opacity:.55}.pl .player-kind{display:block;color:var(--mu);font-size:10px}.text-input{width:100%;padding:13px 14px;border:3px solid var(--ln);border-radius:var(--radius-sm);background:var(--sf);color:var(--tx);font:800 16px var(--fm)}.text-input:focus{border-color:var(--ac);outline:3px solid var(--tx);outline-offset:2px}.text-input::placeholder{color:var(--mu)}@media(max-width:520px){.room-actions{align-items:stretch;flex-direction:column}.room-code{text-align:center}.room-join-row{align-items:stretch;flex-direction:column}.lobby-player-head{align-items:flex-start;flex-direction:column}.add-bot{width:100%}}
+.target-choices{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}
+.target-choices .btn{width:100%;min-height:44px;padding:9px 12px;font-size:16px}
+.match-log:empty{min-height:0}
+.characters-placeholder{display:grid;place-items:center;min-height:160px;margin-top:18px;text-align:center}
+.characters-placeholder p{max-width:32ch;font:400 clamp(18px,5vw,24px)/1.3 var(--fd)}
+@media(max-width:520px){#game .act .btn{font-size:12px;padding:8px 9px;min-height:40px}.game-statusbar .turn{font-size:14px;padding:8px 10px}.match-log{max-height:35px}}
+</style>
+<link rel="stylesheet" href="src/styles/chroma-cards.css">
+<link rel="stylesheet" href="src/styles/chroma-rework.css">
+<link rel="stylesheet" href="src/styles/chroma-disabled-states.css">
+<link rel="stylesheet" href="src/styles/chroma-chaos-background.css">
+<link rel="stylesheet" href="src/styles/chroma-chaos-meter.css">
+<link rel="stylesheet" href="src/styles/chroma-home.css">
+</head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/home.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/ranking.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-bag" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/shop.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/user.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/users.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-characters" viewBox="0 0 24 24"><circle cx="9" cy="7.5" r="3.2"/><circle cx="17.2" cy="9" r="2.5"/><path d="M2.4 20c.3-4.3 2.6-6.8 6.6-6.8s6.3 2.5 6.6 6.8H2.4zM15 14.2c3.9-.7 6.4 1.3 6.8 5.8h-4.4c-.2-2.3-.9-4.2-2.4-5.8z"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/back.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/pause.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-block" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/block.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-rev" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/reverse.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/coin.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/card.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/shield.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-mirror" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/mirror.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/settings.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/lock.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><image class="raster-ui-icon" href="assets/chroma-ui/icons/check.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="s-d" viewBox="0 0 24 24"><image class="raster-ui-icon raster-ui-icon--card" href="assets/chroma-ui/icons/shape-diamond.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="s-c" viewBox="0 0 24 24"><image class="raster-ui-icon raster-ui-icon--card" href="assets/chroma-ui/icons/shape-circle.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="s-t" viewBox="0 0 24 24"><image class="raster-ui-icon raster-ui-icon--card" href="assets/chroma-ui/icons/shape-triangle.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+<symbol id="s-s" viewBox="0 0 24 24"><image class="raster-ui-icon raster-ui-icon--card" href="assets/chroma-ui/icons/shape-star.png" width="24" height="24" preserveAspectRatio="xMidYMid meet"/></symbol>
+</defs></svg>
+
+<div class="app" id="app">
+<section class="scr on" id="home">
+ <header class="hd" id="hdHome"></header>
+ <div class="hero">
+  <svg class="art s1" viewBox="0 0 360 300" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Entrada de mina com ouro e cartas">
+   <defs>
+    <radialGradient id="mgGlow" cx="180" cy="176" r="176" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffcf5a" stop-opacity=".46"/><stop offset=".55" stop-color="#e9a825" stop-opacity=".15"/><stop offset="1" stop-color="#e9a825" stop-opacity="0"/></radialGradient>
+    <linearGradient id="mgArch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34241a"/><stop offset="1" stop-color="#241811"/></linearGradient>
+    <linearGradient id="mgGloss" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+   </defs>
+   <path d="M0 300V120C30 40 110 0 180 0s150 40 180 120v180z" fill="url(#mgArch)"/>
+   <path d="M0 300V120C30 40 110 0 180 0s150 40 180 120v180z" fill="none" stroke="#5a4533" stroke-width="3" opacity=".75"/>
+   <path d="M36 300V150C62 84 120 52 180 52s118 32 144 98v150z" fill="#1d130d"/>
+   <path d="M-10 292 370 214M-10 312 370 234" stroke="#4a382a" stroke-width="7" fill="none"/>
+   <circle cx="180" cy="176" r="176" fill="url(#mgGlow)"/>
+   <g transform="translate(124 168) rotate(-16)"><rect x="-31" y="-43" width="70" height="98" rx="9" fill="#000" opacity=".28"/><rect x="-35" y="-49" width="70" height="98" rx="9" fill="#e8384f" stroke="#fff3dc" stroke-width="4"/><path d="M0-20 18 0 0 20-18 0z" fill="#fff3dc"/><rect x="-33" y="-47" width="66" height="94" rx="7" fill="url(#mgGloss)"/></g>
+   <g transform="translate(236 168) rotate(16)"><rect x="-31" y="-43" width="70" height="98" rx="9" fill="#000" opacity=".28"/><rect x="-35" y="-49" width="70" height="98" rx="9" fill="#f4e04d" stroke="#fff3dc" stroke-width="4"/><rect x="-16" y="-16" width="32" height="32" rx="3" fill="#1a120c"/><rect x="-33" y="-47" width="66" height="94" rx="7" fill="url(#mgGloss)"/></g>
+   <g transform="translate(180 152)"><rect x="-33" y="-46" width="74" height="104" rx="9" fill="#000" opacity=".3"/><rect x="-37" y="-52" width="74" height="104" rx="9" fill="#2f6fed" stroke="#fff3dc" stroke-width="4"/><circle r="19" fill="#fff3dc"/><rect x="-35" y="-50" width="70" height="100" rx="7" fill="url(#mgGloss)"/></g>
+   <path d="M60 300 104 240l52-22 52 8 58 22 36 52z" fill="#b97a10"/>
+   <path d="M104 240l52-22-12 44z" fill="#f2c14a"/><path d="M156 218l52 8-24 36z" fill="#e9a825"/><path d="M208 226l58 22-50 18z" fill="#ffd36b"/>
+   <g fill="#fff3c4"><g transform="translate(96 104) scale(.95)"><path class="twinkle" d="M0-7 1.8-1.8 7 0 1.8 1.8 0 7-1.8 1.8-7 0-1.8-1.8z"/></g><g transform="translate(270 88) scale(1.15)"><path class="twinkle" style="animation-delay:-1.2s" d="M0-7 1.8-1.8 7 0 1.8 1.8 0 7-1.8 1.8-7 0-1.8-1.8z"/></g><g transform="translate(222 214) scale(.8)"><path class="twinkle" style="animation-delay:-2.3s" d="M0-7 1.8-1.8 7 0 1.8 1.8 0 7-1.8 1.8-7 0-1.8-1.8z"/></g></g>
+  </svg>
+  <svg class="art s2" viewBox="8 20 344 250" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Buraco negro com cartas em órbita">
+   <path fill="#8b7bd9" d="M40 60l4 8-4 8-4-8zM306 42l3 6-3 6-3-6zM332 128l3 6-3 6-3-6zM64 142l3 6-3 6-3-6zM246 96l2 4-2 4-2-4zM120 30l2 4-2 4-2-4z"/>
+   <g transform="translate(180 172) rotate(-14)" fill="none"><ellipse rx="152" ry="54" stroke="#2b2350" stroke-width="24"/><ellipse rx="152" ry="54" stroke="#5b34c9" stroke-width="12"/><ellipse rx="120" ry="40" stroke="#ff5fb8" stroke-width="6"/><ellipse rx="94" ry="30" stroke="#53e3f0" stroke-width="3"/></g>
+   <circle cx="180" cy="172" r="46" fill="#05030d"/>
+   <path d="M147 152a46 46 0 0 1 38-27" stroke="#2b2350" stroke-width="4" fill="none"/>
+   <g transform="translate(64 196) rotate(-30)"><rect x="-26" y="-37" width="52" height="74" rx="7" fill="#e8384f" stroke="#f1ecff" stroke-width="3"/><path d="M0-14 12 0 0 14-12 0z" fill="#f1ecff"/></g>
+   <g transform="translate(296 150) rotate(24)"><rect x="-26" y="-37" width="52" height="74" rx="7" fill="#f4e04d" stroke="#f1ecff" stroke-width="3"/><rect x="-11" y="-11" width="22" height="22" rx="2" fill="#0b0818"/></g>
+   <g transform="translate(180 84) rotate(5)"><rect x="-26" y="-37" width="52" height="74" rx="7" fill="#2f6fed" stroke="#f1ecff" stroke-width="3"/><circle r="13" fill="#f1ecff"/></g>
+  </svg>
+  <div class="ttl"><small id="sTag">Temporada 1</small><h1 id="sName">Mina de Ouro</h1><p class="season-story" id="sStory">Uma corrida pelos veios raros da mina.</p></div>
+ </div>
+ <button class="prog pbtn" id="pbtn" data-go="pass" aria-label="Abrir passe da temporada"><span id="homePassLevel">Nível 1</span><i><b id="homePassFill" style="width:0%"></b></i><span id="homePassXp">0 XP</span><svg class="i"><use href="#i-back"/></svg></button>
+ <button class="btn btn-primary pri btn-play" data-go="lobby" data-haptic-kind="important">JOGAR</button>
+ <div class="quick-links" aria-label="Atalhos da temporada">
+  <button class="btn sec quick-card mission-card" type="button" data-go="missions" style="--p:0%;--n:5"><span class="qc-ico" aria-hidden="true"><svg class="i"><use href="#i-check"/></svg></span><span class="qc-body"><span class="qc-kicker">Missões</span><b id="missionShortcut">0/5</b><i class="qc-track" aria-hidden="true"><u></u></i></span></button>
+  <button class="btn sec quick-card event-card" type="button" data-go="events"><span class="qc-ico qc-cards" aria-hidden="true"><i></i><i></i><i></i></span><span class="qc-body"><span class="qc-kicker">Evento da semana</span><b class="qc-title" id="homeEventName">Maré de Cartas</b></span><svg class="i" aria-hidden="true"><use href="#i-back"/></svg></button>
+ </div>
+</section>
+<canvas class="home-grid" id="homeGrid" aria-hidden="true"></canvas>
+
+<section class="scr col" id="lobby">
+ <div class="sub"><button class="btn sec sq" data-go="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><div><h2 id="lobbyTitle">Sala local</h2><small id="lobbyStatus">Crie uma sala ou entre com um código</small></div></div>
+ <div class="room-tools surface-card">
+  <span class="type-label">MULTIPLAYER</span>
+  <div class="room-actions"><button class="btn btn-primary pri" id="createRoom" type="button">CRIAR SALA</button><span class="room-code" id="roomCodeDisplay" hidden></span></div>
+  <div class="room-join"><label class="type-label" for="roomCodeInput">CÓDIGO DA PARTIDA</label><div class="room-join-row"><input class="text-input fld" id="roomCodeInput" type="text" maxlength="6" placeholder="Ex.: K7QP" autocomplete="off" spellcheck="false"><button class="btn btn-secondary sec" id="joinRoom" type="button">ENTRAR</button></div></div>
+  <small id="roomHint">Abra o mesmo endereço em outra aba/janela para testar uma sala multiplayer.</small>
+ </div>
+ <div class="mode cut"><h3 id="mN"></h3><p id="mD"></p><div class="meta"><span id="mP"></span><span id="mT"></span><span id="mB"></span></div></div>
+ <div class="tabs" role="tablist" id="tabs"></div>
+ <div class="lobby-player-head"><div class="lb" id="mL">Jogadores 1 de 4</div><button class="btn btn-secondary sec add-bot" id="addBot" type="button">+ ADICIONAR BOT</button></div>
+ <div class="pl" id="pl"></div>
+ <div class="cfg"><div><span>Cartas iniciais</span><b>7</b></div><div><span>Tempo por turno</span><b>15 s</b></div><div><span>Acúmulo de +N / Espelho</span><button class="sw" id="stackToggle" type="button" role="switch" aria-checked="false" aria-label="Ativar acúmulo de compras e Espelho"><span>Não</span><i></i></button></div></div>
+ <button class="btn btn-primary pri" id="startMatch" data-go="game" data-haptic-kind="important" disabled>ADICIONE MAIS 1 JOGADOR</button>
+ <button class="btn btn-secondary sec lobby-watch" id="watchStart">ASSISTIR COMO ESPECTADOR</button>
+</section>
+
+<section class="scr" id="game">
+ <div class="gt"><button class="btn btn-secondary btn-square sec sq" id="pauseGame" aria-label="Pausar partida" aria-keyshortcuts="P"><svg class="i"><use href="#i-pause"/></svg><span class="control-key" aria-hidden="true"><img src="assets/chroma-ui/keys/keyboard_p.png" alt=""></span></button><button class="btn btn-secondary btn-square sec sq" id="audioToggle" type="button" aria-label="Silenciar sons" aria-pressed="false" title="Silenciar sons"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button><div class="opps" id="opps"></div></div>
+ <div class="spectator-banner" id="spectatorBanner" hidden><b>Modo espectador</b><span>Você vê a mesa e o registro de jogadas, sem mãos nem ações de jogador.</span></div>
+ <div class="emote-feedback" id="emoteFeedback" role="status" aria-live="polite" hidden></div>
+ <div class="game-statusbar" aria-live="polite"><span class="turn cut" id="turnLabel">Esperando partida</span><span class="turn-timer" id="turnTimer">15 s</span><span class="stack-indicator" id="stackIndicator" hidden></span></div>
+  <div class="chaos-meter-row" hidden>
+   <aside class="chaos-meter" id="chaosMeter" hidden role="meter" aria-readonly="true" aria-labelledby="chaosMeterLabel chaosMeterState" aria-valuemin="0" aria-valuemax="150" aria-valuenow="0" aria-valuetext="0, estável">
+    <div class="chaos-meter__head"><svg class="chaos-meter__coil" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5.5c2.8-4 3.1 9 6 5s3.2-9 6-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span class="chaos-meter__label" id="chaosMeterLabel">CAOS</span><span class="chaos-meter__value">0</span></div>
+    <span class="chaos-meter__state" id="chaosMeterState">ESTÁVEL</span>
+    <div class="chaos-meter__track" aria-hidden="true"><span class="chaos-meter__fill"></span><span class="chaos-meter__ticks"></span><i class="chaos-meter__spark chaos-meter__spark--left"></i><i class="chaos-meter__spark chaos-meter__spark--right"></i><i class="chaos-meter__spark chaos-meter__spark--left"></i><i class="chaos-meter__spark chaos-meter__spark--right"></i></div>
+   </aside>
+  </div>
+ <div class="table cut">
+  <button class="cd bk draw-pile" id="drawPile" type="button" aria-label="Comprar uma carta" aria-keyshortcuts="D"><b class="v">C</b><small id="drawCount"></small><span class="control-key" aria-hidden="true"><img src="assets/chroma-ui/keys/keyboard_d.png" alt=""></span><span class="draw-ring" aria-hidden="true"></span></button>
+  <div id="disc"></div>
+ </div>
+ <div class="cur" id="cur"></div>
+ <p class="game-message" id="gameMessage" role="status" aria-live="polite">Escolha um modo e comece a partida.</p>
+ <div class="match-log" id="matchLog" role="log" aria-label="Últimas jogadas" aria-live="polite"></div>
+ <div class="act" id="act"><button class="btn btn-special" id="chromaBtn" type="button" aria-keyshortcuts="C">CHROMA!<span class="control-key" aria-hidden="true"><img src="assets/chroma-ui/keys/keyboard_c.png" alt=""></span></button><button class="btn btn-special" id="catchBtn" type="button" hidden>DENUNCIAR</button><button class="btn btn-secondary sec quick-open" id="quickOpen" aria-expanded="false" aria-controls="quickMenu">Mensagens rápidas</button><button class="btn btn-secondary sec" id="passBtn" type="button" aria-keyshortcuts="N" hidden>PASSAR<span class="control-key" aria-hidden="true"><img src="assets/chroma-ui/keys/keyboard_n.png" alt=""></span></button><button class="btn btn-primary pri" id="play" data-haptic-kind="important" aria-keyshortcuts="Enter" disabled>JOGAR<span class="control-key" aria-hidden="true"><img src="assets/chroma-ui/keys/keyboard_enter.png" alt=""></span></button></div><div class="input-legend" id="inputLegend" role="note" aria-label="Atalhos do modo PC">
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_arrow_left.png" alt=""><img src="assets/chroma-ui/keys/keyboard_arrow_right.png" alt=""> Selecionar carta</span>
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_enter.png" alt=""> Jogar</span>
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_d.png" alt=""> Comprar</span>
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_n.png" alt=""> Passar</span>
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_c.png" alt=""> CHROMA!</span>
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_p.png" alt=""> Pausar</span>
+<span class="input-legend__item"><img src="assets/chroma-ui/keys/keyboard_escape.png" alt=""> Cancelar/fechar</span>
+</div>
+<div class="controller-legend" id="controllerLegend" role="note" aria-live="polite" hidden>
+<img src="assets/chroma-ui/icons/controller.png" alt=""><span id="controllerState">Aguardando controle</span>
+<span class="input-legend__item"><kbd>← →</kbd> cartas</span><span class="input-legend__item"><kbd>A</kbd> jogar/confirmar</span>
+<span class="input-legend__item"><kbd>X</kbd> comprar</span><span class="input-legend__item"><kbd>B</kbd> passar/voltar</span><span class="input-legend__item"><kbd>Y</kbd> pausar</span>
+</div>
+ <div class="quick-menu" id="quickMenu" hidden><div class="quick-menu-title"><b>Reações rápidas</b><small>Cooldown de 1,5 s</small></div><div class="reaction-list"><button data-reaction="Boa jogada!">Boa jogada!</button><button data-reaction="Vamos lá!">Vamos lá!</button><button data-reaction="Cuidado!">Cuidado!</button><button data-reaction="Não acredito!">Não acredito!</button><button data-reaction="Foi por pouco!">Foi por pouco!</button><button data-reaction="GG!">GG!</button></div><section class="emote-picker" aria-label="Emotes Style 1"><div class="emote-picker-title"><span>Emotes</span><small>Style 1 · pacote local</small></div><div class="emote-grid"><button type="button" data-reaction="Emote: Balão" data-emote-src="assets/chroma-ui/emotes/style-1/emote__.png" aria-label="Emote: Balão" title="Balão"><img src="assets/chroma-ui/emotes/style-1/emote__.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Alerta" data-emote-src="assets/chroma-ui/emotes/style-1/emote_alert.png" aria-label="Emote: Alerta" title="Alerta"><img src="assets/chroma-ui/emotes/style-1/emote_alert.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Raiva" data-emote-src="assets/chroma-ui/emotes/style-1/emote_anger.png" aria-label="Emote: Raiva" title="Raiva"><img src="assets/chroma-ui/emotes/style-1/emote_anger.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Força" data-emote-src="assets/chroma-ui/emotes/style-1/emote_bars.png" aria-label="Emote: Força" title="Força"><img src="assets/chroma-ui/emotes/style-1/emote_bars.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Moedas" data-emote-src="assets/chroma-ui/emotes/style-1/emote_cash.png" aria-label="Emote: Moedas" title="Moedas"><img src="assets/chroma-ui/emotes/style-1/emote_cash.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Círculo" data-emote-src="assets/chroma-ui/emotes/style-1/emote_circle.png" aria-label="Emote: Círculo" title="Círculo"><img src="assets/chroma-ui/emotes/style-1/emote_circle.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Nuvem" data-emote-src="assets/chroma-ui/emotes/style-1/emote_cloud.png" aria-label="Emote: Nuvem" title="Nuvem"><img src="assets/chroma-ui/emotes/style-1/emote_cloud.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Erro" data-emote-src="assets/chroma-ui/emotes/style-1/emote_cross.png" aria-label="Emote: Erro" title="Erro"><img src="assets/chroma-ui/emotes/style-1/emote_cross.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Um ponto" data-emote-src="assets/chroma-ui/emotes/style-1/emote_dots1.png" aria-label="Emote: Um ponto" title="Um ponto"><img src="assets/chroma-ui/emotes/style-1/emote_dots1.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Dois pontos" data-emote-src="assets/chroma-ui/emotes/style-1/emote_dots2.png" aria-label="Emote: Dois pontos" title="Dois pontos"><img src="assets/chroma-ui/emotes/style-1/emote_dots2.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Três pontos" data-emote-src="assets/chroma-ui/emotes/style-1/emote_dots3.png" aria-label="Emote: Três pontos" title="Três pontos"><img src="assets/chroma-ui/emotes/style-1/emote_dots3.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Gota" data-emote-src="assets/chroma-ui/emotes/style-1/emote_drop.png" aria-label="Emote: Gota" title="Gota"><img src="assets/chroma-ui/emotes/style-1/emote_drop.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Gotas" data-emote-src="assets/chroma-ui/emotes/style-1/emote_drops.png" aria-label="Emote: Gotas" title="Gotas"><img src="assets/chroma-ui/emotes/style-1/emote_drops.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Atenção" data-emote-src="assets/chroma-ui/emotes/style-1/emote_exclamation.png" aria-label="Emote: Atenção" title="Atenção"><img src="assets/chroma-ui/emotes/style-1/emote_exclamation.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Atenção dupla" data-emote-src="assets/chroma-ui/emotes/style-1/emote_exclamations.png" aria-label="Emote: Atenção dupla" title="Atenção dupla"><img src="assets/chroma-ui/emotes/style-1/emote_exclamations.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Rosto zangado" data-emote-src="assets/chroma-ui/emotes/style-1/emote_faceAngry.png" aria-label="Emote: Rosto zangado" title="Rosto zangado"><img src="assets/chroma-ui/emotes/style-1/emote_faceAngry.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Rosto feliz" data-emote-src="assets/chroma-ui/emotes/style-1/emote_faceHappy.png" aria-label="Emote: Rosto feliz" title="Rosto feliz"><img src="assets/chroma-ui/emotes/style-1/emote_faceHappy.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Rosto triste" data-emote-src="assets/chroma-ui/emotes/style-1/emote_faceSad.png" aria-label="Emote: Rosto triste" title="Rosto triste"><img src="assets/chroma-ui/emotes/style-1/emote_faceSad.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Coração" data-emote-src="assets/chroma-ui/emotes/style-1/emote_heart.png" aria-label="Emote: Coração" title="Coração"><img src="assets/chroma-ui/emotes/style-1/emote_heart.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Coração partido" data-emote-src="assets/chroma-ui/emotes/style-1/emote_heartBroken.png" aria-label="Emote: Coração partido" title="Coração partido"><img src="assets/chroma-ui/emotes/style-1/emote_heartBroken.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Corações" data-emote-src="assets/chroma-ui/emotes/style-1/emote_hearts.png" aria-label="Emote: Corações" title="Corações"><img src="assets/chroma-ui/emotes/style-1/emote_hearts.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Ideia" data-emote-src="assets/chroma-ui/emotes/style-1/emote_idea.png" aria-label="Emote: Ideia" title="Ideia"><img src="assets/chroma-ui/emotes/style-1/emote_idea.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Risada" data-emote-src="assets/chroma-ui/emotes/style-1/emote_laugh.png" aria-label="Emote: Risada" title="Risada"><img src="assets/chroma-ui/emotes/style-1/emote_laugh.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Música" data-emote-src="assets/chroma-ui/emotes/style-1/emote_music.png" aria-label="Emote: Música" title="Música"><img src="assets/chroma-ui/emotes/style-1/emote_music.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Dúvida" data-emote-src="assets/chroma-ui/emotes/style-1/emote_question.png" aria-label="Emote: Dúvida" title="Dúvida"><img src="assets/chroma-ui/emotes/style-1/emote_question.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Sono" data-emote-src="assets/chroma-ui/emotes/style-1/emote_sleep.png" aria-label="Emote: Sono" title="Sono"><img src="assets/chroma-ui/emotes/style-1/emote_sleep.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Dormindo" data-emote-src="assets/chroma-ui/emotes/style-1/emote_sleeps.png" aria-label="Emote: Dormindo" title="Dormindo"><img src="assets/chroma-ui/emotes/style-1/emote_sleeps.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Estrela" data-emote-src="assets/chroma-ui/emotes/style-1/emote_star.png" aria-label="Emote: Estrela" title="Estrela"><img src="assets/chroma-ui/emotes/style-1/emote_star.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Estrelas" data-emote-src="assets/chroma-ui/emotes/style-1/emote_stars.png" aria-label="Emote: Estrelas" title="Estrelas"><img src="assets/chroma-ui/emotes/style-1/emote_stars.png" alt="" loading="lazy"></button><button type="button" data-reaction="Emote: Espiral" data-emote-src="assets/chroma-ui/emotes/style-1/emote_swirl.png" aria-label="Emote: Espiral" title="Espiral"><img src="assets/chroma-ui/emotes/style-1/emote_swirl.png" alt="" loading="lazy"></button></div></section><button class="finish-preview" id="finishPreview">Ver resumo parcial</button></div>
+ <div class="spectator-log" id="spectatorLog" hidden><b>Registro da mesa</b><p id="spectatorLogCopy">Cartas visíveis, ordem de turno e contagem pública. As mãos dos jogadores permanecem ocultas.</p><ol id="spectatorLogItems"></ol></div>
+ <div class="hand" id="hand"></div>
+</section>
+
+<section class="scr col" id="rank">
+ <div class="hd"><h2>Ranking</h2><span class="tag cut" id="rTag">Temporada 1</span></div>
+ <div class="pos"><span class="big"><i>#</i>12</span><div><b>Sua posição</b><small>Ouro II, 1.284 pontos. Subiu 3 lugares.</small></div></div>
+ <div class="pod" id="pod"></div>
+ <ul class="rows" id="rows"></ul>
+</section>
+
+<section class="scr col" id="shop">
+ <header class="hd"><h2>Loja</h2><div class="pill bal"><svg class="i"><use href="#i-coin"/></svg>2.480</div></header>
+ <p id="shopStorage" role="status" aria-live="polite">Prévia local: compras ficam salvas neste dispositivo e não sincronizam com Firebase.</p>
+ <div id="feat"></div>
+ <div class="shelf" id="shelf"></div>
+ <div class="tabs shop-categories" id="cats" role="tablist" aria-label="Categorias de cosméticos"><button type="button" role="tab" data-c="Cartas" aria-selected="true">Cartas</button><button type="button" role="tab" data-c="Mesas" aria-selected="false">Mesas</button><button type="button" role="tab" data-c="Molduras" aria-selected="false">Molduras</button><button type="button" role="tab" data-c="Efeitos de Nome" aria-selected="false">Efeitos de Nome</button></div>
+</section>
+
+<section class="scr col" id="prof"></section>
+<section class="scr col" id="characters" aria-labelledby="charactersTitle">
+ <div class="hd"><h2 id="charactersTitle">Personagens</h2></div>
+ <article class="mode cut characters-placeholder" role="status"><p>Ainda em desenvolvimento, poderá ser acessado somente na Temporada 3: Lua Carmesim Japonesa</p></article>
+</section>
+
+<div class="ov" id="ov" hidden><div class="mdl" role="dialog" aria-modal="true" aria-labelledby="mt"><h3 id="mt">Confirmar compra</h3><div id="mp"></div><p id="mx"></p><div class="row"><button class="btn sec" id="no">Cancelar</button><button class="btn pri" id="yes" data-haptic-kind="important">Comprar</button></div></div></div>
+
+<section class="scr col" id="set">
+ <div class="sub"><button class="btn sec sq" data-go="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h2>Configurações</h2></div>
+ <div id="setBody"></div><section class="appearance-settings" id="appearanceSettings" aria-labelledby="appearanceTitle">
+<h3 id="appearanceTitle">Aparência e tela</h3>
+<div class="appearance-block"><p class="appearance-label"><img src="assets/chroma-ui/icons/mode-dark.png" alt=""> Tema</p>
+<div class="settings-choice" role="group" aria-label="Tema da interface">
+<button type="button" data-theme-choice="dark" aria-pressed="true"><img src="assets/chroma-ui/icons/mode-dark.png" alt=""><span>Escuro</span></button>
+<button type="button" data-theme-choice="light" aria-pressed="false"><img src="assets/chroma-ui/icons/mode-light.png" alt=""><span>Claro</span></button>
+</div><small class="appearance-help">A escolha de tema fica salva neste dispositivo.</small></div>
+<div class="appearance-block"><p class="appearance-label">Perfil de layout</p>
+<div class="settings-choice" role="group" aria-label="Perfil de layout">
+<button type="button" data-profile-choice="pc" aria-pressed="false"><img src="assets/chroma-ui/icons/profile-pc.png" alt=""><span>PC</span></button>
+<button type="button" data-profile-choice="tablet" aria-pressed="false"><img src="assets/chroma-ui/icons/profile-tablet.png" alt=""><span>Tablet</span></button>
+<button type="button" data-profile-choice="phone" aria-pressed="false"><img src="assets/chroma-ui/icons/profile-phone.png" alt=""><span>Celular</span></button>
+</div><small class="appearance-help">Ajusta a largura e a organização da interface ao perfil escolhido, sem simular a resolução física nem cortar conteúdo; telas menores continuam refluindo e podem rolar.</small></div>
+<div class="appearance-block"><label class="appearance-label" for="cursorStyle"><img src="assets/chroma-ui/icons/computer-mouse.png" alt=""> Estilo do ponteiro</label>
+<select id="cursorStyle" aria-describedby="cursorHelp"><option value="system">Padrão do sistema</option><option value="kenney-outline">Kenney · contorno</option><option value="kenney-shaded">Kenney · sombreado</option></select>
+<small class="appearance-help" id="cursorHelp">Os cursores personalizados aparecem apenas com mouse/ponteiro preciso; toque e caneta permanecem inalterados.</small></div>
+</section>
+</section>
+
+<div class="ov" id="ov2" hidden><div class="mdl" role="alertdialog" aria-modal="true" aria-labelledby="mt2"><h3 id="mt2">Sair da conta?</h3><p>Você volta para a entrada. Suas moedas e sua coleção ficam salvas.</p><div class="row"><button class="btn sec" id="no2">Cancelar</button><button class="btn sol" id="yes2">Sair</button></div></div></div>
+
+<section class="scr col" id="pass">
+ <div class="sub"><button class="btn sec sq" data-go="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Passe da temporada</h2><small id="pSub">Mina de Ouro, termina em 23 dias</small></div><button class="btn sec pass-missions" data-go="missions">MISSÕES</button></div>
+ <div class="ph"><div class="lv"><small>Passe</small><b id="systemPassLevel">Nível 1</b></div><div class="px"><span id="systemPassXp">0 / 100 XP</span><i class="bar"><b id="systemPassFill" style="width:0%"></b></i><span id="systemPassNext">100 XP para o próximo nível</span></div></div>
+ <div class="pb"><div><b>Passe premium</b><small>Uma recompensa extra por nível</small></div><button class="btn spc cut" id="prem">Desbloquear</button></div>
+ <div class="trk" id="trk"></div>
+ <div class="pbar"><button class="btn pri" id="claim"></button></div>
+</section>
+
+<section class="scr col" id="soc">
+ <div class="hd"><h2>Social</h2><span class="tag cut" id="sOn"></span></div>
+ <div class="tabs" role="tablist" id="stabs"><button role="tab" data-t="f" aria-selected="true" aria-controls="sF">Amigos</button><button role="tab" data-t="c" aria-selected="false" aria-controls="sC">Clã</button></div>
+ <div id="sF">
+  <input class="fld" id="sq" type="search" placeholder="Buscar jogador por nome ou @usuário" aria-label="Buscar jogador" autocomplete="off">
+  <div class="social-hint" id="socialHint" role="status" aria-live="polite"></div>
+  <div class="lb" id="lRs" hidden>Resultados</div><ul class="rows" id="sRs" hidden></ul>
+  <div class="lb" id="lRq"></div><ul class="rows" id="sRq"></ul>
+  <div class="lb" id="lFr"></div><ul class="rows" id="sFr"></ul>
+  <div class="lb" id="lSn">Pedidos enviados</div><ul class="rows" id="sSn"></ul>
+ </div>
+ <div id="sC" hidden><div id="sCl"></div></div>
+ </section>
+
+<section class="scr col" id="tutorial">
+ <div class="sub"><button class="btn sec sq" data-go="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Como jogar</h2><small>Treinamento guiado · sem ranking</small></div></div>
+ <div class="tutorial-progress"><span id="tutorialCount">1 / 6</span><i><b id="tutorialFill" style="width:16.67%"></b></i></div>
+ <article class="tutorial-card" aria-live="polite"><span class="tutorial-kicker" id="tutorialKicker">FUNDAMENTO</span><h3 id="tutorialTitle"></h3><p id="tutorialText"></p><div class="tutorial-example" id="tutorialExample"></div></article>
+ <div class="tutorial-actions"><button class="btn sec" id="tutorialPrev">VOLTAR</button><button class="btn sec" id="tutorialSkip">PULAR TUTORIAL</button><button class="btn pri" id="tutorialNext">PRÓXIMO</button></div>
+ <p class="prototype-note">Este guia é uma prévia local: não cria sala online nem altera estatísticas de uma conta real.</p>
+ </section>
+
+<section class="scr col" id="missions">
+ <div class="sub"><button class="btn sec sq" data-go="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Missões</h2><small>Progresso local de demonstração</small></div></div>
+ <div class="mission-season"><b>Temporada 01 · Mina de Ouro</b><span>Complete objetivos para avançar no Passe.</span></div>
+ <div class="lb">Diárias</div><div id="dailyMissionList" class="mission-list"></div>
+ <div class="lb mission-heading">Semanais</div><div id="weeklyMissionList" class="mission-list"></div>
+ <p class="prototype-note">As missões com amigos são simuladas com os jogadores de exemplo desta prévia; não há verificação de amizade nem sincronização online.</p>
+ </section>
+
+<section class="scr col" id="inventory">
+ <div class="sub"><button class="btn sec sq" data-go="prof" aria-label="Voltar ao perfil"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Inventário</h2><small>Coleção carregando…</small></div></div>
+ <div class="inventory-summary"><b>Equipado agora</b><span id="equippedItem">Veio dourado · verso de carta</span></div>
+ <div class="inventory-grid" id="inventoryGrid">
+  <article class="inventory-item selected"><div class="inventory-art back-gold">C</div><div><b>Veio dourado</b><small>Verso de carta · Lendário</small></div><button data-equip="Veio dourado" aria-pressed="true">Equipado</button></article>
+  <article class="inventory-item"><div class="inventory-art back-ember">C</div><div><b>Brasa</b><small>Verso de carta · Épico</small></div><button data-equip="Brasa" aria-pressed="false">Equipar</button></article>
+  <article class="inventory-item"><div class="inventory-art avatar-art">N</div><div><b>Mineiro</b><small>Avatar · Raro</small></div><button data-equip="Mineiro" aria-pressed="false">Equipar</button></article>
+  <article class="inventory-item"><div class="inventory-art table-art">+</div><div><b>Galeria</b><small>Mesa · Épico</small></div><button data-equip="Galeria" aria-pressed="false">Equipar</button></article>
+ </div>
+ <p class="prototype-note">Os presentes recebidos entram diretamente na sua coleção. Toque em “Equipar” para aplicar o cosmético.</p>
+ </section>
+
+<section class="scr col" id="achievements">
+ <div class="sub"><button class="btn sec sq" data-go="prof" aria-label="Voltar ao perfil"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Conquistas</h2><small>Marcos do jogador</small></div></div>
+ <div class="achievement-feature"><span class="achievement-mark">I</span><div><small>DESTAQUE</small><b>Primeira vitória</b><span>Uma rodada vencida abre o caminho.</span></div><strong>1 / 1</strong></div>
+ <ul class="achievement-list"><li><span class="achievement-mark">5</span><div><b>Ritmo constante</b><small>Vença cinco partidas seguidas</small><i><b style="width:60%"></b></i></div><span>3 / 5</span></li><li><span class="achievement-mark">C</span><div><b>Uma mão limpa</b><small>Termine a rodada sem comprar</small><i><b style="width:100%"></b></i></div><span>Concluída</span></li><li><span class="achievement-mark">★</span><div><b>Campeão</b><small>Vença um torneio</small><i><b style="width:0%"></b></i></div><span>0 / 1</span></li></ul>
+ </section>
+
+<section class="scr col" id="rewards">
+ <div class="sub"><button class="btn sec sq" data-go="prof" aria-label="Voltar ao perfil"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Recompensas</h2><small>Presente diário e correio</small></div></div>
+ <div class="daily-reward"><div><span class="tutorial-kicker">ENTRADA DIÁRIA</span><h3>Uma pequena vantagem</h3><p>Recompensa de demonstração para sua sequência.</p></div><strong>+75 <small>moedas</small></strong><button class="btn pri" id="claimDaily">COLETAR</button></div>
+ <div class="lb mission-heading">Correio</div><ul class="rows reward-mail"><li><div><b>Boas-vindas à Mina de Ouro</b><small>Um verso de carta raro aguarda na sua coleção.</small></div><button class="btn sec" data-go="inventory">VER ITEM</button></li><li><div><b>Novidades da temporada</b><small>O Passe da Mina de Ouro está ativo.</small></div><button class="btn sec" data-go="pass">ABRIR PASSE</button></li></ul>
+ <p class="prototype-note">Não há entrega de itens ou saldo fora desta prévia.</p>
+ </section>
+
+<section class="scr col" id="events">
+ <div class="sub"><button class="btn sec sq" data-go="home" aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><div><h2>Eventos</h2><small>Atividade sazonal em destaque</small></div></div>
+ <article class="event-feature"><span class="event-index">01 / TEMPORADA</span><h3>Maré de Cartas</h3><p>Entre em uma mesa de Eventos Aleatórios: a cada seis turnos livres, uma surpresa muda o ritmo da rodada.</p><div class="event-rule"><b>NA MESA</b><span>Chuva de cartas · Maré inversa · Pintura surpresa · Presente de escudo · Passa-passa</span></div><button class="btn pri" id="openEventMode">VER MODO</button></article>
+ <p class="prototype-note">Eventos Aleatórios não são ranqueados na referência do jogo. Esta tela apresenta regras, sem matchmaking real.</p>
+ </section>
+
+<nav class="dock" id="dock" aria-label="Navegação">
+ <button type="button" data-go="home" aria-current="page"><svg aria-hidden="true"><use href="#i-home"/></svg><span class="dock-label">Início</span></button>
+ <button type="button" data-go="rank"><svg aria-hidden="true"><use href="#i-trophy"/></svg><span class="dock-label">Ranking</span></button>
+ <button type="button" data-go="shop"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="dock-label">Loja</span></button>
+ <button type="button" data-go="soc"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg><span class="dock-label">Social</span></button>
+ <button type="button" data-go="prof"><svg aria-hidden="true"><use href="#i-user"/></svg><span class="dock-label">Perfil</span></button>
+</nav>
+</div>
+
+<div class="ov" id="endOv" hidden><div class="mdl" role="dialog" aria-modal="true" aria-labelledby="endTitle"><h3 id="endTitle">Resumo da rodada</h3><p id="endCopy">Resultado e métricas desta prévia local.</p><p class="tourney-meta" id="tourneyMeta" hidden></p><ol class="tourney-standings" id="tourneyStandings" hidden></ol><div class="end-stats" id="endStats"></div><div class="row button-row"><button class="btn btn-secondary sec" id="endClose">Fechar</button><button class="btn btn-secondary sec" id="endMissions">VER MISSÕES</button><button class="btn btn-primary pri" id="nextRound" type="button" hidden>PRÓXIMA RODADA</button></div></div></div>
+<div class="ov" id="pauseOv" hidden><div class="mdl" role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><h3 id="pauseTitle">Partida pausada</h3><p id="pauseCopy">Seu turno e sua mão ficam preservados enquanto você está fora da mesa.</p><div class="row button-row"><button class="btn btn-secondary sec" id="leaveMatch" type="button">Sair para a sala</button><button class="btn btn-primary pri" id="resumeMatch" type="button" data-haptic-kind="important">RETOMAR</button></div></div></div>
+<div class="ov" id="targetPick" hidden><div class="mdl" role="dialog" aria-modal="true" aria-labelledby="targetTitle"><h3 id="targetTitle">Escolha quem observar</h3><p>O Olho mostra a mão de outra pessoa por alguns segundos.</p><div class="target-choices" id="targetChoices"></div><button class="btn btn-secondary sec" id="cancelTarget" type="button">Cancelar</button></div></div>
+<div class="ov" id="colorPick" hidden><div class="mdl" role="dialog" aria-modal="true" aria-labelledby="colorTitle"><h3 id="colorTitle">Escolha a cor</h3><p>Escolha a cor que vale a partir da carta especial.</p><div class="color-choices"><button data-color="r" aria-label="Vermelho">Vermelho</button><button data-color="b" aria-label="Azul">Azul</button><button data-color="g" aria-label="Verde">Verde</button><button data-color="y" aria-label="Amarelo">Amarelo</button></div></div></div>
+<div class="ov" id="friendModal" hidden><section class="mdl friend-actions-modal" role="dialog" aria-modal="true" aria-labelledby="friendModalTitle"><div class="friend-modal-head"><div><h3 id="friendModalTitle">Amigo</h3><small id="friendModalHandle"></small></div><button class="friend-modal-close" type="button" data-friend-modal-close aria-label="Fechar">×</button></div><div id="friendModalBody"></div></section></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const ic=n=>`<svg viewBox="0 0 24 24"><use href="#${n}"/></svg>`;
+const SH={r:'d',b:'c',g:'t',y:'s'},NM={r:'Rubi',b:'Cobalto',g:'Esmeralda',y:'Sol'};
+const AV=[['#c8452c','#f1c9a0','#2f6fed'],['#2f6fed','#d9a67a','#e9a825'],['#1fa86a','#f1c9a0','#e8384f'],['#e9a825','#9b6a45','#3d2d21'],['#3d2d21','#f1c9a0','#e9a825']];
+const av=(i,s=40)=>{const[a,b,c]=AV[i%5];return `<span class="av" style="--s:${s}px"><svg viewBox="0 0 40 40"><rect width="40" height="40" fill="${a}"/><circle cx="20" cy="16" r="7" fill="${b}"/><path d="M6 40c0-9 6-14 14-14s14 5 14 14z" fill="${c}"/></svg></span>`};
+window.chromaAvatar=av;
+const val=v=>v=='blk'?ic('i-block'):v=='rev'?ic('i-rev'):v=='shield'?ic('i-shield'):v=='mirror'?ic('i-mirror'):v=='w'?'COR':v;
+const card=(o,t='div',x='',a='')=>`<${t} class="cd c-${o.c}${o.p===0?' off':''}${x}" ${a}>${o.c!='w'?`<span class="k">${ic('s-'+SH[o.c])}</span>`:''}<b class="v">${val(o.v)}</b>${o.c!='w'?`<span class="k e">${ic('s-'+SH[o.c])}</span>`:''}</${t}>`;
+
+/* navegação */
+function go(id,source=null){
+ const current=$('.scr.on')?.id;
+ if(current&&current!==id)window.chromaHaptic?.(source?.dataset.hapticKind==='important'?'important':'navigation');
+ if(current==='game'&&id!=='game')window.chromaGame?.pause?.('navigation');
+	 if(id==='game'){window.chromaToast?.clear?.();window.chromaGame?.enter?.()}
+	 $$('.scr').forEach(s=>s.classList.toggle('on',s.id==id));
+		 $('#dock').hidden=!['home','rank','shop','soc','prof','characters'].includes(id);
+	 $$('#dock [data-go]').forEach(b=>b.toggleAttribute('aria-current',b.dataset.go==id));
+	 window.ChromaAudio?.setMusicContext?.(id==='lobby'||id==='game');
+	 window.ChromaAudio?.setGameScreenActive?.(id==='game');
+}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(t)go(t.dataset.go,t)});
+
+/* home */
+{const ev=document.querySelector('#events .event-feature h3'),tag=$('#homeEventName');if(ev&&tag)tag.textContent=ev.textContent}
+$('#hdHome').innerHTML=`<div class="me">${av(0,44)}<div><b id="systemHomeName">Jogador</b><small id="systemHomeLevel">Nível 1</small></div></div><div class="hr"><div class="pill bal wallet"><svg class="i" aria-hidden="true"><use href="#i-coin"/></svg><small>Moedas</small><span id="systemHomeCoins">0</span></div><button class="btn sec sq sm" data-go="set" aria-label="Configurações"><svg class="i"><use href="#i-gear"/></svg></button></div>`;
+
+/* lobby */
+const M=[['Clássico','Primeiro a zerar a mão vence. Sem surpresas.','2 a 10 jogadores','10 min','',4],['Caos','+6, +10, Bloqueio Duplo e Coringa Troca','2 a 10 jogadores','10 min','Desde o nível 5',4],['Super Caos','+99, +6, +10 e todas as cartas do Caos','2 a 10 jogadores','10 min','Desde o nível 5',4],['Cor Maldita','A cor muda a cada 8 turnos; jogá-la custa 1 carta','2 a 10 jogadores','10 min','Não ranqueado',4],['Eventos Aleatórios','Uma surpresa a cada 6 turnos livres','2 a 10 jogadores','10 min','Não ranqueado',4],['Torneio','Pontos por colocação e pódio final','2 a 10 jogadores','5 rodadas','',4],['2×2 · Duplas','Exatamente 4 jogadores · a primeira dupla a zerar ganha','4 jogadores','10 min','',4],['3×3 · Trios','Exatamente 9 jogadores · a primeira equipe a zerar ganha','9 jogadores','10 min','',9]];
+ function mode(i){const m=M[i];$('#mN').textContent=m[0];$('#mD').textContent=m[1];$('#mP').textContent=m[2];$('#mT').textContent=m[3];const t=$('#mB');t.textContent=m[4];t.hidden=!m[4];$$('#tabs button').forEach((b,j)=>{b.setAttribute('aria-selected',j==i);if(j==i)b.scrollIntoView({inline:'center',block:'nearest'})});window.chromaGame?.updateLobby?.(i)}
+$('#tabs').innerHTML=M.map((m,i)=>`<button role="tab" data-m="${i}">${m[0]}</button>`).join('');
+$('#tabs').onclick=e=>{const b=e.target.closest('[data-m]');if(b)mode(+b.dataset.m)};
+
+mode(0);
+
+/* partida */
+$('#opps').innerHTML='';$('#disc').innerHTML='';$('#cur').textContent='';$('#hand').innerHTML='';$('#matchLog').innerHTML='';
+$('#gameMessage').textContent='Escolha um modo e comece a partida.';
+
+/* ranking */
+const T=[['Kira',2310,2,'2'],['Dante',2544,1,'1'],['Mei',2102,3,'3']];
+$('#pod').innerHTML=[0,1,2].map(i=>{const t=T[i];return `<div class="pd${t[3]=='1'?' f':''}">${av(t[2],t[3]=='1'?84:60)}<span>${t[0]}</span><small>${t[1].toLocaleString('pt-BR')}</small><div class="blk cut" style="height:${t[3]=='1'?96:t[3]=='2'?72:56}px">${t[3]}</div></div>`}).join('');
+const R=[['04','Léo',1980,4],['05','Sora',1912,0],['06','Bia',1855,2],['07','Teo',1790,3]];
+$('#rows').innerHTML=R.map(r=>`<li><span class="rk">${r[0]}</span>${av(r[3],36)}<span>${r[1]}</span><span class="pt">${r[2].toLocaleString('pt-BR')}</span></li>`).join('')+`<li class="you cut"><span class="rk">12</span>${av(0,36)}<span>Você</span><span class="pt">1.284</span></li>`;
+go('home');
+
+/* loja */
+let bal=Math.max(0,Number(localStorage.getItem('chroma-coins')||0)||0),cat='Cartas',si=0;
+const fmt=n=>n.toLocaleString('pt-BR');
+const RA={C:['Comum','--mu','s-s'],R:['Raro','--rr','s-c'],E:['Épico','--re','s-d'],L:['Lendário','--rl','s-t']};
+const SK=(a,b)=>`--k1:${a};--k2:${b}`;
+const SHOP={
+ Cartas:[{n:'Veio dourado',r:'L',p:1200,t:'cb',s:SK('#7a4a12','#ffd36b'),d:'Verso com veios de ouro puro.'},
+  {n:'Brasa',r:'E',p:800,t:'cb',s:SK('#7a1f14','#ff9a5c'),d:'Verso escuro com brasa viva.'},
+  {n:'Pedra',r:'R',p:300,t:'cb',s:SK('#4d4137','#cdbba5'),d:'Verso de rocha lascada.'}],
+ Mesas:[{n:'Galeria',r:'E',p:900,t:'tb',s:SK('#3b2a1c','#e9a825'),d:'Madeira escura com friso dourado.'},
+  {n:'Túnel',r:'R',p:350,t:'tb',s:SK('#2a2f36','#8aa0b5'),d:'Pedra fria e trilhos de aço.'},
+  {n:'Poço',r:'C',p:120,t:'tb',s:SK('#33261b','#7a5c3e'),d:'A mesa simples de quem está começando.'}]};
+const pv=(o,z)=>o.t=='cb'?`<div class="cd bk skin${o.r=='L'?' leg':''}" style="--cw:${z}px;${o.s}"><b class="v">C</b></div>`
+ :o.t=='av'?av(o.i,Math.round(z*1.15))
+ :`<div class="tbl cut" style="--k:${z*.14}px;width:${z*1.8}px;height:${z*1.1}px;${o.s}"></div>`;
+function shop(){
+ const L=SHOP[cat],o=L[si],ra=RA[o.r],ok=bal>=o.p;
+ $('#feat').innerHTML=`<div class="stage cut"><span class="rar" style="color:var(${ra[1]})"><svg viewBox="0 0 24 24"><use href="#${ra[2]}"/></svg>${ra[0]}</span>${pv(o,104)}</div>
+ <div class="fi"><div><h3>${o.n}</h3><p>${o.d}</p></div><span class="pr">${ic('i-coin')}${fmt(o.p)}</span></div>
+ <button class="btn pri" id="buy" data-haptic-kind="important"${o.own||!ok?' disabled':''}>${o.own?'NO INVENTÁRIO':ok?'COMPRAR':'FALTAM MOEDAS'}</button>`;
+ $('#shelf').innerHTML=L.map((x,i)=>`<button class="it" aria-pressed="${i==si}" data-s="${i}">${pv(x,40)}<b>${x.n}</b><span>${x.own?'Seu':fmt(x.p)}</span></button>`).join('');
+ $$('#cats button').forEach(b=>b.setAttribute('aria-selected',b.dataset.c==cat));
+ $$('.bal').forEach(e=>e.lastChild.textContent=fmt(bal));
+}
+$('#shelf').onclick=e=>{const b=e.target.closest('[data-s]');if(b){if(si!==+b.dataset.s)window.chromaHaptic?.('tap');si=+b.dataset.s;shop()}};
+$('#cats').onclick=e=>{const b=e.target.closest('[data-c]');if(b){cat=b.dataset.c;si=0;shop()}};
+$('#feat').onclick=e=>{if(!e.target.closest('#buy'))return;const o=SHOP[cat][si];
+ $('#mp').innerHTML=pv(o,72);$('#mx').textContent=`${o.n} por ${fmt(o.p)} moedas.`;$('#ov').hidden=false;$('#yes').focus()};
+$('#no').onclick=()=>{window.chromaHaptic?.('tap');$('#ov').hidden=true};
+$('#yes').onclick=()=>{window.chromaHaptic?.('important');const o=SHOP[cat][si];o.own=true;bal-=o.p;$('#ov').hidden=true;shop();window.chromaPreview?.notify(`Compra concluída: ${o.n}.`,'success')};
+$('#ov').onclick=e=>{if(e.target.id=='ov')e.target.hidden=true};
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#ov').hidden=true});
+shop();
+
+/* perfil */
+const AC=[['Primeira vitória','0 de 1',0,'i-trophy'],['Sequência de 5','0 de 5',0,'i-rev'],['Mão limpa','0 de 1',0,'i-card'],['Campeão','0 de 1',0,'i-coin']];
+const OW=[];
+$('#prof').innerHTML=`<div class="who">${av(0,112)}<div><h2 id="systemProfileName">Jogador</h2><span class="plate cut">${ic('i-trophy')}<span id="systemProfileRank">Nível 1</span></span></div></div>
+<div class="prog"><span id="systemProfileLevel">Nível 1</span><i><b id="systemProfileFill" style="width:0%"></b></i><span id="systemProfileXpText">0 / 100 XP</span></div>
+<div class="stats">${[['0','Partidas'],['0','Vitórias'],['0%','Aproveitamento']].map((s,i)=>`<div><b id="${['systemPlayed','systemWins','systemRate'][i]}">${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div>
+<div class="lb">Conquistas</div>
+<div class="ach">${AC.map(a=>`<div class="${a[2]?'':'lk'}"><span class="hx">${ic(a[3])}</span>${a[0]}<small>${a[1]}</small></div>`).join('')}</div>
+<div class="lb">Coleção: 0 de 40</div>
+<div class="own">Nenhum item registrado ainda.</div>`;
+
+/* configurações */
+const SET=[['Som e toque',[['fx','Efeitos sonoros','Sons de carta, botão e vitória.',1],['mu','Música','Trilha do menu e da partida.',1],['vb','Feedback tátil','Resposta tátil ao navegar e acionar controles.',0]]],
+ ['Partida',[['cg','Cartas grandes','Aumenta as cartas da sua mão.',0],['rm','Reduzir movimento','Remove animações que não são essenciais.',0]]]];
+const row=(k,t,h,on)=>`<div class="sr"><div><b>${t}</b><small>${h}</small></div><button class="sw" role="switch" aria-checked="${!!on}" aria-label="${t}" data-k="${k}"><span>${on?'Sim':'Não'}</span><i></i></button></div>`;
+$('#setBody').innerHTML=SET.map(g=>`<h3 class="gh">${g[0]}</h3>${g[1].map(r=>row(...r)).join('')}`).join('')
+ +`<h3 class="gh">Temporada</h3><div class="sr"><div><b>Visual da temporada</b><small>Prévia. No jogo, muda pelo calendário.</small></div></div><div class="seg" id="seg"><button data-ss="1" aria-pressed="true">Mina de Ouro</button><button data-ss="2" aria-pressed="false">Singularidade</button></div><h3 class="gh">Ajuda</h3><button class="btn sec settings-tutorial" data-go="tutorial">COMO JOGAR</button><h3 class="gh">Conta</h3><div class="sr acc">${av(0,48)}<div><b>Nina</b><small>Conectada com o Google</small></div></div><button class="btn dng" id="out">Sair da conta</button><small class="version">Versão 4.8</small>`;
+$('#setBody').onclick=e=>{
+ const s=e.target.closest('.sw');
+ if(s){const on=s.getAttribute('aria-checked')!='true';s.setAttribute('aria-checked',on);s.firstChild.textContent=on?'Sim':'Não';
+  if(s.dataset.k=='vb')window.chromaHaptic?.setEnabled(on);
+  if(s.dataset.k=='cg')$('#app').classList.toggle('bigc',on);
+  if(s.dataset.k=='rm')$('#app').classList.toggle('calm',on)}
+ if(e.target.closest('#out')){$('#ov2').hidden=false;$('#no2').focus()}};
+$('#no2').onclick=()=>{window.chromaHaptic?.('tap');$('#ov2').hidden=true};
+$('#yes2').onclick=()=>{window.chromaHaptic?.('tap');$('#ov2').hidden=true;go('home')};
+$('#ov2').onclick=e=>{if(e.target.id=='ov2')e.target.hidden=true};
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#ov2').hidden=true});
+
+/* passe */
+const LV=7;let prem=false;
+const PL=[...[1,2,3,4].map(l=>[l,{k:'c',a:50*l,d:1},{k:'c',a:100*l}]),
+ [5,{k:'c',a:100,d:1},{k:'s',n:'Pedra',s:SK('#4d4137','#cdbba5')}],
+ [6,{k:'c',a:150,d:1},{k:'c',a:300}],
+ [7,{k:'a',i:3,n:'Mineiro'},{k:'s',n:'Brasa',s:SK('#7a1f14','#ff9a5c')}],
+ [8,{k:'c',a:200},{k:'t',n:'Galeria',s:SK('#3b2a1c','#e9a825')}],
+ [9,{k:'c',a:250},{k:'a',i:1,n:'Capitão'}],
+ [10,{k:'s',n:'Poço',s:SK('#33261b','#7a5c3e')},{k:'s',n:'Veio dourado',s:SK('#7a4a12','#ffd36b'),L:1}],
+ [11,{k:'c',a:300},{k:'c',a:600}],
+ [12,{k:'a',i:4,n:'Aprendiz'},{k:'t',n:'Túnel',s:SK('#2a2f36','#8aa0b5')}]];
+const ri=r=>r.k=='c'?`<span class="cn">${ic('i-coin')}</span>`:r.k=='a'?av(r.i,40):pv({t:r.k=='s'?'cb':'tb',r:r.L?'L':'C',s:r.s},r.k=='s'?30:26);
+const rn=r=>r.k=='c'?`${r.a} moedas`:r.n;
+const rc=(r,l,p)=>{const s=r.d?'done':(l>LV||(p&&!prem))?'lk':'rdy';
+ return `<div class="rc${p?' p cut':''} ${s}">${ri(r)}<span>${rn(r)}</span>${s=='rdy'?'':`<i class="st">${ic(s=='done'?'i-check':'i-lock')}</i>`}</div>`};
+const rdy=()=>PL.flatMap(([l,f,p])=>[[f,l,0],[p,l,1]]).filter(([r,l,q])=>!r.d&&l<=LV&&(!q||prem));
+function pass(){
+ const y=$('#trk').scrollTop;
+ $('#trk').innerHTML=`<div class="lvl th"><span>Gratuito</span><i></i><span>Premium${prem?'':ic('i-lock')}</span></div>`
+  +PL.map(([l,f,p])=>`<div class="lvl${l<=LV?' rch':''}">${rc(f,l,0)}<span class="nd${l<LV?' rch':l==LV?' cur':''}"${l==LV?' id="cur7"':''}>${l}</span>${rc(p,l,1)}</div>`).join('');
+ $('#trk').scrollTop=y;
+ const n=rdy().length;
+ $('#claim').disabled=!n;$('#claim').textContent=n?`REIVINDICAR${n>1?' ('+n+')':''}`:'NADA PARA REIVINDICAR';
+ $('#prem').disabled=prem;$('#prem').textContent=prem?'Ativo':'Desbloquear';
+}
+$('#claim').onclick=()=>{window.chromaHaptic?.('tap');rdy().forEach(([r])=>{r.d=1;if(r.k=='c')bal+=r.a});shop();pass();window.chromaPreview?.notify('Recompensa da temporada reivindicada.','success')};
+$('#prem').onclick=()=>{window.chromaHaptic?.('tap');prem=true;pass();window.chromaPreview?.notify('Passe premium desbloqueado nesta prévia.','success')};
+$('#pbtn').addEventListener('click',()=>setTimeout(()=>$('#cur7').scrollIntoView({block:'center'}),40));
+pass();
+
+/* temporadas: troca de pele */
+const SEASONS={1:['Mina de Ouro',23],2:['Singularidade',58]};
+const T2={'Veio dourado':['Horizonte',SK('#2b1470','#53e3f0'),'Verso com anel de luz em órbita.'],
+ 'Brasa':['Nova',SK('#6b1a5e','#ff5fb8'),'Verso magenta de estrela em colapso.'],
+ 'Pedra':['Meteoro',SK('#3a3358','#b9b0e0'),'Verso de rocha espacial.'],
+ 'Mineiro':['Astronauta',null,'Traje selado e rádio ligado.'],
+ 'Capitão':['Comandante',null,'Guia a nave desde o primeiro turno.'],
+ 'Aprendiz':['Cadete',null,'Todo piloto começa em órbita baixa.'],
+ 'Galeria':['Estação',SK('#1b1540','#53e3f0'),'Painéis escuros com friso ciano.'],
+ 'Túnel':['Nebulosa',SK('#2a1a55','#ff5fb8'),'Roxo profundo e poeira estelar.'],
+ 'Poço':['Órbita',SK('#17123a','#8b7bd9'),'A mesa simples de quem está começando.']};
+const ITEMS=[...Object.values(SHOP).flat(),...PL.flatMap(([,f,p])=>[f,p]).filter(r=>r.n)];
+ITEMS.forEach(o=>{o.n0=o.n;o.s0=o.s;o.t0=typeof o.d=='string'?o.d:null});
+function season(n){
+ const S=SEASONS[n];document.documentElement.dataset.season=n;
+ ITEMS.forEach(o=>{const t=n==2&&T2[o.n0];o.n=t?t[0]:o.n0;o.s=t&&t[1]?t[1]:o.s0;if(o.t0)o.d=t?t[2]:o.t0});
+ $('#sStory').textContent=n==2?'Cada jogada empurra o universo ao colapso.':'Uma corrida pelos veios raros da mina.';
+ $('#sTag').textContent=$('#rTag').textContent='Temporada '+n;$('#sName').textContent=S[0];
+ $('#pSub').textContent=`${S[0]}, termina em ${S[1]} dias`;
+ $$('#seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.ss==n));
+ shop();pass();
+}
+$('#setBody').addEventListener('click',e=>{const b=e.target.closest('[data-ss]');if(b)season(+b.dataset.ss)});
+if(location.hash=='#2')season(2);
+
+window.chromaPreview={addCoins(amount){bal+=Math.max(0,Number(amount)||0);localStorage.setItem('chroma-coins',String(bal));shop();document.dispatchEvent(new Event('chroma-state-changed'))},setCoins(amount){bal=Math.max(0,Number(amount)||0);shop()},setMode(index){mode(index)},notify(message,type){document.dispatchEvent(new CustomEvent('chroma-demo-notice',{detail:{message:String(message||'Ação concluída.'),type}}))}};
+</script>
+<script src="src/components/chroma-haptics.js"></script>
+<script src="src/components/chroma-toast.js"></script>
+  <script src="src/features/chroma-chaos-meter.js"></script>
+  <script src="src/features/chroma-game-engine.js"></script>
+  <script src="src/features/chroma-card-fx.js"></script>
+  <script src="src/features/chroma-audio.js"></script>
+  <script src="src/features/chroma-game.js"></script>
+<script src="src/features/chroma-expansion.js"></script>
+<script src="src/features/chroma-home-grid.js"></script>
+<script src="src/features/chroma-rework-settings.js"></script>
+<script src="src/features/chroma-rework-inputs.js"></script>
+<script src="src/features/chroma-systems.js"></script>
+<script src="src/features/chroma-social-clans.js"></script>
+<script src="src/features/chroma-shop.js"></script>
+<script type="module" src="src/current/firebase-auth.js"></script>
+</body></html>

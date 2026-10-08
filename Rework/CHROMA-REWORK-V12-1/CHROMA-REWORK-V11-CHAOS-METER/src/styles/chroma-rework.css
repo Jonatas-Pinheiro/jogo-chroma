@@ -1,0 +1,257 @@
+/* CHROMA: overrides locais, sem framework ou dependência remota. */
+html {
+  --profile-width: 560px;
+  color-scheme: dark;
+}
+html[data-device-profile="pc"] { --profile-width: 1440px; }
+html[data-device-profile="tablet"] { --profile-width: 1024px; }
+html[data-device-profile="phone"] { --profile-width: 560px; }
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4efe7;
+  --sf: #fffaf3;
+  --sf2: #ebe2d6;
+  --ln: #d3c5b4;
+  --tx: #30251c;
+  --mu: #6d5d4e;
+  --ac: #e9a825;
+  --acd: #966008;
+  --ss: #bd4933;
+  --sg: #b78415;
+  --d: #fffdf9;
+  --er: #bd342a;
+  --ov: #21170fa8;
+  --mm: #514233;
+}
+html[data-season="2"][data-theme="light"] {
+  --bg: #f2eff8;
+  --sf: #fffaff;
+  --sf2: #e9e3f3;
+  --ln: #c9bfd9;
+  --tx: #292238;
+  --mu: #665c76;
+  --ac: #d94298;
+  --acd: #8c235e;
+  --ss: #6743c7;
+  --sg: #158e9c;
+  --d: #fffaff;
+  --er: #bf3565;
+  --ov: #1b1232aa;
+  --mm: #4d4264;
+}
+
+/* Os perfis limitam o envelope visual, não alteram a resolução física nem o viewport. */
+#app.app {
+  width: min(100%, var(--profile-width));
+  max-width: var(--profile-width);
+  min-width: 0;
+  min-height: 100dvh;
+  height: 100dvh;
+  margin-inline: auto;
+  overflow: hidden;
+}
+#app > .scr {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding-inline: clamp(12px, 2.6vw, 36px);
+}
+html[data-device-profile="pc"] #app > .col { max-width: min(100%, 1200px); }
+html[data-device-profile="tablet"] #app > .col { max-width: min(100%, 900px); }
+html[data-device-profile="phone"] #app > .col { max-width: 100%; }
+#game {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+#hand { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+#set { overflow-x: hidden; overflow-y: auto; }
+#shop.col { max-width: min(100%, 1200px); }
+
+/* Os PNGs do pacote são monocromáticos brancos; invertê-los preserva contraste no tema claro. */
+.raster-ui-icon { width: 100%; height: 100%; object-fit: contain; }
+html[data-theme="light"] .raster-ui-icon:not(.raster-ui-icon--card) { filter: invert(1); }
+html[data-theme="light"] .raster-ui-icon--card { filter: none; }
+/* Imagens dentro de um SVG referenciado por <use> não recebem a regra por descendência no Chrome. */
+html[data-theme="light"] svg.i { filter: invert(1); }
+html[data-theme="light"] .dock svg { filter: invert(1); }
+.appearance-settings img,
+.settings-choice img,
+.controller-legend img { width: 22px; height: 22px; object-fit: contain; flex: 0 0 auto; }
+html[data-theme="light"] .appearance-settings img,
+html[data-theme="light"] .controller-legend img { filter: invert(1); }
+
+.appearance-settings {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 12px auto 22px;
+  padding: clamp(14px, 2vw, 22px);
+  border: 1px solid var(--ln);
+  border-radius: 18px;
+  background: var(--sf);
+  color: var(--tx);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--sf2), transparent 15%);
+}
+.appearance-settings > h3 { margin: 0 0 14px; color: var(--ac); font: 400 20px/1.15 var(--fd); }
+.appearance-settings .appearance-block { margin-top: 16px; }
+.appearance-settings .appearance-label { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-weight: 800; }
+.appearance-settings .appearance-help { display: block; margin-top: 7px; color: var(--mu); font-size: 12px; line-height: 1.45; }
+.settings-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.settings-choice button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--ln);
+  border-radius: 11px;
+  background: var(--sf2);
+  color: var(--tx);
+  font: 800 13px/1.1 var(--fm);
+  cursor: pointer;
+}
+.settings-choice button[aria-pressed="true"] {
+  border-color: var(--ac);
+  box-shadow: inset 0 0 0 1px var(--ac), 0 2px 0 var(--acd);
+}
+.settings-choice img { width: 21px; height: 21px; }
+html[data-theme="light"] .settings-choice img { filter: invert(1); }
+.appearance-settings select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--ln);
+  border-radius: 10px;
+  background: var(--sf2);
+  color: var(--tx);
+  font: 700 14px var(--fm);
+}
+.appearance-settings :focus-visible,
+.emote-grid button:focus-visible { outline: 3px solid var(--ac); outline-offset: 2px; }
+
+.input-legend,
+.controller-legend {
+  box-sizing: border-box;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  width: min(100%, 1050px);
+  margin: 4px auto 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--ln);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sf), transparent 10%);
+  color: var(--mu);
+  font: 700 11px/1.3 var(--fm);
+}
+.input-legend { display: none; }
+html[data-device-profile="pc"] #inputLegend { display: flex; }
+.controller-legend:not([hidden]) { display: flex; }
+.input-legend__item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.input-legend img { width: 22px; height: 22px; object-fit: contain; }
+.input-legend kbd,
+.controller-legend kbd {
+  padding: 2px 5px;
+  border: 1px solid var(--ln);
+  border-radius: 5px;
+  background: var(--sf2);
+  color: var(--tx);
+  font: 800 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.control-key { display: none; align-items: center; margin-left: 7px; vertical-align: middle; }
+.control-key img { display: block; width: 22px; height: 22px; object-fit: contain; border-radius: 4px; }
+html[data-device-profile="pc"] .control-key { display: inline-flex; }
+#pauseGame { position: relative; }
+#pauseGame .control-key { position: absolute; top: -4px; right: -4px; margin: 0; }
+#pauseGame .control-key img { width: 17px; height: 17px; }
+
+.quick-menu {
+  position: fixed;
+  z-index: 1200;
+  inset: 12px;
+  width: min(calc(100vw - 24px), 900px);
+  max-height: min(82dvh, 640px);
+  min-height: 0;
+  box-sizing: border-box;
+  margin: auto;
+  padding: 14px;
+  border: 1px solid var(--ln);
+  border-radius: 16px;
+  background: var(--sf);
+  color: var(--tx);
+  box-shadow: 0 18px 55px var(--ov);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.emote-picker {
+  margin: 12px 0;
+  padding: 10px;
+  border: 1px solid var(--ln);
+  border-radius: 12px;
+  background: var(--sf);
+}
+.emote-picker-title { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: var(--tx); font-weight: 800; }
+.emote-picker-title small { color: var(--mu); font-size: 10px; font-weight: 700; }
+.emote-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; }
+.emote-grid button {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 46px;
+  padding: 4px;
+  border: 1px solid var(--ln);
+  border-radius: 9px;
+  background: var(--sf2);
+  cursor: pointer;
+}
+.emote-grid button:hover { border-color: var(--ac); transform: translateY(-1px); }
+.emote-grid img { display: block; width: 32px; height: 38px; object-fit: contain; image-rendering: auto; }
+.emote-feedback { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.emote-feedback img { width: 32px; height: 38px; object-fit: contain; }
+
+/* Cursores personalizados só em ponteiros finos; nenhum estilo altera toque/caneta. */
+@media (hover: hover) and (pointer: fine) {
+  html[data-cursor-style="kenney-outline"] body,
+  html[data-cursor-style="kenney-outline"] #app { cursor: url("../../assets/chroma-ui/cursors/pointer-outline.png") 0 0, auto; }
+  html[data-cursor-style="kenney-outline"] button,
+  html[data-cursor-style="kenney-outline"] a,
+  html[data-cursor-style="kenney-outline"] [role="button"],
+  html[data-cursor-style="kenney-outline"] [data-card-id] { cursor: url("../../assets/chroma-ui/cursors/hand-outline.png") 6 4, pointer; }
+  html[data-cursor-style="kenney-shaded"] body,
+  html[data-cursor-style="kenney-shaded"] #app { cursor: url("../../assets/chroma-ui/cursors/pointer-shaded.png") 0 0, auto; }
+  html[data-cursor-style="kenney-shaded"] button,
+  html[data-cursor-style="kenney-shaded"] a,
+  html[data-cursor-style="kenney-shaded"] [role="button"],
+  html[data-cursor-style="kenney-shaded"] [data-card-id] { cursor: url("../../assets/chroma-ui/cursors/hand-shaded.png") 6 4, pointer; }
+  html[data-cursor-style="system"] button,
+  html[data-cursor-style="system"] a,
+  html[data-cursor-style="system"] [role="button"],
+  html[data-cursor-style="system"] [data-card-id] { cursor: pointer; }
+}
+
+@media (max-width: 640px) {
+  #app.app { width: min(100%, var(--profile-width)); }
+  #game { padding-inline: 10px; }
+  .input-legend, .controller-legend { justify-content: flex-start; gap: 6px 9px; }
+  .emote-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .appearance-settings { padding: 14px; }
+}
+@media (max-width: 360px) {
+  #app > .scr { padding-inline: 10px; }
+  .emote-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .settings-choice button { flex: 1 1 40%; padding-inline: 8px; }
+}
+@media (max-height: 640px) {
+  #game { overflow-y: auto; }
+  .input-legend, .controller-legend { margin-block: 2px 6px; padding-block: 5px; }
+}

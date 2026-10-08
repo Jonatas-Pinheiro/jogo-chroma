@@ -1,0 +1,221 @@
+/* CHROMA — loja responsiva e cosméticos aplicáveis */
+#shopStorage {
+  grid-area: st;
+  margin: -3px 0 9px;
+  color: var(--mu);
+  font: 800 11px/1.4 var(--fm);
+}
+#cats.shop-categories {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  gap: 6px;
+  margin: auto 0 12px;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+#cats.shop-categories::-webkit-scrollbar { display: none; }
+#cats.shop-categories button {
+  flex: 0 0 auto;
+  min-width: 92px;
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 0;
+  border-bottom: 3px solid var(--ln);
+  background: transparent;
+  color: var(--mu);
+  font: 400 15px/1.05 var(--fd);
+  white-space: nowrap;
+  cursor: pointer;
+}
+#cats.shop-categories button[aria-selected="true"] {
+  border-color: var(--sg);
+  color: var(--tx);
+}
+#cats.shop-categories button:focus-visible { outline-offset: -2px; }
+#shelf .it { min-width: 0; }
+#shelf .it b { max-width: 100%; overflow-wrap: anywhere; text-align: center; }
+#shelf .it.selected { border-color: var(--sg); }
+#feat .featured-cosmetic { display: grid; place-items: center; min-width: 0; }
+#feat .stage { overflow: hidden; }
+#feat .fi { flex-wrap: wrap; }
+#feat .fi > div { min-width: 0; }
+#feat .fi h3, #feat .fi p { overflow-wrap: anywhere; }
+#feat .pr { white-space: nowrap; }
+.shop-name-preview {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: var(--tx);
+  font: 400 clamp(22px, 7vw, 34px)/1.15 var(--fd);
+  text-align: center;
+}
+.shop-avatar {
+  display: grid;
+  width: 64px;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 4px solid var(--tx);
+  border-radius: 50%;
+  background: var(--sf2);
+  color: var(--tx);
+  font: 400 30px/1 var(--fd);
+  box-shadow: 0 3px 0 #0005;
+}
+.shop-card-preview {
+  display: grid;
+  width: 61px;
+  height: 82px;
+  place-items: center;
+  border: 3px solid var(--tx);
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--preview-a) 0 51%, var(--d) 51%);
+  color: var(--preview-b);
+  box-shadow: 0 4px 0 #0005;
+}
+.shop-card-preview b { font: 400 34px/1 var(--fd); }
+.shop-table-preview {
+  display: block;
+  width: min(190px, 52vw);
+  height: 94px;
+  border: 4px solid var(--preview-b);
+  background: linear-gradient(140deg, var(--preview-a), color-mix(in srgb, var(--preview-a), var(--d) 34%));
+  box-shadow: inset 0 -8px 0 #0002, 0 5px 0 #0005;
+  clip-path: polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+}
+#mp .shop-avatar { width: 58px; }
+
+/* Efeitos de nome: deliberadamente estáticos e legíveis sobre as superfícies do jogo. */
+.name-effect-gold {
+  color: #ffd36b !important;
+  text-shadow: 0 1px 0 #75480d, 0 0 7px #e9a82555;
+}
+.name-effect-diamond {
+  color: #bdf4ff !important;
+  text-shadow: 0 1px 0 #185264, 0 0 7px #58c4dd66;
+}
+.name-effect-flame {
+  color: #ffad70 !important;
+  text-shadow: 0 1px 0 #70230f, 0 0 7px #ff5a4d55;
+}
+.name-effect-ice {
+  color: #9deaff !important;
+  text-shadow: 0 1px 0 #174b72, 0 0 6px #53e3f066;
+}
+#prof #systemProfileName { overflow-wrap: anywhere; }
+
+/* Molduras e avatares afetam o retrato do jogador nas superfícies já existentes. */
+.profile-frame-gold { box-shadow: 0 0 0 2px var(--d), 0 0 0 5px #e9a825, 0 3px 8px #0007 !important; }
+.profile-frame-void { box-shadow: 0 0 0 2px var(--d), 0 0 0 5px #8b7bd9, 0 3px 8px #0007 !important; }
+.profile-frame-fire { box-shadow: 0 0 0 2px var(--d), 0 0 0 5px #c8452c, 0 3px 8px #0007 !important; }
+.av[data-cosmetic-avatar] {
+  display: inline-grid;
+  place-items: center;
+  border-color: var(--tx);
+  color: var(--tx);
+  font: 400 24px/1 var(--fd);
+}
+.av[data-cosmetic-avatar] > svg { display: none; }
+.av[data-cosmetic-avatar]::after { content: attr(data-cosmetic-avatar); }
+.av.avatar-miner { background: linear-gradient(145deg, #3d2d21, #a86a06) !important; }
+.av.avatar-captain { background: linear-gradient(145deg, #2f6fed, #17110d) !important; }
+.av.avatar-apprentice { background: linear-gradient(145deg, #1fa86a, #2c2119) !important; }
+
+/* Variações sutis: preservam a leitura das cores e do centro da carta. */
+#game .cd.cosmetic-card-gold { border-color: #ffd36b !important; box-shadow: 0 0 0 2px #6f4812, 0 4px 0 #0006 !important; }
+#game .cd.cosmetic-card-ember { border-color: #ff9a5c !important; box-shadow: 0 0 0 2px #6f2114, 0 4px 0 #0006 !important; }
+#game .cd.cosmetic-card-stone { border-color: #cdbba5 !important; box-shadow: 0 0 0 2px #51463d, 0 4px 0 #0006 !important; }
+#game .table.table-skin-gallery { background: linear-gradient(145deg, #3b2a1c, #241910) !important; box-shadow: inset 0 0 0 4px #e9a825; }
+#game .table.table-skin-tunnel { background: linear-gradient(145deg, #343940, #20242b) !important; box-shadow: inset 0 0 0 4px #8aa0b5; }
+#game .table.table-skin-pit { background: linear-gradient(145deg, #33261b, #211810) !important; box-shadow: inset 0 0 0 4px #7a5c3e; }
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .app { max-width: 720px; border-inline: 2px solid var(--ln); }
+  .scr { padding-inline: 28px; }
+  #shop.col { max-width: 680px; }
+  #shop .shelf { gap: 12px; }
+}
+@media (min-width: 900px) {
+  #shop.on {
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas: "h h" "st st" "f s" "c c";
+    column-gap: 48px;
+  }
+  #shopStorage { margin-bottom: 4px; }
+  #cats.shop-categories { justify-content: center; overflow-x: visible; gap: 5px; }
+  #cats.shop-categories button { flex: 1 1 0; min-width: 0; }
+}
+@media (max-width: 420px) {
+  #shopStorage { font-size: 10px; }
+  #feat .fi { gap: 8px; }
+  #feat .fi h3 { font-size: 27px; }
+  #cats.shop-categories button { min-width: 88px; padding-inline: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-effect-gold, .name-effect-diamond, .name-effect-flame, .name-effect-ice { animation: none !important; }
+}
+
+.season-story {
+  max-width: 38ch;
+  margin-top: 8px;
+  color: var(--mu);
+  font: 800 12px/1.45 var(--fm);
+  text-wrap: pretty;
+}
+
+/* Social: apelidos privados, menu de amizade e entrega de presentes. */
+.friend-identity { flex: 1; min-width: 0; }
+.friend-identity b, .friend-identity small { display: block; overflow-wrap: anywhere; }
+.friend-identity b { font: 400 17px/1.15 var(--fd); }
+.friend-identity small { margin-top: 4px; color: var(--mu); font-size: 12px; }
+.friend-menu-button { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf2); color: var(--tx); cursor: pointer; }
+.friend-menu-button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.friend-menu-button:hover { border-color: var(--sg); color: var(--sg); }
+.friend-actions-modal { max-height: min(82vh, 720px); overflow-y: auto; text-align: left; }
+.friend-modal-head { display: flex; align-items: center; gap: 12px; margin: -4px 0 16px; }
+.friend-modal-head > div { min-width: 0; flex: 1; }
+.friend-modal-head b, .friend-modal-head small { display: block; overflow-wrap: anywhere; }
+.friend-modal-head b { font: 400 23px/1.1 var(--fd); }
+.friend-modal-head small { margin-top: 4px; color: var(--mu); font-size: 12px; }
+.friend-modal-close { width: 40px; height: 40px; flex: none; border: 0; border-radius: 10px; background: var(--sf2); color: var(--tx); font: 400 27px/1 var(--fd); cursor: pointer; }
+.friend-action-list { display: grid; gap: 9px; }
+.friend-action-list .btn { width: 100%; min-height: 48px; padding: 11px 14px; text-align: left; font: 800 14px var(--fm); }
+.friend-action-list .friend-action-danger { background: var(--er); color: var(--d); box-shadow: 0 5px 0 #8a2018; }
+.friend-action-list .friend-action-danger:active { transform: translateY(4px); box-shadow: 0 1px 0 #8a2018; }
+.friend-modal-copy { margin: 4px 0 14px; color: var(--mu); font-size: 13px; line-height: 1.5; }
+.friend-modal-back { width: 100%; margin-top: 14px; }
+.friend-gift-list { display: grid; gap: 8px; max-height: 48vh; overflow-y: auto; padding: 0; list-style: none; }
+.friend-gift-item { display: grid; grid-template-columns: 42px minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--ln); }
+.friend-gift-art { width: 38px; height: 42px; display: grid; place-items: center; border: 2px solid var(--sg); border-radius: 8px; background: var(--sf2); color: var(--tx); font: 400 20px var(--fd); }
+.friend-gift-art.avatar { border-radius: 50%; }
+.friend-gift-item b, .friend-gift-item small { display: block; overflow-wrap: anywhere; }
+.friend-gift-item b { font: 400 16px var(--fd); }
+.friend-gift-item small { color: var(--mu); font-size: 11px; }
+.friend-gift-item .btn { min-height: 38px; padding: 7px 10px; font-size: 12px; }
+.friend-nickname-field { margin: 10px 0 14px; text-align: left !important; }
+.friend-modal-buttons { display: flex; gap: 9px; }
+.friend-modal-buttons .btn { flex: 1; min-height: 46px; padding: 9px 12px; font-size: 14px; }
+.friend-profile-card { padding: 16px; margin: 8px 0 4px; background: var(--sf2); border-left: 4px solid var(--sg); }
+.friend-profile-card b, .friend-profile-card small { display: block; }
+.friend-profile-card b { font: 400 20px var(--fd); }
+.friend-profile-card small { margin-top: 6px; color: var(--mu); }
+.friend-toast { position: fixed; z-index: 110; top: max(14px, calc(env(safe-area-inset-top, 0px) + 14px)); left: 50%; width: min(440px, calc(100vw - 28px)); transform: translateX(-50%); display: grid; gap: 5px; padding: 13px 16px; border: 1px solid var(--ln); border-left: 5px solid var(--sg); border-radius: 14px; background: linear-gradient(135deg, var(--sf2), var(--sf)); color: var(--tx); text-align: left; box-shadow: 0 10px 30px #0008; cursor: pointer; animation: friend-toast-in .2s ease-out; }
+.friend-toast[hidden] { display: none; }
+.friend-toast small { color: var(--sg); font: 800 10px var(--fm); letter-spacing: .12em; }
+.friend-toast b { font: 800 13px/1.35 var(--fm); }
+.friend-toast span { color: var(--mu); font-size: 11px; }
+@keyframes friend-toast-in { from { opacity: 0; transform: translate(-50%, -8px); } }
+#inventoryGrid .inventory-item { min-width: 0; }
+#inventoryGrid .inventory-item .inventory-art { grid-row: span 2; }
+#inventoryGrid .inventory-empty { grid-column: 1 / -1; padding: 18px 0; color: var(--mu); }
+@media (max-width: 520px) {
+  .friend-actions-modal { padding: 19px 16px 16px; }
+  .friend-gift-item { grid-template-columns: 36px minmax(0,1fr) auto; gap: 7px; }
+  .friend-gift-art { width: 34px; height: 38px; }
+  .friend-gift-item .btn { padding-inline: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .friend-toast { animation: none; } }
