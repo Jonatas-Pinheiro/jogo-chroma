@@ -1,0 +1,4 @@
+/* Fundo interativo da tela inicial (canvas #homeGrid). Aparece só quando #home está ativa. */
+.app{position:relative;isolation:isolate}
+.home-grid{display:none;position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;-webkit-mask-image:radial-gradient(circle at center,#000 55%,transparent 100%);mask-image:radial-gradient(circle at center,#000 55%,transparent 100%)}
+#home.on ~ .home-grid{display:block}

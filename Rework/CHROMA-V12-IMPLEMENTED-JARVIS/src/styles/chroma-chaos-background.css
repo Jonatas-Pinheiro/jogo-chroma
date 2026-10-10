@@ -1,0 +1,21 @@
+/* Fundo atmosférico exclusivo dos modos Caos e Super Caos. */
+#game[data-mode="caos"],
+#game[data-mode="supercaos"] {
+  position: relative;
+  isolation: isolate;
+  background-color: #000;
+}
+
+#game[data-mode="caos"]::before,
+#game[data-mode="supercaos"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("../../assets/chroma-chaos/volcanic-rocks.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.14;
+}

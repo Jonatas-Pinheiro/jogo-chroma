@@ -1,0 +1,92 @@
+  PASS T01 sem login -> AUTH_LOADING -> UNAUTHENTICATED; recursos pedem login
+  PASS T02 login e-mail/senha: Auth -> UID -> perfil -> pronto, sem estado intermediário incorreto
+  PASS T03 atualizar a página logado restaura a sessão sem duplicar perfil
+  PASS T04 Google resulta na mesma arquitetura; vínculo com conta e-mail/senha existente sem duplicar
+  PASS T05/T06 Social e Clãs funcionam autenticado, com o mesmo UID, sem mensagem de deslogado
+  PASS T07 permission-denied: erro REAL, sessão preservada, nunca "deslogado/internet"
+  PASS T08 unavailable/rede: falha de comunicação, sessão preservada, progresso local mantido e reenviado
+  PASS T09 alterar username salva no Firestore e mantém o estado local consistente
+  PASS T10 comprar/equipar/debitar usam o UID da sessão atual
+  PASS T11 trocar de conta: dados da anterior NÃO aparecem na nova
+  PASS T12 deslogar limpa e re-renderiza todo estado dependente da conta
+  PASS T13 sessão antiga terminando depois de uma nova NÃO sobrescreve a conta atual
+  PASS T14 sincronização: nada antes de pronto; debounce; fila serial; sem loop
+  PASS T15 classificação central de erros
+  PASS T16 erro do observador -> AUTH_ERROR; falha de publicProfiles não derruba a sessão e não é engolida
+  PASS T17 publica rankedBoard com UID atual e expõe todos os jogadores
+  PASS T18 eventos e participação usam o documento eventId__uid
+  PASS T19 presente é transferido imediatamente, sem aceite, com aviso único ao destinatário
+
+Todos os 18 testes passaram (Firebase simulado em memória)
+[32m✔ src/current/auth-session.test.mjs [90m(7881.991804ms)[39m[39m
+[32m✔ música inicia após interação no Lobby e também no jogo, pausando ao sair desses contextos [90m(3.287625ms)[39m[39m
+[32m✔ controles independentes de volume e habilitação são persistidos [90m(1.252187ms)[39m[39m
+[32m✔ card-fan-1 e card-fan-2 tocam em sequência somente no início da partida [90m(202.368606ms)[39m[39m
+[32m✔ som de colocação alterna exclusivamente entre os quatro card-place e é silenciado pelas preferências [90m(1.799747ms)[39m[39m
+[32m✔ todos os efeitos declarados existem e a trilha entregue está conectada [90m(1.712977ms)[39m[39m
+[32m✔ classificação do medidor cobre exatamente as cinco faixas e os limites adjacentes [90m(5.244596ms)[39m[39m
+[32m✔ a intensidade cresce gradualmente a partir de 60, sem alterar a faixa definida [90m(2.488913ms)[39m[39m
+[32m✔ integração real de +2, +4, +6, +10 e +99 atualiza pending, faixa, valor e impacto visual [90m(12.309337ms)[39m[39m
+[32m✔ Espelho preserva o acúmulo real e dispara a onda visual do medidor [90m(0.832984ms)[39m[39m
+[32m✔ colapso exato encerra visualmente em COLAPSO!, libera a barra e volta para ESTÁVEL [90m(2.993046ms)[39m[39m
+[32m✔ acúmulos acima de 150 aguardam a sequência visual e depois sorteiam um alvo para exatamente +150 [90m(2.528739ms)[39m[39m
+[32m✔ o medidor só aparece em partidas Super Caos ativas, e ULTRA LEVE zera os efeitos extras [90m(0.755752ms)[39m[39m
+[32m✔ partículas só são habilitadas no estado de Sobrecarga ou na ruptura, nunca em Estável [90m(0.545765ms)[39m[39m
+[32m✔ layout mobile respeita o limite aproximado de 15% e preserva dimensões distintas em tablet/desktop [90m(1.004028ms)[39m[39m
+[32m✔ preferência legada chroma-light e classe lightweight são reconhecidas sem alterar a lógica [90m(0.733971ms)[39m[39m
+[32m✔ HTML carrega o componente isolado antes do controlador, e CSS desativa animações sob movimento reduzido [90m(1.697734ms)[39m[39m
+[32m✔ curingas da mão mantêm cor e brilho da mesa sem perder o estado não jogável [90m(1.665601ms)[39m[39m
+[32m✔ Personagens é um destino navegável da dock e mantém o aviso com texto exato [90m(1.621637ms)[39m[39m
+[32m✔ a dock usa seis colunas flexíveis e rótulos que podem quebrar em telas estreitas [90m(0.282157ms)[39m[39m
+[32m✔ os modos mantêm as cartas especiais por configuração e Espelho depende do acúmulo [90m(4.690926ms)[39m[39m
+[32m✔ Super Caos sorteia qualquer jogador para +150 ao ultrapassar o limite e encerra a cadeia [90m(4.887054ms)[39m[39m
+[32m✔ Super Caos também colapsa quando +99 atinge exatamente 150 [90m(3.215597ms)[39m[39m
+[32m✔ o Escudo ainda absorve o +150 depois do sorteio e a resolução não se duplica [90m(0.82945ms)[39m[39m
+[32m✔ pausar durante o colapso preserva a partida e devolve um turno completo ao retomar [90m(1.103814ms)[39m[39m
+[32m✔ Bloqueio e Inverter avançam corretamente; Inverter em dois jogadores devolve a vez [90m(0.947091ms)[39m[39m
+[32m✔ a compra normal libera somente a carta comprada; passar consome o turno [90m(1.906073ms)[39m[39m
+[32m✔ um Coringa +4 não pode ser usado com a cor atual na mão; Coringa exige escolha de cor [90m(0.702631ms)[39m[39m
+[32m✔ acúmulo +2 é absorvido pelo Escudo e a vez é encerrada sem cartas [90m(0.658049ms)[39m[39m
+[32m✔ Espelho devolve todo o acúmulo ao jogador anterior sem inverter o sentido [90m(0.830663ms)[39m[39m
+[32m✔ Cor Maldita cobra uma carta após o efeito, mas não cobra a última carta vencedora [90m(0.856392ms)[39m[39m
+[32m✔ timeout consome uma única época e exatamente o acúmulo existente [90m(0.427191ms)[39m[39m
+[32m✔ saída de quem está no turno avança época/contagem, aplica eventos e limpa carta comprada obsoleta [90m(1.018738ms)[39m[39m
+[32m✔ sair no sentido anti-horário escolhe a pessoa anterior como novo turno [90m(0.369477ms)[39m[39m
+[32m✔ quando sobra uma pessoa, a partida encerra e limpa compra, carta comprada e relógio [90m(0.408099ms)[39m[39m
+[32m✔ pausar e retomar preserva mão, turno, acúmulo e tempo restante [90m(0.496213ms)[39m[39m
+[32m✔ ações repetidas com o mesmo identificador não removem duas cartas [90m(0.420712ms)[39m[39m
+[32m✔ Torneio soma pontos por colocação e mantém o placar ao iniciar a rodada seguinte [90m(1.212012ms)[39m[39m
+[32m✔ a quinta rodada encerra o Torneio e escolhe o campeão pelo placar acumulado [90m(0.603771ms)[39m[39m
+[32m✔ criar uma partida com roster explícito preserva vagas vazias sem adicionar bots [90m(0.426787ms)[39m[39m
+[32m✔ todas as imagens, scripts e folhas de estilo locais do HTML existem [90m(5.737645ms)[39m[39m
+[32m✔ URLs locais do CSS de rework apontam para assets existentes [90m(0.628724ms)[39m[39m
+[32m✔ todos os 30 botões de emote usam apenas PNGs Style 1 [90m(1.280931ms)[39m[39m
+[32m✔ o spritesheet de interface usa imagens locais do pacote nos 20 símbolos principais [90m(0.605259ms)[39m[39m
+[32m✔ preferências de tema/perfil/ponteiro são válidas e persistidas localmente [90m(0.552405ms)[39m[39m
+[32m✔ legenda de teclado fica só no perfil PC e legenda de controle depende de conexão [90m(0.377061ms)[39m[39m
+[32m✔ atalhos PC e entrada de controle usam ações existentes e detecção de conexão [90m(0.299653ms)[39m[39m
+[32m✔ cursores personalizados ficam limitados a ponteiros precisos [90m(0.459634ms)[39m[39m
+[32m✔ Loja remove apenas a categoria Avatares e mantém os cosméticos de avatar no catálogo interno [90m(1.829635ms)[39m[39m
+[32m✔ compras e equipamentos usam a moeda existente e preservam o armazenamento local ou a transação Firebase [90m(0.371993ms)[39m[39m
+[32m✔ efeitos de nome têm catálogo, visualização e aplicação ao jogador [90m(0.441425ms)[39m[39m
+[32m✔ Mina de Ouro e Singularidade têm narrativas curtas sob o título sazonal [90m(0.241149ms)[39m[39m
+[32m✔ interface da Loja inclui a folha responsiva e não adiciona etapa de build [90m(0.381719ms)[39m[39m
+[32m✔ lista Social usa menu hambúrguer e o modal expõe os quatro comandos pedidos [90m(1.413308ms)[39m[39m
+[32m✔ apelidos são privados por UID e ficam acima do handle oficial [90m(0.40374ms)[39m[39m
+[32m✔ presente é transferido na transação e gera notificação em tempo real sem resgate [90m(0.541306ms)[39m[39m
+[32m✔ documentação informa que as regras do projeto Firebase não vieram na ZIP [90m(0.226751ms)[39m[39m
+[32m✔ perfil local novo inicia progresso, passe, moedas e amizades em zero/vazio [90m(6.395758ms)[39m[39m
+[32m✔ perfil já identificado por UID mantém os dados locais espelhados da conta remota [90m(1.564768ms)[39m[39m
+[32m✔ amizade em modo sem login é explícita, local e removível [90m(2.155645ms)[39m[39m
+[32m✔ a prévia local do clã não injeta nem intercepta amizades fictícias [90m(0.635937ms)[39m[39m
+[32m✔ partida concluída concede XP, atualiza passe/estatísticas uma vez e ignora evento repetido [90m(1.337798ms)[39m[39m
+[32m✔ botão Google dinâmico chama o login real disponibilizado pelo Firebase Auth [90m(1.467057ms)[39m[39m
+[32m✔ login por e-mail abre Entrar e alterna no mesmo modal para Criar conta via Firebase Auth [90m(1.903423ms)[39m[39m
+[34mℹ tests 64[39m
+[34mℹ suites 0[39m
+[34mℹ pass 64[39m
+[34mℹ fail 0[39m
+[34mℹ cancelled 0[39m
+[34mℹ skipped 0[39m
+[34mℹ todo 0[39m
+[34mℹ duration_ms 7897.69429[39m
